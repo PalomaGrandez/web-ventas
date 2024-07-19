@@ -1,0 +1,50 @@
+﻿@page "/confirmacion-compra"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Pedido Realizado</PageTitle>
+<div style="height:20px" />
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudGrid Justify="Justify.Center">
+        <MudItem lg="12">
+            <MudCard Elevation="3">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h4" Align="Align.Center">Pedido N°2023-08-000001  Realizado exitosamente!!!</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid Justify="Justify.Center">
+                        <MudItem lg="12">
+                            <MudText Typo="Typo.body1" Align="Align.Center">Puede realizar su pago mediante Yape o Plin, luego debe enviarnos el compobante al correo ventas@fabricaentradas.pe con el Asunto: Pago Pedido N° xxxx-xx-xxxxxx, una vez validado el pago el pedido sera aprobado y podra descargar sus entradas desde la sección Mis Pedidos</MudText>
+                        </MudItem>
+                        <MudItem lg="12" >
+                            <div class="d-flex justify-center" >
+                                <MudImage Height="500" ObjectPosition="ObjectPosition.Center" Src="pago/formas-pago.png"  Class="rounded-lg"  ObjectFit="ObjectFit.Contain" Fluid= "true" Style="max-height:500px"/>
+                            </div>
+                        </MudItem>
+                        <MudItem lg="12">
+                            <MudText Typo="Typo.h5" Align="Align.Center">Muchas gracias por su compra!!! </MudText>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudGrid Justify="Justify.Center">
+                        <MudItem lg="12" Class="d-flex justify-center">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Home" Color="Color.Success" OnClick="Inicio">
+                                Aceptar
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private void Inicio()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

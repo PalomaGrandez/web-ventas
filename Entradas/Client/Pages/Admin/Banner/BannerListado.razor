@@ -1,0 +1,116 @@
+﻿@page "/admin/banner/banner-listado"
+
+@inject IBannerService BannerService
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <PageTitle>@tituloPagina</PageTitle>
+
+        <div style="height:20px"></div>
+
+        <MudContainer MaxWidth="MaxWidth.Large">
+            <MudCard Elevation="3" Class="p-2 m-2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">@tituloPagina</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                       Variant="Variant.Filled"
+                                       Size="Size.Large"
+                                       Color="Color.Success"
+                                       Style="border-radius:20px"
+                                       Title="Nuevo Banner"
+                                       OnClick="Nuevo">
+                        </MudIconButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    @* <MudTextField @bind-Value="busqueda" Placeholder="Busqueda" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
+                    AdornmentColor="Color.Info" IconSize="Size.Medium" Variant="Variant.Outlined" Class="mt-0"></MudTextField> *@
+                </MudCardContent>
+            </MudCard>
+
+            <MudTable Items="@BannerService.Banners" Context="tableContext" Hover="true" Striped="true" Elevation="3" Loading="@_cargando" Breakpoint="Breakpoint.Sm" Dense="true" Class="p-2 m-2">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>Imagen</MudTh>
+                    <MudTh>Activo</MudTh>
+                    <MudTh>Actualizar</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="ID">@tableContext.BannerId</MudTd>
+                    <MudTd DataLabel="Imagen">@tableContext.Imagen</MudTd>
+                    <MudTd DataLabel="Activo">
+                        <MudSwitch T="bool"
+                                   @bind-Checked=@tableContext.FlagActivo
+                                   Color="Color.Success" ReadOnly="true" />
+                    </MudTd>
+                    <MudTd>
+                        <MudFab Size="Size.Small"
+                                StartIcon="@Icons.Material.Filled.Edit"
+                                Color="Color.Info"
+                                DisableElevation="true"
+                                OnClick="()=> Actualizar(tableContext.BannerId)">
+                        </MudFab>
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    @*<MudTablePager HideRowsPerPage="true" InfoFormat="@($"{infoFormat}")" HorizontalAlignment="HorizontalAlignment.Center" />*@
+                    <div class="d-flex flex-column align-center">
+                        <MudPagination Variant="Variant.Filled" Count="paginasTotales" SelectedChanged="PaginaSeleccionada" Class="pa-4" />
+                    </div>
+                </PagerContent>
+            </MudTable>
+        </MudContainer>
+
+    </Authorized>
+    <NotAuthorized>
+        <PaginaNoAutorizada />
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    private string tituloPagina = "Banners";
+    private string busqueda = string.Empty;
+    private int paginasTotales;
+    private int paginaActual = 1;
+
+    private bool _cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await AuthService.IsUserAuthenticated();
+        var rol = await AuthService.GetUserRole();
+        if (isAuthenticated && rol.Equals("Admin"))
+        {
+            await CargarBanners();
+        }
+        
+    }
+
+    private void Nuevo()
+    {
+        NavigationManager.NavigateTo($"/admin/banner/banner");
+    }
+    private void Actualizar(int id)
+    {
+        NavigationManager.NavigateTo($"/admin/banner/banner/{id}");
+    }
+
+    private async Task PaginaSeleccionada(int pagina)
+    {
+        paginaActual = pagina;
+        await CargarBanners(pagina);
+    }
+    private async Task CargarBanners(int pagina = 1)
+    {
+        _cargando = true;
+        BannerService.OnChange += StateHasChanged;
+        await BannerService.GetBannersPaginado(pagina);
+        paginasTotales = BannerService.PaginasTotales;
+        _cargando = false;
+    }
+
+}

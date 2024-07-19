@@ -1,0 +1,39 @@
+﻿@inject NavigationManager NavigationManager
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>No encontrado</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <MudContainer MaxWidth="MaxWidth.Large">
+                    <MudGrid Justify="Justify.Center" Class="my-4 pt-4">
+                        <MudItem lg="12" Class="d-flex justify-content-center">
+                            <MudText Typo="Typo.h5">Disculpe, no hay nada en esta dirección. </MudText>
+                        </MudItem>
+                        <MudItem lg="12" Class="d-flex justify-content-center">
+                            <MudButton Size="Size.Large"
+                                       ButtonType="ButtonType.Button"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Home"
+                                       OnClick="Inicio">
+                                REGRESAR
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudContainer>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    private void Inicio()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

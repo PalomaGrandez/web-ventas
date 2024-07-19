@@ -1,0 +1,115 @@
+﻿@page "/pedido-ticket/{ordenId:int}"
+
+@inject IOrdenService OrdenService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@tituloPagina</PageTitle>
+
+<div style="height:20px"></div>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudGrid Justify="Justify.Center">
+        <MudItem lg="12">
+            <MudCard Elevation="3">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Align="Align.Center" Typo="Typo.h5">@tituloPagina.ToUpper()</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                @*            <MudCardContent>
+
+                </MudCardContent> *@
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Button"
+                               Variant="Variant.Filled"
+                               Color="Color.Info"
+                               StartIcon="@Icons.Material.Filled.Check"
+                               Class="ml-auto m-2"
+                               OnClick="Aceptar"
+                               Size="Size.Large">Aceptar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem lg="12">
+            <MudDataGrid Items="@pedidoTicket" Striped="true" Bordered="true" HeaderClass="" Class="d-flex justify-content-center" Elevation="3" Dense="false" Breakpoint="Breakpoint.Xs">
+                <Columns>
+                    <PropertyColumn Property="x => x.OrdenTicketId" Title="ID" />
+                    <PropertyColumn Property="x => x.Evento" Title="EVENTO" />
+                    <PropertyColumn Property="x => x.Tipo" Title="TIPO" />
+                    <PropertyColumn Property="x => x.Fecha" Title="FECHA DE EVENTO" Culture="CultureInfo.InvariantCulture" Format="dd/MM/yyyy" />                    
+                    <TemplateColumn Title="NOMINADO">
+                        <CellTemplate>                      
+                                <MudSwitch T="bool" Size="Size.Medium"
+                                           Color="Color.Success"
+                                           ReadOnly="true"
+                                           @bind-Checked="@context.Item.FlagNominado">
+                                </MudSwitch>                            
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="NOMINAR">
+                        <CellTemplate>
+                            @if (!context.Item.FlagNominado)
+                            {
+                                <MudFab Size="Size.Medium"
+                                        StartIcon="@Icons.Material.Filled.Edit"
+                                        Color="Color.Info"
+                                        DisableElevation="true"
+                                        OnClick="()=> Nominar(context.Item.OrdenTicketId)">
+                                </MudFab>
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="VER">
+                        <CellTemplate>
+                            <MudFab Size="Size.Medium"
+                                    StartIcon="@Icons.Material.Filled.RemoveRedEye"
+                                    Color="Color.Info"
+                                    DisableElevation="true"
+                                    OnClick="()=> Detalle(context.Item.OrdenTicketId)">
+                            </MudFab>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+        </MudItem>
+    </MudGrid>
+
+</MudContainer>
+
+@code {
+    [Parameter]
+    public int? ordenId { get; set; }
+
+    private List<VwOrdenTicket> pedidoTicket = new();
+
+    private string tituloPagina = "E-Tickets";
+    private bool _cargando = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPedidoTicket();
+    }
+
+    private async Task CargarPedidoTicket()
+    {
+        var response = await OrdenService.GetOrdenTicketPorOrdenId((int)ordenId!);
+
+        pedidoTicket = response.Data!;
+
+    }
+
+    private void Aceptar()
+    {
+        NavigationManager.NavigateTo($"/usuario/mis-pedidos");
+    }
+
+    private void Nominar(int ordenTicketId)
+    {
+        NavigationManager.NavigateTo($"/admin/ticket/ticket-nominar/{ordenTicketId}/{ordenId}");
+    }
+    private void Detalle(int ordenTicketId)
+    {
+        NavigationManager.NavigateTo($"/usuario/ticket/ticket-visualizar/{ordenTicketId}/{ordenId}");
+    }
+}
+

@@ -1,0 +1,147 @@
+﻿@page "/"
+
+@inject NavigationManager NavigationManager
+@inject IEventoService EventoService
+@inject IBannerService BannerService
+
+<PageTitle>Fabrica Entradas</PageTitle>
+
+<MudCarousel ItemsSource="@BannerService.Banners"
+             Style="height:450px; width:auto; display:block"
+             ShowArrows="true" NextIcon="@Icons.Material.Filled.NavigateNext"
+             ShowBullets="true" BulletsColor="Color.Info"
+             EnableSwipeGesture="true"
+             SelectedIndex="0"
+             AutoCycle="true" Class="mud-width-full">
+    <PreviousButtonTemplate>
+        <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
+            <span class="mud-icon-button-label">
+                <MudIcon Class="mud-ripple mud-ripple-icon mud-icon-button-size-medium" Icon="@Icons.Material.Filled.ArrowBackIos" Size="Size.Large" Color="@Color.Inherit" />
+            </span>
+        </div>
+    </PreviousButtonTemplate>
+    <NextButtonTemplate>
+        <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
+            <span class="mud-icon-button-label">
+                <MudIcon Class="mud-ripple mud-ripple-icon mud-icon-button-size-medium" Icon="@Icons.Material.Filled.ArrowForwardIos" Size="Size.Large" Color="@Color.Inherit" />
+            </span>
+        </div>
+    </NextButtonTemplate>
+    <ItemTemplate>
+        <div class="d-flex flex-column flex-column justify-center" style="height:100%;background-image:url(@context.Imagen);background-size:cover;background-position:center">
+            @* <MudImage onclick="@EventoDetalle" onmouseover="" Src="@context" Style="height:100%; cursor:pointer" ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Center" />*@
+        </div>
+    </ItemTemplate>
+</MudCarousel>
+<div style="height:20px" />
+<center>
+    <MudText Typo="Typo.h4">Productos Destacados</MudText>
+</center>
+
+<div style="margin: 20px 10%; display: flex; justify-content: center;">
+    <MudTextField @bind-Value="searchQuery" Placeholder="Buscar eventos..." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Variant="Variant.Outlined" Class="mud-width-full mud-max-width-600" OnKeyUp="PerformSearch">
+            <Adornment AdornmentPosition="AdornmentPosition.End">
+            <IconButton Icon="@Icons.Material.Filled.Search" OnClick="PerformSearch" />
+        </Adornment>
+    </MudTextField>
+</div>
+
+<MudGrid Class="d-flex justify-center p-3">
+    @if (filteredEventos.Count > 0)
+    {
+        @foreach (var evento in filteredEventos)
+        {
+            <MudItem xs="12" sm="6" lg="4" md="6" Class="d-flex justify-center ">
+                <MudPaper MaxWidth="450px">
+                    <MudCard Elevation="3">
+                        <MudCardMedia Image="@evento.Imagen" Height="220" Style="width:450px" />
+                        <MudCardContent>
+                            <MudText Typo="Typo.subtitle2">@evento.Ubicacion</MudText>
+                            <MudText Typo="Typo.h6">@evento.Nombre </MudText>
+                            @* <MudText Typo="Typo.body2">@evento.</MudText> *@
+                        </MudCardContent>
+                        <MudCardActions Class="justify-content-end ">
+                            <MudButton Variant="Variant.Outlined" ButtonType="ButtonType.Button" StartIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="()=>EventoDetalle(evento.EventoId)">Ver Detalle</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudPaper>
+            </MudItem>
+        }
+        <MudItem xs="12" sm="12" lg="12">
+            <div class="d-flex flex-column align-center">
+                <MudPagination Variant="Variant.Filled" Size="Size.Large" Count="paginasTotales" SelectedChanged="PaginaSeleccionada" Class="pa-4" />
+            </div>
+        </MudItem>
+    }
+    else
+    {
+        <MudProgressCircular Indeterminate="true">
+        </MudProgressCircular>
+    }
+</MudGrid>
+
+@code {
+    private bool _cargando = false;
+    private int paginasTotales;
+    private int paginaActual;
+    private bool _cargandoBanners;
+    private string searchQuery = string.Empty;
+    private List<Evento> filteredEventos = new List<Evento>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarBanners();
+        await CargarEventos();
+    }
+
+    private void EventoDetalle(int id)
+    {
+        NavigationManager.NavigateTo($"/evento-detalle/{id}");
+    }
+
+    private async Task CargarEventos(int pagina = 1)
+    {
+        _cargando = true;
+        EventoService.OnChange += StateHasChanged;
+        await EventoService.GetEventosPaginado(pagina);
+        paginasTotales = EventoService.PaginasTotales;
+        filteredEventos = EventoService.Eventos;
+        _cargando = false;
+    }
+
+    private async Task CargarBanners()
+    {
+        _cargandoBanners = true;
+        BannerService.OnChange += StateHasChanged;
+        await BannerService.GetBanners();
+        _cargandoBanners = false;
+    }
+
+    private async Task PaginaSeleccionada(int pagina)
+    {
+        paginaActual = pagina;
+        await CargarEventos(pagina);
+    }
+
+    private void PerformSearch(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            SearchEventos();
+        }
+    }
+
+    private void SearchEventos()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            filteredEventos = EventoService.Eventos;
+        }
+        else
+        {
+            filteredEventos = EventoService.Eventos.Where(e => e.Nombre.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) || e.Ubicacion.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        StateHasChanged();
+    }
+}

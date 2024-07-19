@@ -1,0 +1,41 @@
+﻿// Directivas de Microsoft
+@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.JSInterop
+
+// Directivas relacionadas con Entradas.Client y MudBlazor
+@using Entradas.Client
+@using Entradas.Client.Shared
+@using MudBlazor
+@using System.Globalization
+@using Blazored.SessionStorage
+
+// Directivas relacionadas con Entradas.Shared
+@using Entradas.Shared.Models;
+@using Entradas.Shared.DTO;
+@using Entradas.Shared.DTO.OrdenDto
+@using Entradas.Shared.DTO.EventoDto;
+@using Entradas.Shared.DTO.CategoriaDto;
+@using Entradas.Shared.DTO.UsuarioDto;
+@using Entradas.Shared.DTO.BannerDto;
+
+// Directivas relacionadas con Entradas.Client.Services
+@using Entradas.Client.Services.CategoriaService;
+@using Entradas.Client.Services.EventoService;
+@using Entradas.Client.Services.EventoEntradaService;
+@using Entradas.Client.Services.EventoFechaService;
+@using Entradas.Client.Services.OrdenService;
+@using Entradas.Client.Services.BannerService;
+
+// Otros
+@using static Entradas.Shared.Constants
+@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@using QRCoder

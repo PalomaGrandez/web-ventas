@@ -1,0 +1,81 @@
+﻿@page "/pedido-detalle/{ordenId:int}/{usuarioId:int}"
+
+@inject IOrdenService OrdenService
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>@tituloPagina</PageTitle>
+
+<div style="height:20px"></div>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudGrid Justify="Justify.Center">
+        <MudItem lg="12">
+            <MudCard Elevation="3">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Align="Align.Center" Typo="Typo.h5">@tituloPagina.ToUpper()</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                @*            <MudCardContent>
+
+                </MudCardContent> *@
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Button"
+                               Variant="Variant.Filled"
+                               Color="Color.Info"
+                               StartIcon="@Icons.Material.Filled.Check"
+                               Class="ml-auto m-2"
+                               OnClick="Aceptar"
+                               Size="Size.Large">Aceptar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem lg="12">
+            <MudDataGrid Items="@pedidoDetalle" Striped="true" Bordered="true" HeaderClass="" Class="d-flex justify-content-center" Elevation="3" Dense="false" Breakpoint="Breakpoint.Xs">
+                <Columns>
+                    <PropertyColumn Property="x => x.Evento" Title="EVENTO" />
+                    <PropertyColumn Property="x => x.TipoEntrada" Title="TIPO ENTRADA" />
+                    <PropertyColumn Property="x => x.Fecha" Title="FECHA DE EVENTO" Culture="CultureInfo.InvariantCulture" Format="dd/MM/yyyy" />
+                    <PropertyColumn Property="x => x.Cantidad" Title="CANTIDAD" />
+                    <PropertyColumn Property="x => x.PrecioUnitario" Title="PRECIO UNITARIO" Culture="CultureInfo.InvariantCulture" Format="F2" />
+                    <PropertyColumn Property="x => x.PrecioTotal" Title="PRECIO TOTAL" Culture="CultureInfo.InvariantCulture" Format="F2" />
+                    
+                </Columns>
+            </MudDataGrid>
+        </MudItem>
+    </MudGrid>
+
+</MudContainer>
+
+@code {
+    [Parameter]
+    public int? ordenId { get; set; }
+
+    [Parameter]
+    public int? usuarioId { get; set; }
+
+    private List<VwOrden> pedidoDetalle = new();
+
+    private string tituloPagina = "Pedido Detalle";
+    private bool _cargando = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPedido();
+    }
+
+    private async Task CargarPedido()
+    {
+        var response = await OrdenService.GetOrdenPorOrdenIdPorUsuarioId((int)ordenId!, (int)usuarioId!);
+
+        pedidoDetalle = response.Data!;
+
+    }
+
+    private void Aceptar()
+    {
+        NavigationManager.NavigateTo($"/usuario/mis-pedidos");
+    }
+}
+

@@ -1,0 +1,179 @@
+﻿@page "/admin/evento/evento-listado"
+
+@inject IEventoService EventoService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <PageTitle>@tituloPagina</PageTitle>
+
+        <div style="height:20px" />
+
+        <MudContainer MaxWidth="MaxWidth.Large">
+            <MudCard Elevation="3" Class="p-2 m-2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">@tituloPagina</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                       Variant="Variant.Filled"
+                                       Size="Size.Large"
+                                       Color="Color.Success"
+                                       Style="border-radius:20px"
+                                       Title="Nueva Categoria"
+                                       OnClick="Nuevo">
+                        </MudIconButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid Justify="Justify.Center">
+                        <MudItem lg="4" sm="6" xs="12">
+                            <MudTextField Label="Nombre"
+                                          Placeholder="Buscar por nombre"
+                                          @bind-Value="busquedaNombre" />
+                        </MudItem>
+                        <MudItem lg="4" sm="6" xs="12">
+                            <MudTextField Label="Información"
+                                          Placeholder="Buscar por información"
+                                          @bind-Value="busquedaInformacion" />
+                        </MudItem>
+                        <MudItem lg="4" sm="6" xs="12">
+                            <MudTextField Label="Ubicación"
+                                          Placeholder="Buscar por ubicación"
+                                          @bind-Value="busquedaUbicacion" />
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudGrid Justify="Justify.FlexEnd">
+                        <MudItem lg="4" sm="6" xs="12">
+                            <MudButton ButtonType="ButtonType.Button"
+                                       Size="Size.Large"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Info"
+                                       StartIcon="@Icons.Material.Filled.Search"
+                                       Class="ml-auto"
+                                       OnClick="()=>Buscar()">
+                                Buscar
+                            </MudButton>
+                            <MudButton ButtonType="ButtonType.Button"
+                                       Size="Size.Large"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Error"
+                                       StartIcon="@Icons.Material.Filled.Clear"
+                                       Class="ml-auto"
+                                       OnClick="()=>Limpiar()">
+                                Limpiar
+                            </MudButton>
+                        </MudItem>
+
+                    </MudGrid>
+                </MudCardActions>
+            </MudCard>
+
+            <MudTable Items="@EventoService.Eventos" Context="eventoContext" Hover="true" Striped="true" Elevation="3" Loading="@_cargando" Breakpoint="Breakpoint.Sm" Dense="true" Class="p-2 m-2">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>NOMBRE</MudTh>
+                    <MudTh>INFORMACION</MudTh>
+                    <MudTh>UBICACION</MudTh>
+                    <MudTh>CAPACIDAD TOTAL</MudTh>
+                    <MudTh>EDITAR</MudTh>
+                    <MudTh>ELIMINAR</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="ID">@eventoContext.EventoId</MudTd>
+                    <MudTd DataLabel="NOMBRE">@eventoContext.Nombre</MudTd>
+                    <MudTd DataLabel="INFORMACION">@eventoContext.Informacion</MudTd>
+                    <MudTd DataLabel="UBICACION">@eventoContext.Ubicacion</MudTd>
+                    <MudTd DataLabel="CAPACIDAD TOTAL">@eventoContext.CapacidadTotal</MudTd>
+                    <MudTd><MudFab Size="Size.Small" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Info" DisableElevation="true" OnClick="()=> Actualizar(eventoContext.EventoId)"></MudFab></MudTd>
+                    <MudTd><MudFab Size="Size.Small" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" DisableElevation="true" OnClick="()=> Eliminar(eventoContext.EventoId)"></MudFab></MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    @*<MudTablePager HideRowsPerPage="true" InfoFormat="@($"{infoFormat}")" HorizontalAlignment="HorizontalAlignment.Center" />*@
+                    <div class="d-flex flex-column align-center">
+                        <MudPagination Variant="Variant.Filled" Count="paginasTotales" SelectedChanged="PaginaSeleccionada" Class="pa-4" />
+                    </div>
+                </PagerContent>
+            </MudTable>
+        </MudContainer>
+
+    </Authorized>
+    <NotAuthorized>
+        <PaginaNoAutorizada />
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    private bool _cargando = true;
+    private int paginaActual = 1;
+    private int paginasTotales;
+    private string tituloPagina = "Eventos";
+
+    private string busquedaNombre = string.Empty;
+    private string busquedaInformacion = string.Empty;
+    private string busquedaUbicacion = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarEventos();
+    }
+    private void Nuevo()
+    {
+        NavigationManager.NavigateTo($"/admin/evento/evento-registro");
+    }
+    private async Task PaginaSeleccionada(int pagina)
+    {
+        paginaActual = pagina;
+        await CargarEventos(pagina);
+    }
+    private async Task CargarEventos(int pagina = 1)
+    {
+        _cargando = true;
+        EventoService.OnChange += StateHasChanged;
+        await EventoService.GetEventosPaginado(pagina);
+        paginasTotales = EventoService.PaginasTotales;
+        _cargando = false;
+    }
+    private void Actualizar(int id)
+    {
+        NavigationManager.NavigateTo($"/admin/evento/evento-registro/{id}");
+    }
+    private async Task Buscar(int pagina = 1)
+    {
+        _cargando = true;
+        EventoService.OnChange += StateHasChanged;
+        await EventoService.BuscarEventoPaginado(pagina, busquedaNombre, busquedaInformacion, busquedaUbicacion);
+        paginasTotales = EventoService.PaginasTotales;
+        _cargando = false;
+    }
+    private async Task Limpiar()
+    {
+        busquedaNombre = string.Empty;
+        busquedaInformacion = string.Empty;
+        busquedaUbicacion = string.Empty;
+
+        await CargarEventos();
+    }
+
+    private async Task Eliminar(int eventoId)
+    {
+        //EventoService.OnChange += StateHasChanged;
+        var result = await EventoService.DeleteEvento(eventoId);
+
+        //mensaje = result.Message;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        if (result.Success)
+        {
+            Snackbar.Add($"Evento eliminado exitosamente!", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add($"Ha sucedido un error: {result.Message}", Severity.Error);
+        }
+
+        await CargarEventos();
+    }
+}

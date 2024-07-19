@@ -1,0 +1,181 @@
+﻿@page "/evento-detalle/{Id:int}"
+
+@inject NavigationManager NavigationManager
+@inject IEventoService EventoService
+@inject IEventoEntradaService EventoEntradaService
+@inject IEventoFechaService EventoFechaService
+@inject IAuthService AuthService
+
+<PageTitle>Evento Detalle</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudGrid Justify="Justify.Center" Class="p-3">
+           
+        @if(_cargando)
+        {
+            <MudItem lg="12" sm="12" Class="d-flex justify-center" Style="margin-top:100px;">
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size=Size.Large />
+            </MudItem>
+        }
+        else {
+        <MudItem lg="12" sm="12" Class="d-flex justify-center">
+            <MudText Typo="Typo.h3">@evento.Nombre </MudText>
+        </MudItem>
+        <MudItem lg="12" sm="12" Class="d-flex justify-center">
+            <MudPaper Elevation="3" Class="p-2" Style="border-radius:10px">
+                <MudContainer>
+                    <MudGrid Justify="Justify.Center">
+
+                        <MudItem lg="6" sm="6">
+                            <MudImage Src="@evento.Imagen" Height="220" Fluid="true" Style="border-radius:10px " ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
+                        </MudItem>
+                        <MudItem lg="6" sm="6">
+                            <MudList>
+                                @*  <MudListItem Icon="@Icons.Material.Filled.GpsFixed">
+                                Lugar: Camino Centenario y 514 - Estacionamiento Hipermercado
+                                </MudListItem>
+                                <MudListItem Icon="@Icons.Material.Filled.GpsFixed">
+                                Ciudad: La Plata
+                                </MudListItem>
+                                <MudListItem Icon="@Icons.Material.Filled.CalendarMonth">
+                                Fecha: 2023-08-06
+                                </MudListItem>
+                                <MudListItem Icon="@Icons.Material.Filled.LockClock">
+                                Hora: 2:00AM
+                                </MudListItem>
+                                <MudListItem Icon="@Icons.Material.Filled.Category">
+                                Categoría: Exposiciones
+                                </MudListItem>
+                                <MudListItem Icon="@Icons.Material.Filled.Info">
+                                Edad mínima de ingreso: de 3 a 70 Años
+                                </MudListItem>
+                                <MudListItem Icon="@Icons.Material.Filled.GpsFixed">
+                                Dirección: Camino Centenario y 514, La Plata
+                                </MudListItem> *@
+                                <MudListItem Icon="@Icons.Material.Filled.GpsFixed">
+                                    Lugar: @evento.Ubicacion
+                                </MudListItem>
+                                <MudListItem Icon="@Icons.Material.Filled.Numbers">
+                                    Capacidad: @evento.CapacidadTotal
+                                </MudListItem>
+                            </MudList>
+                            <div style="height:20px"> </div>
+                            <MudButton Variant="Variant.Filled" Size="Size.Large" StartIcon="@Icons.Material.Filled.Sell" Color="Color.Success" FullWidth="true" OnClick="()=>Comprar(evento.EventoId)">Comprar</MudButton>
+                        </MudItem>
+
+                    </MudGrid>
+                </MudContainer>
+            </MudPaper>
+        </MudItem>
+        <MudItem lg="12" sm="12" Class="d-flex justify-center">
+            <MudText Typo="Typo.h3">DETALLE DEL EVENTO </MudText>
+        </MudItem>
+        <MudItem lg="12" sm="12" Class="d-flex justify-center">
+            <MudPaper Elevation="3" Class="p-3" Style="border-radius:10px ">
+                <MudText Typo="Typo.h5"> @evento.Nombre</MudText>
+                @* <MudText Typo="Typo.subtitle1"> El Parque inflable más grande de Argentina con un recorrido emocionante<br /> </MudText> *@
+                <MudText Typo="Typo.body1" Align="Align.Justify">
+                    @evento.Informacion
+                </MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem lg="12" sm="12" Class="d-flex justify-center">
+
+        </MudItem>
+        <MudItem lg="12" sm="12" Class="justify-center">
+            <MudCard Elevation="3">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h3" Align="Align.Center">UBICACIÓN Y PRECIO </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+
+                <MudCardContent>
+                    <MudDataGrid Items="@EventoEntradaService.EventoEntradas"
+                                 Filterable="false"
+                                 SortMode="@SortMode.None"
+                                 Groupable="false"
+                                 Class="p-3 m-1"
+                                 Elevation="3"
+                                 Hover="true"
+                                 Striped="true"
+                                 Dense="false"
+                                 LoadingProgressColor="Color.Primary"
+                                 Breakpoint="Breakpoint.Xs">
+                        <Columns>
+                            <PropertyColumn Title="TIPO"
+                                            Property="x => x.Tipo"
+                                            CellStyle="font-size:20px;text-align:center;"
+                                            HeaderStyle="font-size:25px;text-align:center;font-weight: bold;" />
+                            <PropertyColumn Title="PRECIO"
+                                            Property="x => x.PrecioRegular"
+                                            CellStyle="font-size:20px;text-align:center;"
+                                            Culture="CultureInfo.InvariantCulture"
+                                            Format="F2"
+                                            HeaderStyle="font-size:25px;text-align:center;font-weight: bold;" />
+                            <PropertyColumn Title="CAPACIDAD"
+                                            Property="x => x.Capacidad"
+                                            CellStyle="font-size:20px;text-align:center;"
+                                            HeaderStyle="font-size:25px;text-align:center;font-weight: bold;" />
+                        </Columns>
+                    </MudDataGrid>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled" Size="Size.Large" StartIcon="@Icons.Material.Filled.Sell" Color="Color.Success" FullWidth="false" OnClick="()=>Comprar(evento.EventoId)">Comprar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        }
+    </MudGrid>
+
+</MudContainer>
+@code {
+
+    [Parameter]
+    public int? Id { get; set; }
+
+    private string mensaje = string.Empty;
+    private Evento evento = new();
+
+    private bool _cargando = true;
+
+    private async Task Comprar(int eventoId)
+    {
+        var isAuthenticated = await AuthService.IsUserAuthenticated();
+        var rol = await AuthService.GetUserRole();
+
+        if (isAuthenticated && rol.Equals("Customer"))
+        {
+            NavigationManager.NavigateTo($"seleccion-entradas/{eventoId}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"Auth/iniciar-sesion");
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //btnText = Id == null ? "REGISTRAR" : "ACTUALIZAR";
+        //tituloPagina = Id == null ? "Registrar Evento" : $"Actualizar Evento";
+        //  mensaje = string.Empty;
+
+        _cargando = true;
+        //Validar
+        if (Id != null)
+        {
+            var response = await EventoService.GetEventoPorId((int)Id);
+
+            await EventoEntradaService.GetEventoEntradasPorEvento(1, (int)Id);
+            if (!response.Success)
+            {
+                mensaje = response.Message;
+            }
+            else
+            {
+                evento = response.Data!;
+            }
+        }
+        _cargando = false;
+    }
+}

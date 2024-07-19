@@ -1,0 +1,195 @@
+﻿@page "/usuario/ticket/ticket-visualizar/{ordenTicketId:int}/{ordenId:int}"
+
+@inject NavigationManager NavigationManager
+@inject IOrdenService OrdenService
+@inject ISnackbar Snackbar
+
+<PageTitle>@tituloPagina</PageTitle>
+<div style="height:20px" />
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <EditForm Model="ordenTicketActualizarDto" OnSubmit="HandleRegistration">
+        <DataAnnotationsValidator />
+
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12" sm="12" lg="12">
+                <MudCard Elevation="3">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@tituloPagina</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @* <MudGrid Justify="Justify.Center">
+                        <MudItem lg="4" sm="6" md="4" xs="12">
+                        <MudNumericField Label="Id"
+                        ReadOnly="true"
+                        @bind-Value="ordenTicketActualizarDto!.OrdenTicketId" />
+                        </MudItem>
+                        </MudGrid> *@
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem lg="4" sm="6" md="4" xs="12">
+                                <MudTextField T="string"
+                                              ReadOnly="true"
+                                              Label="Evento"
+                                              @bind-Value="ordenTicketActualizarDto.Evento" />
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem lg="4" sm="6" md="4" xs="12">
+                                <MudTextField T="string"
+                                              ReadOnly="true"
+                                              Label="Tipo Entrada"
+                                              @bind-Value="ordenTicketActualizarDto.Tipo" />
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem lg="4" sm="6" md="4" xs="12">
+                                <MudDatePicker @bind-Date="ordenTicketActualizarDto.Fecha"
+                                               DateFormat="dd/MM/yyyy"
+                                               Label="Fecha Evento"
+                                               ReadOnly="true" />
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem lg="4" sm="6" md="4" xs="12">
+                                <MudTextField T="string"
+                                              Label="Nombres"
+                                              @bind-Value="ordenTicketActualizarDto.Nombres"
+                                              ReadOnly="true" />
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem lg="4" sm="6" md="4" xs="12">
+                                <MudTextField T="string"
+                                              Label="Apellido Paterno"
+                                              @bind-Value="ordenTicketActualizarDto.ApellidoPaterno"
+                                              ReadOnly="true" />
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem lg="4" sm="6" md="4" xs="12">
+                                <MudTextField T="string"
+                                              Label="Apellido Materno"
+                                              @bind-Value="ordenTicketActualizarDto.ApellidoMaterno"
+                                              ReadOnly="true" />
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem lg="4" sm="6" md="4" xs="12">
+                                <MudTextField T="string"
+                                              Label="Tipo de Documento"
+                                              @bind-Value="@ordenTicketActualizarDto.TipoDocumento"
+                                              ReadOnly="true" />
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem lg="4" sm="6" md="4" xs="12">
+                                <MudTextField T="string"
+                                              Label="Numero de Documento"
+                                              @bind-Value="ordenTicketActualizarDto.NumeroDocumento"
+                                              ReadOnly="true" />
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem lg="4" sm="6" md="4" xs="12">
+                                <div class="d-flex flex-column align-center">
+                                    <MudImage Height="300" Src="@QRCodeText" />
+                                </div>
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudSpacer></MudSpacer>
+                        <MudButton Disabled="@_guardando"
+                                   Size="Size.Large"
+                                   ButtonType="ButtonType.Submit"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Check"
+                                   Class="ml-auto">
+                            <MudText>@btnText</MudText>
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public int? ordenTicketId { get; set; }
+
+    [Parameter]
+    public int? ordenId { get; set; }
+
+    public string QRCodeText = string.Empty;
+
+    private string tituloPagina = "Visualizar Ticket";
+    string btnText = "ACEPTAR";
+
+    private OrdenTicketActualizarDto ordenTicketActualizarDto = new();
+    private bool _cargandoEstados = false;
+    private bool _guardando = false;
+
+    private string mensaje = string.Empty;
+
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        btnText = ordenTicketId == null ? "REGISTRAR" : "ACEPTAR";
+        tituloPagina = ordenTicketId == null ? "Registrar Orden" : $"Visualizar Ticket";
+        //_eventoSoloLectura = Id == null ? false : true;
+        mensaje = string.Empty;
+
+        //Validar
+        if (ordenTicketId != null)
+        {
+            var response = await OrdenService.GetOrdenTicketPorOrdenTicketId((int)ordenTicketId);
+
+            if (!response.Success)
+            {
+                mensaje = response.Message;
+            }
+            else
+            {
+                var ordenTicketResponse = response.Data;
+
+                ordenTicketActualizarDto.OrdenId = ordenTicketResponse!.OrdenId;
+                ordenTicketActualizarDto.OrdenTicketId = ordenTicketResponse.OrdenTicketId;
+                ordenTicketActualizarDto.Evento = ordenTicketResponse.Evento;
+                ordenTicketActualizarDto.Tipo = ordenTicketResponse.Tipo;
+                ordenTicketActualizarDto.Fecha = ordenTicketResponse.Fecha;
+                ordenTicketActualizarDto.Nombres = ordenTicketResponse.Nombres.ToUpper();
+                ordenTicketActualizarDto.ApellidoPaterno = ordenTicketResponse.ApellidoPaterno.ToUpper();
+                ordenTicketActualizarDto.ApellidoMaterno = ordenTicketResponse.ApellidoMaterno.ToUpper();
+                ordenTicketActualizarDto.TipoDocumento = ordenTicketResponse.TipoDocumento;
+                ordenTicketActualizarDto.NumeroDocumento = ordenTicketResponse.NumeroDocumento;
+
+                GenerateQRCode();
+            }
+        }
+    }
+
+    private async Task HandleRegistration()
+    {
+
+        NavigationManager.NavigateTo($"/pedido-ticket/{ordenId}");
+    }
+
+
+    protected void GenerateQRCode()
+    {
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode(ordenTicketId.ToString(), QRCodeGenerator.ECCLevel.Q);
+        BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
+
+        byte[] qrCodeAsByteArr = qrCode.GetGraphic(20);
+
+        var ms = new MemoryStream(qrCodeAsByteArr);
+
+        QRCodeText = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
+    }
+}

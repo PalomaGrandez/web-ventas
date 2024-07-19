@@ -1,0 +1,27 @@
+﻿@inject NavigationManager NavigationManager
+
+<PageTitle>No Autorizado</PageTitle>
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudGrid Justify="Justify.Center" Class="my-4 pt-4">
+        <MudItem lg="12" Class="d-flex justify-content-center">
+            <MudText Typo="Typo.h5">Disculpe, no tiene autorización para ver esta pagina. </MudText>
+        </MudItem>
+        <MudItem lg="12" Class="d-flex justify-content-center">
+            <MudButton Size="Size.Large"
+                       ButtonType="ButtonType.Button"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Home"
+                       OnClick="Inicio">
+                REGRESAR
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private void Inicio()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

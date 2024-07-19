@@ -1,0 +1,147 @@
+﻿@page "/Auth/iniciar-sesion"
+
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Iniciar Sesión</PageTitle>
+<div style="height:20px"></div>
+<MudContainer MaxWidth="MaxWidth.Large">
+    <EditForm Model="usuarioLoginDto" OnValidSubmit="IniciarSesion">
+        <DataAnnotationsValidator />
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12" sm="6" lg="6">
+                <MudCard Elevation="3">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">Iniciar Sesión</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudTextField Label="Email"
+                                      HelperText="Ingrese el email"
+                                      Variant="Variant.Outlined"
+                                      Style="border-radius:20px"
+                                      @bind-Value="usuarioLoginDto!.Email"
+                                      For="@(() => usuarioLoginDto!.Email)" />
+                        <MudTextField Label="Password"
+                                      HelperText="Ingrese el password"
+                                      Variant="Variant.Outlined"
+                                      Style="border-radius:20px"
+                                      InputType="@PasswordInput"
+                                      AdornmentIcon="@PasswordInputIcon"
+                                      Adornment="Adornment.End"
+                                      OnAdornmentClick="ShowPassword"
+                                      @bind-Value="usuarioLoginDto!.Password"
+                                      For="@(() => usuarioLoginDto!.Password)" />
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudSpacer />
+                        <MudButton Disabled="@_guardando"
+                                   ButtonType="ButtonType.Submit"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Login"
+                                   Size="Size.Large"
+                                   Class="ml-auto m-2">
+                            @if (_guardando)
+                            {
+                                <MudProgressCircular Class="ms-n1"
+                                                     Size="Size.Small"
+                                                     Indeterminate="true" />
+                                <MudText Class="ms-2">Guardando</MudText>
+                            }
+                            else
+                            {
+                                <MudText>@btnText</MudText>
+
+                            }
+                        </MudButton>
+                        <MudButton ButtonType="ButtonType.Button"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Error"
+                                   StartIcon="@Icons.Material.Filled.Cancel"
+                                   Class="ml-auto m-2"
+                                   OnClick="Cancelar"
+                                   Size="Size.Large">Cancelar</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+</MudContainer>
+
+@code {
+    UsuarioLoginDto usuarioLoginDto = new();
+
+    private bool _guardando = false;
+    private string btnText = "INGRESAR";
+
+    private async Task IniciarSesion()
+    {
+        try
+        {
+            var result = await AuthService.Login(usuarioLoginDto);
+
+            // Configurar la posición de la Snackbar
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+
+            if (result.Success)
+            {
+                // Limpiar la Snackbar y mostrar un mensaje de inicio de sesión exitoso
+                Snackbar.Clear();
+                Snackbar.Add($"Inicio de sesión exitoso: {result.Message}", Severity.Success);
+
+                // Guardar el token de autenticación en el almacenamiento local
+                await LocalStorage.SetItemAsync("authToken", result.Data);
+
+                // Actualizar el estado de autenticación del usuario
+                await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+                // Redirigir al usuario a la página principal
+                NavigationManager.NavigateTo("/", forceLoad: true);
+
+            }
+            else
+            {
+                // Limpiar la Snackbar y mostrar un mensaje de error de inicio de sesión
+                Snackbar.Clear();
+                Snackbar.Add($"Error en inicio de sesión: {result.Message}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Manejar cualquier excepción que pueda ocurrir durante el proceso de inicio de sesión
+            Snackbar.Clear();
+            Snackbar.Add($"Error inesperado en inicio de sesión: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task Cancelar()
+    {
+        NavigationManager.NavigateTo($"/");
+    }
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private void ShowPassword()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+}

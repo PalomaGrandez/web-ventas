@@ -1,0 +1,157 @@
+﻿@page "/admin/orden/orden-listado"
+
+@inject IOrdenService OrdenService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+
+        <PageTitle>@tituloPagina</PageTitle>
+
+        <div style="height:20px" />
+        <MudContainer MaxWidth="MaxWidth.Large">
+            <MudCard Elevation="3" Class="p-2 m-2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">@tituloPagina</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        @*   <MudIconButton Icon="@Icons.Material.Filled.Add"
+                        Variant="Variant.Filled"
+                        Size="Size.Large"
+                        Color="Color.Success"
+                        Style="border-radius:20px"
+                        Title="Nueva Categoria"
+                        OnClick="Nuevo">
+                        </MudIconButton> *@
+                    </CardHeaderActions>
+                </MudCardHeader>
+            </MudCard>
+
+            <MudTable Items="@OrdenService.Ordenes"
+                      Context="tableContext"
+                      Hover="true"
+                      Striped="true"
+                      Elevation="3"
+                      Loading="@_cargando"
+                      Breakpoint="Breakpoint.Xs"
+                      Dense="true"
+                      Class="p-2 m-2">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>FECHA ORDEN</MudTh>
+                    <MudTh>PRECIO TOTAL</MudTh>
+                    <MudTh>ESTADO</MudTh>
+                    <MudTh>MEDIO DE PAGO</MudTh>
+                    <MudTh>TICKET GENERADO</MudTh>
+                    <MudTh>ACTUALIZAR</MudTh>
+                    <MudTh>GENERAR TICKETS</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="ID">@tableContext.OrdenId</MudTd>
+                    <MudTd DataLabel="FECHA ORDEN">@tableContext.FechaOrden</MudTd>
+                    <MudTd DataLabel="PRECIO TOTAL">@tableContext.PrecioTotal</MudTd>
+                    <MudTd DataLabel="ESTADO">@tableContext.Estado</MudTd>
+                    <MudTd DataLabel="MEDIO DE PAGO">@tableContext.MedioPago</MudTd>
+                    <MudTd DataLabel="TICKET GENERADO">
+                        <MudCheckBox T="bool"
+                                     @bind-Checked=@tableContext.TicketGenerado
+                                     Color="Color.Success"
+                                     ReadOnly="true" />
+                    </MudTd>
+                    <MudTd DataLabel="ACTUALIZAR">
+                        <MudFab Size="Size.Small"
+                                StartIcon="@Icons.Material.Filled.Edit"
+                                Color="Color.Info"
+                                DisableElevation="true"
+                                OnClick="()=> Actualizar(tableContext.OrdenId)">
+                        </MudFab>
+                    </MudTd>
+                    <MudTd DataLabel="GENERAR TICKETS">
+                        @if (tableContext.Estado.Equals("APROBADO"))
+                        {
+                            <MudFab Size="Size.Small"
+                                    StartIcon="@Icons.Material.Filled.Approval"
+                                    Color="Color.Success"
+                                    DisableElevation="true"
+                                    OnClick="()=> GenerarEntradas(tableContext.OrdenId)">
+                            </MudFab>
+                        }
+                    </MudTd>
+                    @* <MudTd><MudFab Size="Size.Small" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" DisableElevation="true" OnClick="()=> Eliminar(context.EventoId)"></MudFab></MudTd> *@
+                </RowTemplate>
+                <PagerContent>
+                    @*<MudTablePager HideRowsPerPage="true" InfoFormat="@($"{infoFormat}")" HorizontalAlignment="HorizontalAlignment.Center" />*@
+                    <div class="d-flex flex-column align-center">
+                        <MudPagination Variant="Variant.Filled" Count="paginasTotales" SelectedChanged="PaginaSeleccionada" Class="pa-4" />
+                    </div>
+                </PagerContent>
+            </MudTable>
+
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        <PaginaNoAutorizada />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private string tituloPagina = "Orden";
+    private bool _cargando = false;
+    private int paginasTotales = 0;
+    private int paginaActual = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarOrdenes();
+    }
+
+    private void Nuevo()
+    {
+        NavigationManager.NavigateTo($"/admin/orden/orden-registro");
+    }
+
+    private void Actualizar(int id)
+    {
+        NavigationManager.NavigateTo($"/admin/orden/orden-registro/{id}");
+    }
+
+    private async Task PaginaSeleccionada(int pagina)
+    {
+        paginaActual = pagina;
+        await CargarOrdenes(pagina);
+    }
+
+    private async Task CargarOrdenes(int pagina = 1)
+    {
+        _cargando = true;
+        OrdenService.OnChange += StateHasChanged;
+        await OrdenService.GetOrdenesPaginado(pagina);
+        paginasTotales = OrdenService.PaginasTotales;
+        _cargando = false;
+    }
+
+    private async Task GenerarEntradas(int ordenId)
+    {
+        // Actualizar la orden y obtener el resultado
+        var result = await OrdenService.GenerarTickets(ordenId);
+
+        // Mostrar un mensaje de éxito o error según el resultado
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        if (result.Success)
+        {
+            Snackbar.Add($"{result.Message}", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add($"Ha sucedido un error: {result.Message}", Severity.Error);
+        }
+
+        await CargarOrdenes();
+
+        // Navegar a la lista de órdenes después de la actualización
+        NavigationManager.NavigateTo($"/admin/orden/orden-listado");
+    }
+}

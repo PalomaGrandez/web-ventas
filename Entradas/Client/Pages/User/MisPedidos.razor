@@ -1,0 +1,155 @@
+﻿@page "/usuario/mis-pedidos"
+@inject IJSRuntime JS
+
+@inject IOrdenService OrdenService
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+<PageTitle>@tituloPagina</PageTitle>
+
+<div style="height:20px"></div>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <script src="https://js.culqi.com/checkout-js"></script>
+
+    <MudGrid Justify="Justify.Center">
+        <MudItem lg="12" md="12" sm="12">
+            <MudCard Elevation="3">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Align="Align.Center" Typo="Typo.h5">MIS PEDIDOS</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem lg="12" md="12" sm="12">
+            <MudDataGrid Items="@OrdenService.Ordenes" Striped="true" Bordered="true" HeaderClass="" Class="d-flex justify-content-center" Elevation="3" Dense="false" Breakpoint="Breakpoint.Sm">
+                <Columns>
+                    <PropertyColumn Property="x => x.OrdenId" Title="N° DE ORDEN" />
+                    <PropertyColumn Property="x => x.FechaOrden" Title="FECHA DE COMPRA" />
+                    <TemplateColumn Title="MEDIO DE PAGO">
+                        <CellTemplate>
+                            @if (context.Item.MedioPago.Equals("PLIN"))
+                            {
+                                <MudImage Src="pago/plin-logo.png" Height="50" Width="50" />
+                            }
+                            else if (context.Item.MedioPago.Equals("YAPE"))
+                            {
+                                <MudImage Src="pago/yape-logo.png" Height="50" Width="50" />
+                            }
+                            else
+                            {
+                                @* <MudImage Src="" Height="50" Width="50" /> *@
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <PropertyColumn Property="x => x.PrecioTotal" Title="TOTAL" Culture="@CultureInfo.InvariantCulture" Format="F2" />
+                    <TemplateColumn Title="ESTADO">
+                        <CellTemplate>
+                            @if (context.Item.Estado.Equals("REGISTRADO"))
+                            {
+                                <MudChip Size="Size.Medium" Color="Color.Info">@context.Item.Estado</MudChip>
+                            }
+                            else if (context.Item.Estado.Equals("PROCESANDO"))
+                            {
+                                <MudChip Size="Size.Medium" Color="Color.Warning">@context.Item.Estado</MudChip>
+                            }
+                            else if (context.Item.Estado.Equals("RECHAZADO"))
+                            {
+                                <MudChip Size="Size.Medium" Color="Color.Error">@context.Item.Estado</MudChip>
+                            }
+                            else if (context.Item.Estado.Equals("ANULADO"))
+                            {
+                                <MudChip Size="Size.Medium" Color="Color.Error">@context.Item.Estado</MudChip>
+                            }
+                            else if (context.Item.Estado.Equals("APROBADO"))
+                            {
+                                <MudChip Size="Size.Medium" Color="Color.Success">@context.Item.Estado</MudChip>
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="DETALLE">
+                        <CellTemplate>
+                            @* @if (context.Item.Estado.Equals("APROBADO")) *@
+                            @* { *@
+                            <MudFab Size="Size.Medium"
+                                    StartIcon="@Icons.Material.Filled.List"
+                                    Color="Color.Info"
+                                    DisableElevation="true"
+                                    OnClick="()=> VerDetalle(context.Item.OrdenId,userId)">
+                            </MudFab>
+                            @* } *@
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="TICKETS">
+                        <CellTemplate>
+
+
+                            <MudFab Size="Size.Medium"
+                                    StartIcon="@Icons.Material.Filled.Receipt"
+                                    Color="Color.Warning"
+                                    DisableElevation="true"
+                                    OnClick="()=> AbrirCulqi()">
+                            </MudFab>
+
+
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+        </MudItem>
+        <MudItem lg="12" md="12" sm="12">
+            <div class="d-flex flex-column align-center">
+                <MudPagination Variant="Variant.Filled" Count="paginasTotales" SelectedChanged="PaginaSeleccionada" Class="pa-4" />
+            </div>
+        </MudItem>
+    </MudGrid>
+
+</MudContainer>
+@code {
+    private string tituloPagina = "Mis Pedidos";
+    private bool _cargando = false;
+    private int paginasTotales = 0;
+    private int paginaActual = 1;
+    private int userId;
+    protected override async Task OnInitializedAsync()
+    {
+        userId = await AuthService.GetUserId();
+        Console.WriteLine($"User Id: {userId}");
+        await CargarOrdenes();
+    }
+
+    private async Task CargarOrdenes(int pagina = 1)
+    {
+        _cargando = true;
+        OrdenService.OnChange += StateHasChanged;
+        await OrdenService.GetOrdenesPorUsuario(pagina, userId);
+        paginasTotales = OrdenService.PaginasTotales;
+        _cargando = false;
+    }
+
+    private async Task PaginaSeleccionada(int pagina)
+    {
+        paginaActual = pagina;
+        await CargarOrdenes(pagina);
+    }
+
+    private void VerDetalle(int ordenId, int usuarioId)
+    {
+        NavigationManager.NavigateTo($"/pedido-detalle/{ordenId}/{usuarioId}");
+    }
+
+    private void VerTickets(int ordenId)
+    {
+        NavigationManager.NavigateTo($"/pedido-ticket/{ordenId}");
+    }
+
+    private void AbrirCulqi()
+    {
+        JS.InvokeVoidAsync("openCulqiCheckout");
+    }
+
+}

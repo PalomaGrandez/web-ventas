@@ -1,0 +1,171 @@
+﻿@page "/admin/categoria/categoria"
+@page "/admin/categoria/categoria/{Id:int}"
+
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject ICategoriaService CategoriaService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IAuthService AuthService
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+
+        <PageTitle>@tituloPagina</PageTitle>
+
+        <div style="height:20px"></div>
+        <MudContainer MaxWidth="MaxWidth.Large">
+            <EditForm Model="categoriaRegistroDto" Context="formContext" OnValidSubmit="OnValidSubmit">
+                <DataAnnotationsValidator />
+                <MudGrid Justify="Justify.Center">
+                    <MudItem lg="12">
+                        <MudCard Elevation="3">
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.h5">@tituloPagina</MudText>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudGrid Justify="Justify.FlexStart">
+                                    <MudItem lg="6" xs="12">
+                                        <MudTextField Label="Nombre Categoria"
+                                                      Placeholder="Ingrese el Nombre de la Categoría"
+                                                      Variant="Variant.Outlined"
+                                                      @bind-Value="categoriaRegistroDto.Nombre"
+                                                      For="@(() => categoriaRegistroDto.Nombre)" />
+                                    </MudItem>
+                                </MudGrid>
+                            </MudCardContent>
+                            <MudCardActions>
+                                <MudGrid Justify="Justify.FlexEnd">
+                                    <MudItem>
+                                        <MudButton ButtonType="ButtonType.Submit" Disabled="@guardarDisabled" Size="Size.Large" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Class="ml-auto">
+                                            @if (guardarDisabled)
+                                            {
+                                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                                <MudText Class="ms-2">Guardando</MudText>
+                                            }
+                                            else
+                                            {
+                                                @*<MudText>@btnText</MudText>*@
+                                                @btnText
+                                            }
+                                        </MudButton>
+                                    </MudItem>
+                                    <MudItem>
+                                        <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Large" Color="Color.Error" StartIcon="@Icons.Material.Filled.Cancel" Class="ml-auto" OnClick="Cancelar">Cancelar</MudButton>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudCardActions>
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
+            </EditForm>
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        <PaginaNoAutorizada />
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    private string tituloPagina = string.Empty;
+
+    CategoriaRegistroDto categoriaRegistroDto = new();
+    Categoria categoriaModel = new();
+
+    private string btnText = string.Empty;
+    private string mensaje = string.Empty;
+
+    private bool guardarDisabled = false;
+
+    private bool autenticado;
+    private string rol = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var isAuthenticated = await AuthService.IsUserAuthenticated();
+        rol = await AuthService.GetUserRole();
+
+        if (isAuthenticated && rol.Equals("Admin"))
+        {
+            btnText = Id == null ? "REGISTRAR" : "ACTUALIZAR";
+            tituloPagina = Id == null ? "Registrar Categoria" : $"Actualizar Categoria";
+            mensaje = string.Empty;
+
+            //Validar
+            if (Id != null)
+            {
+                var response = await CategoriaService.GetCategoriaById((int)Id);
+
+                if (!response.Success)
+                {
+                    mensaje = response.Message;
+                }
+                else
+                {
+                    categoriaModel = response.Data!;
+
+                    categoriaRegistroDto.CategoriaId = categoriaModel.CategoriaId;
+                    categoriaRegistroDto.Nombre = categoriaModel.Nombre;
+                }
+            }
+        }
+        
+    }
+
+    private async Task OnValidSubmit()
+    {
+        guardarDisabled = true;
+        Categoria categoriaModel = new();
+
+        if (Id == null)
+        {
+            categoriaModel.Nombre = categoriaRegistroDto.Nombre;
+            await CategoriaService.CreateCategoria(categoriaModel);
+            guardarDisabled = false;
+        }
+        else
+        {
+            categoriaModel.CategoriaId = categoriaRegistroDto.CategoriaId;
+            categoriaModel.Nombre = categoriaRegistroDto.Nombre;
+            await CategoriaService.UpdateCategoria(categoriaModel);
+
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Clear();
+            Snackbar.Add($"Se actualizo exitosamente la categoria.", Severity.Success);
+
+            guardarDisabled = false;
+        }
+
+        StateHasChanged();
+
+        NavigationManager.NavigateTo("/admin/categoria/categoria-listado");
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/admin/categoria/categoria-listado");
+
+    }
+
+    private async Task ValidarSesion()
+    {
+        var authenticationState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+
+        var rolClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+        var nombreClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+
+        if (rolClaim != null && (rolClaim.Value.Equals("Admin") || rolClaim.Value.Equals("Customer")))
+        {
+            autenticado = true;
+            rol = rolClaim.Value;
+        }
+        else
+        {
+            autenticado = false;
+        }
+    }
+}

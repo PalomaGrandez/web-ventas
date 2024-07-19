@@ -1,0 +1,170 @@
+﻿@page "/admin/eventofecha/evento-fecha-registro"
+@page "/admin/eventofecha/evento-fecha-registro/{Id:int}"
+
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject IEventoFechaService EventoFechaService
+@inject IEventoService EventoService
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+
+        <PageTitle>@tituloPagina</PageTitle>
+        <div style="height:20px" />
+
+        <EditForm Model="eventoFecha" Context="formContext" OnValidSubmit="HandleRegistration">
+            <DataAnnotationsValidator />
+
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12" sm="7">
+                    <MudCard Elevation="3">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">@tituloPagina</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudSelect T="int?" Label="Evento" Disabled="@_cargandoEvento"
+                                       AnchorOrigin="Origin.BottomCenter" @bind-Value="@eventoFecha!.EventoId"
+                                       Adornment="Adornment.Start"
+                                       Placeholder="Seleccione el evento"
+                                       Variant="Variant.Text"
+                                       HelperText="Seleccione el evento"
+                                       For="@(() => eventoFecha!.EventoId)">
+                                <MudSelectItem Value="@((int?) 0)">Seleccione el evento</MudSelectItem>
+                                @if (EventoService.Eventos.Count > 0)
+                                {
+                                    @foreach (var evento in EventoService.Eventos)
+                                    {
+                                        <MudSelectItem Value="@((int?)evento.EventoId)">@evento.Nombre</MudSelectItem>
+                                    }
+                                }
+                            </MudSelect>
+                            <MudDatePicker @bind-Date="eventoFecha.Fecha" DateFormat="dd/MM/yyyy" Label="Fecha" />
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Disabled="@_guardando" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Class="ml-auto">
+                                @if (_guardando)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                    <MudText Class="ms-2">Guardando</MudText>
+                                }
+                                else
+                                {
+                                    <MudText>@btnText</MudText>
+
+                                }
+                            </MudButton>
+                            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.Cancel" Class="ml-auto" OnClick="Cancelar">Cancelar</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+
+    </Authorized>
+    <NotAuthorized>
+        <PaginaNoAutorizada />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public int? Id { get; set; }
+
+    EventoFecha eventoFecha = new();
+
+    private bool _cargandoEvento = false;
+    private bool _guardando = false;
+    string mensaje = string.Empty;
+
+    private string tituloPagina = "Registrar Evento Fecha";
+    string btnText = "REGISTRAR";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarEventos();
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        btnText = Id == null ? "REGISTRAR" : "ACTUALIZAR";
+        tituloPagina = Id == null ? "Registrar Evento Fecha" : $"Actualizar Evento Fecha";
+        mensaje = string.Empty;
+
+        //Validar
+        if (Id != null)
+        {
+            var response = await EventoFechaService.GetEventoFechaPorId((int)Id);
+
+            if (!response.Success)
+            {
+                mensaje = response.Message;
+            }
+            else
+            {
+                var eventoFechaRequest = response.Data;
+
+                eventoFecha.EventoFechaId = (int)Id;
+                eventoFecha.EventoId = eventoFechaRequest.EventoId;
+                eventoFecha.Fecha = eventoFechaRequest.Fecha;
+            }
+        }
+    }
+
+    private async Task CargarEventos(int pagina = 1)
+    {
+        _cargandoEvento = true;
+        EventoService.OnChange += StateHasChanged;
+        await EventoService.GetEventos();
+        _cargandoEvento = false;
+    }
+
+    private async Task HandleRegistration()
+    {
+        _guardando = true;
+
+        if (Id == null)
+        {
+            var result = await EventoFechaService.CreateEventoFecha(eventoFecha);
+
+            if (result.Success)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add($"Evento registrado exitosamente!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add($"Ha sucedido un error!", Severity.Error);
+            }
+            NavigationManager.NavigateTo($"/admin/eventofecha/evento-fecha-listado");
+
+            _guardando = false;
+        }
+        else
+        {
+            var result = await EventoFechaService.UpdateEventoFecha(eventoFecha);
+
+            if (result.Success)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add($"Evento Fecha actualizada exitosamente!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add($"Ha sucedido un error: {result.Message}", Severity.Error);
+            }
+            NavigationManager.NavigateTo($"/admin/eventofecha/evento-fecha-listado");
+            _guardando = false;
+        }
+
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo($"/admin/eventofecha/evento-fecha-listado");
+    }
+
+}

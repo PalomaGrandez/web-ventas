@@ -1,0 +1,205 @@
+﻿@page "/admin/evento/evento-registro"
+@page "/admin/evento/evento-registro/{Id:int}"
+
+@inject NavigationManager NavigationManager
+@inject IEventoService EventoService
+@inject ICategoriaService CategoriaService
+@inject ISnackbar Snackbar
+@inject IAuthService AuthService
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <PageTitle>Registro de Evento</PageTitle>
+        <div style="height:20px" />
+        <EditForm Model="eventoRegistroDto" Context="formContext" OnValidSubmit="HandleRegistration">
+            <DataAnnotationsValidator />
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12" sm="7">
+                    <MudCard Elevation="3">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">Registrar Evento</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudTextField Label="Nombre" HelperText="Ingrese el nombre"
+                                          @bind-Value="eventoRegistroDto!.Nombre" For="@(() => eventoRegistroDto!.Nombre)" />
+                            <MudTextField Label="Información" HelperText="Ingrese la información del evento"
+                                          @bind-Value="eventoRegistroDto!.Informacion" For="@(() => eventoRegistroDto!.Informacion)"
+                                          Lines="3" />
+                            <MudTextField Label="Ubicación" HelperText="Ingrese la ubicación"
+                                          @bind-Value="eventoRegistroDto!.Ubicacion" For="@(() => eventoRegistroDto!.Ubicacion)" />
+                            <MudTextField Label="Imagen" HelperText="Ingrese una imagen para el evento"
+                                          @bind-Value="eventoRegistroDto!.Imagen" For="@(() => eventoRegistroDto!.Imagen)" />
+                            <MudSelect T="int?" Label="Categoria" Disabled="@_cargandoCategoria"
+                                       AnchorOrigin="Origin.BottomCenter" @bind-Value="@eventoRegistroDto!.CategoriaId"
+                                       Adornment="Adornment.Start"
+                                       Placeholder="Seleccione la categoria"
+                                       Variant="Variant.Text"
+                                       HelperText="Seleccione la categoria"
+                                       For="@(() => eventoRegistroDto!.CategoriaId)">
+                                <MudSelectItem Value="@((int?) 0)">Seleccione la categoria</MudSelectItem>
+                                @if (CategoriaService.Categorias.Count > 0)
+                                {
+                                    @foreach (var categoria in CategoriaService.Categorias)
+                                    {
+                                        <MudSelectItem Value="@((int?)categoria.CategoriaId)">@categoria.Nombre</MudSelectItem>
+                                    }
+                                }
+                            </MudSelect>
+                            <MudNumericField Label="Capacidad Total"
+                                             HelperText="Ingrese la capacidad total"
+                                             @bind-Value="eventoRegistroDto!.CapacidadTotal"
+                                             For="@(() => eventoRegistroDto!.CapacidadTotal)"
+                                             Culture="@CultureInfo.InvariantCulture"
+                                             Format="F2" />
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Disabled="@_guardando" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Class="ml-auto">
+                                @if (_guardando)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                    <MudText Class="ms-2">Guardando</MudText>
+                                }
+                                else
+                                {
+                                    <MudText>@btnText</MudText>
+
+                                }
+                            </MudButton>
+                            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.Cancel" Class="ml-auto" OnClick="Cancelar">Cancelar</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </Authorized>
+    <NotAuthorized>
+        <PaginaNoAutorizada />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    EventoRegistroDto eventoRegistroDto = new();
+
+    string btnText = "REGISTRAR";
+    private bool _guardando = false;
+    private bool _cargandoCategoria = false;
+    string mensaje = string.Empty;
+    string messageCssClass = string.Empty;
+    private string rol = string.Empty;
+
+    private string tituloPagina = string.Empty;
+    Evento evento = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await AuthService.IsUserAuthenticated();
+        rol = await AuthService.GetUserRole();
+
+        if (isAuthenticated && rol.Equals("Admin"))
+        {
+            await CargarCategorias();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var isAuthenticated = await AuthService.IsUserAuthenticated();
+        rol = await AuthService.GetUserRole();
+
+        if (isAuthenticated && rol.Equals("Admin"))
+        {
+            btnText = Id == null ? "REGISTRAR" : "ACTUALIZAR";
+            tituloPagina = Id == null ? "Registrar Evento" : $"Actualizar Evento";
+            mensaje = string.Empty;
+
+            //Validar
+            if (Id != null)
+            {
+                var response = await EventoService.GetEventoPorId((int)Id);
+
+                if (!response.Success)
+                {
+                    mensaje = response.Message;
+                }
+                else
+                {
+                    evento = response.Data!;
+
+                    eventoRegistroDto.EventoId = (int)Id;
+                    eventoRegistroDto.Nombre = evento.Nombre.ToUpper();
+                    eventoRegistroDto.Informacion = evento.Informacion.ToUpper();
+                    eventoRegistroDto.Ubicacion = evento.Ubicacion.ToUpper();
+                    eventoRegistroDto.Imagen = evento.Imagen;
+                    eventoRegistroDto.CategoriaId = evento.CategoriaId;
+
+                    eventoRegistroDto.CapacidadTotal = evento.CapacidadTotal;
+
+                    //categoriaRegistroDto.CategoriaId = categoriaModel.CategoriaId;
+                    //categoriaRegistroDto.Nombre = categoriaModel.Nombre;
+                }
+            }
+        }
+    }
+
+    private async Task HandleRegistration()
+    {
+        _guardando = true;
+
+        if (Id == null)
+        {
+            var result = await EventoService.CreateEvento(eventoRegistroDto);
+
+            mensaje = result.Message;
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            if (result.Success)
+            {
+                Snackbar.Add($"Evento registrado exitosamente!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            }
+
+            NavigationManager.NavigateTo($"/admin/evento/evento-listado");
+
+            _guardando = false;
+        }
+        else
+        {
+            var result = await EventoService.UpdateEvento(eventoRegistroDto);
+
+            if (result.Success)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add($"Evento actualizado exitosamente!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add($"Ha sucedido un error: {result.Message}", Severity.Error);
+            }
+            NavigationManager.NavigateTo($"/admin/evento/evento-listado");
+            _guardando = false;
+        }
+
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo($"/admin/evento/evento-listado");
+    }
+
+    private async Task CargarCategorias(int pagina = 1)
+    {
+        _cargandoCategoria = true;
+        CategoriaService.OnChange += StateHasChanged;
+        await CategoriaService.GetCategorias();
+        _cargandoCategoria = false;
+    }
+
+}

@@ -1,0 +1,185 @@
+﻿@page "/admin/eventoentrada/evento-entrada-registro"
+@page "/admin/eventoentrada/evento-entrada-registro/{Id:int}"
+
+@inject NavigationManager NavigationManager
+@inject IEventoService EventoService
+@inject IEventoEntradaService EventoEntradaService
+@inject ISnackbar Snackbar
+
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <PageTitle>@tituloPagina</PageTitle>
+        <div style="height:20px" />
+
+        <EditForm Model="eventoEntrada" Context="formContext" OnValidSubmit="HandleRegistration">
+            <DataAnnotationsValidator />
+
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12" sm="7">
+                    <MudCard Elevation="3">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">@tituloPagina</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudSelect T="int?" Label="Evento" Disabled="@_cargandoEvento"
+                                       AnchorOrigin="Origin.BottomCenter" @bind-Value="@eventoEntrada!.EventoId"
+                                       Adornment="Adornment.Start"
+                                       Placeholder="Seleccione el evento"
+                                       Variant="Variant.Text"
+                                       HelperText="Seleccione el evento"
+                                       ReadOnly="@_eventoSoloLectura"
+                                       For="@(() => eventoEntrada!.EventoId)">
+                                <MudSelectItem Value="@((int?) 0)">Seleccione el evento</MudSelectItem>
+                                @if (EventoService.Eventos.Count > 0)
+                                {
+                                    @foreach (var evento in EventoService.Eventos)
+                                    {
+                                        <MudSelectItem Value="@((int?)evento.EventoId)">@evento.Nombre</MudSelectItem>
+                                    }
+                                }
+                            </MudSelect>
+                            <MudTextField Label="Tipo" HelperText="Ingrese el tipo"
+                                          @bind-Value="eventoEntrada!.Tipo" For="@(() => eventoEntrada!.Tipo)" />
+                            <MudNumericField Label="Precio Regular" HelperText="Ingrese el precio regular"
+                                             @bind-Value="eventoEntrada!.PrecioRegular" For="@(() => eventoEntrada!.PrecioRegular)" />
+                            <MudNumericField Label="Precio Descuento" HelperText="Ingrese el precio con descuento"
+                                             @bind-Value="eventoEntrada!.PrecioDescuento" For="@(() => eventoEntrada!.PrecioDescuento)" />
+                            <MudDatePicker @bind-Date="eventoEntrada.FechaVigenciaDescuento" DateFormat="dd/MM/yyyy" Label="Fecha Vigencia Descuento" />
+                            <MudNumericField Label="Capacidad" HelperText="Ingrese la capacidad"
+                                             @bind-Value="eventoEntrada!.Capacidad" For="@(() => eventoEntrada!.Capacidad)" />
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Disabled="@_guardando" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Class="ml-auto">
+                                @if (_guardando)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                    <MudText Class="ms-2">Guardando</MudText>
+                                }
+                                else
+                                {
+                                    <MudText>@btnText</MudText>
+
+                                }
+                            </MudButton>
+                            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.Cancel" Class="ml-auto" OnClick="Cancelar">Cancelar</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+
+    </Authorized>
+    <NotAuthorized>
+        <PaginaNoAutorizada />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    private string tituloPagina = "Registrar Evento Entrada";
+    string btnText = "REGISTRAR";
+
+    EventoEntrada eventoEntrada = new();
+
+    private bool _cargandoEvento = true;
+    private bool _guardando = false;
+    private bool _eventoSoloLectura = false;
+    string mensaje = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarEventos();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        btnText = Id == null ? "REGISTRAR" : "ACTUALIZAR";
+        tituloPagina = Id == null ? "Registrar Evento Entrada" : $"Actualizar Evento Entrada";
+        _eventoSoloLectura = Id == null ? false : true;
+        mensaje = string.Empty;
+
+        //Validar
+        if (Id != null)
+        {
+            var response = await EventoEntradaService.GetEventoEntradaPorId((int)Id);
+
+            if (!response.Success)
+            {
+                mensaje = response.Message;
+            }
+            else
+            {
+                var eventoResponse = response.Data;
+
+                eventoEntrada.EventoId = eventoResponse!.EventoId;
+                eventoEntrada.EventoEntradaId = (int)Id;
+                eventoEntrada.Tipo = eventoResponse.Tipo.ToUpper();
+                eventoEntrada.PrecioRegular = eventoResponse.PrecioRegular;
+                eventoEntrada.PrecioDescuento = eventoResponse.PrecioDescuento;
+                eventoEntrada.FechaVigenciaDescuento = eventoResponse.FechaVigenciaDescuento;
+                eventoEntrada.Capacidad = eventoResponse.Capacidad;
+            }
+        }
+    }
+
+    private async Task CargarEventos(int pagina = 1)
+    {
+        _cargandoEvento = true;
+        EventoService.OnChange += StateHasChanged;
+        await EventoService.GetEventos();
+        _cargandoEvento = false;
+    }
+
+    private async Task HandleRegistration()
+    {
+        _guardando = true;
+
+        if (Id == null)
+        {
+            var result = await EventoEntradaService.CreateEventoEntrada(eventoEntrada);
+
+            if (result.Success)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add($"Evento Entrada registrado exitosamente!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add($"Ha sucedido un error!", Severity.Error);
+            }
+
+            NavigationManager.NavigateTo($"/admin/eventoentrada/evento-entrada-listado");
+
+            _guardando = false;
+        }
+        else
+        {
+            var result = await EventoEntradaService.UpdateEventoEntrada(eventoEntrada);
+
+            if (result.Success)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add($"Evento Entrada actualizado exitosamente!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add($"Ha sucedido un error: {result.Message}", Severity.Error);
+            }
+            NavigationManager.NavigateTo($"/admin/eventoentrada/evento-entrada-listado");
+            _guardando = false;
+        }
+
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo($"/admin/eventoentrada/evento-entrada-listado");
+    }
+}

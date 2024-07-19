@@ -1,0 +1,139 @@
+﻿@page "/auth/usuario-registro"
+
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject ISnackbar Snackbar
+
+<PageTitle>Registro Usuario</PageTitle>
+<div style="height:20px"></div>
+<MudContainer MaxWidth="MaxWidth.Large">
+    <EditForm Model="usuarioDto" OnValidSubmit="HandleRegistration">
+        <DataAnnotationsValidator />
+
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12" sm="6" lg="6">
+                <MudCard Elevation="3">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">Registrar Usuario</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudTextField Label="Nombres" HelperText="Ingrese los nombres"
+                                      @bind-Value="usuarioDto!.Nombres" For="@(() => usuarioDto!.Nombres)" />
+                        <MudTextField Label="Apellido Paterno" HelperText="Ingrese el apellido paterno"
+                                      @bind-Value="usuarioDto!.ApellidoPaterno" For="@(() => usuarioDto!.ApellidoPaterno)" />
+                        <MudTextField Label="Apellido Materno" HelperText="Ingrese el apellido materno"
+                                      @bind-Value="usuarioDto!.ApellidoMaterno" For="@(() => usuarioDto!.ApellidoMaterno)" />
+                        <MudTextField Label="Nombre de Usuario" HelperText="Ingrese el nombre de usuario"
+                                      @bind-Value="usuarioDto!.NombreUsuario" For="@(() => usuarioDto!.NombreUsuario)" />
+                        <MudTextField Label="Email" HelperText="Ingrese el email"
+                                      @bind-Value="usuarioDto!.Email" For="@(() => usuarioDto!.Email)" />
+                        <MudTextField Label="Contraseña"
+                                      HelperText="Ingrese la contraseña"
+                                      InputType="@PasswordInput"
+                                      AdornmentIcon="@PasswordInputIcon"
+                                      Adornment="Adornment.End"
+                                      OnAdornmentClick="ShowPassword"
+                                      @bind-Value="usuarioDto!.Password"
+                                      For="@(() => usuarioDto!.Password)" />
+                        <MudTextField Label="Confirmar Contraseña"
+                                      HelperText="Ingrese la confirmación de la contraseña"
+                                      InputType="@PasswordInput"
+                                      AdornmentIcon="@PasswordInputIcon"
+                                      Adornment="Adornment.End"
+                                      OnAdornmentClick="ShowPassword"
+                                      @bind-Value="usuarioDto!.ConfirmPassword"
+                                      For="@(() => usuarioDto!.ConfirmPassword)" />
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudSpacer />
+                        <MudButton Disabled="@_guardando"
+                                   ButtonType="ButtonType.Submit"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Save"
+                                   Size="Size.Large"
+                                   Class="ml-auto m-2">
+                            @if (_guardando)
+                            {
+                                <MudProgressCircular Class="ms-n1"
+                                                     Size="Size.Small"
+                                                     Indeterminate="true" />
+                                <MudText Class="ms-2">Guardando</MudText>
+                            }
+                            else
+                            {
+                                <MudText>@btnText</MudText>
+
+                            }
+                        </MudButton>
+                        <MudButton ButtonType="ButtonType.Button"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Error"
+                                   StartIcon="@Icons.Material.Filled.Cancel"
+                                   Class="ml-auto m-2"
+                                   OnClick="Cancelar"
+                                   Size="Size.Large">Cancelar</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+</MudContainer>
+@code {
+    UsuarioRegistroDto usuarioDto = new();
+
+    string btnText = "REGISTRAR";
+
+    string message = string.Empty;
+    string messageCssClass = string.Empty;
+    private bool _guardando = false;
+
+    private async Task HandleRegistration()
+    {
+        _guardando = true;
+        var result = await AuthService.Registro(usuarioDto);
+
+        message = result.Message;
+
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Clear();
+        if (result.Success)
+        {
+
+            Snackbar.Add($"Se registro el usuario exitosammente.", Severity.Success);
+
+            NavigationManager.NavigateTo($"/");
+        }
+        else
+        {
+            Snackbar.Add($"Ha sucedido un error. No se pudo realizar el registro", Severity.Error);
+        }
+        _guardando = true;
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo($"/");
+    }
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private void ShowPassword()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+}

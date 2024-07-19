@@ -1,0 +1,144 @@
+﻿@inherits LayoutComponentBase
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1" Style="height: 75px; background-color: #333333;">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle" />
+
+        <MudImage Src="icons/guitar-icon.png" Height="50" Width="50" onclick="@Home" Style="cursor: pointer" />
+        <div style="width: 20px"></div>
+        <MudText Typo="Typo.h5" onclick="@Home" Style="cursor: pointer">Productos</MudText>
+
+        <MudSpacer />
+
+        @if (autenticado)
+        {
+            <MudText Typo="Typo.h6" Class="mt-1">Hola, @nombre</MudText>
+
+              <MudButton ButtonType="ButtonType.Button"
+                       StartIcon="@Icons.Material.Filled.ShoppingCart"
+                       Size="Size.Large"
+                       Color="Color.Inherit"
+                       Variant="Variant.Text"
+                      // OnClick="IrACarrito"
+                       Style="border-radius: 20px">
+                Carrito
+            </MudButton>
+
+            <MudButton ButtonType="ButtonType.Button"
+                       StartIcon="@Icons.Material.Filled.Login"
+                       Size="Size.Large"
+                       Color="Color.Inherit"
+                       Variant="Variant.Text"
+                       OnClick="CerrarSesion"
+                       Style="border-radius: 20px">
+                Cerrar Sesión
+            </MudButton>
+
+            <div style="width: 20px"></div>
+
+          
+        }
+        else
+        {
+            <MudButton ButtonType="ButtonType.Button"
+                       StartIcon="@Icons.Material.Filled.Login"
+                       Size="Size.Large"
+                       Color="Color.Inherit"
+                       Variant="Variant.Text"
+                       OnClick="IniciarSesion"
+                       Style="border-radius: 20px">
+                Iniciar Sesión
+            </MudButton>
+            <div style="width: 20px"></div>
+            <MudButton ButtonType="ButtonType.Button"
+                       StartIcon="@Icons.Material.Filled.AppRegistration"
+                       Size="Size.Large"
+                       Color="Color.Inherit"
+                       Variant="Variant.Text"
+                       OnClick="Registrarse"
+                       Style="border-radius: 20px">
+                Registrarse
+            </MudButton>
+        }
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="2" ClipMode="DrawerClipMode.Always">
+        <div style="height: 20px"></div>
+        <MudDrawerHeader>
+            <MudAvatar Variant="Variant.Filled">@nombre?.Substring(0, 1)</MudAvatar>
+            <div style="width: 20px"></div>
+            <MudText Typo="Typo.h5" Class="mt-1" Style="overflow-wrap: normal; max-width: 200px">@nombre</MudText>
+        </MudDrawerHeader>
+        <NavMenu></NavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = false;
+    string user = "Invitado";
+    string nombre = "Invitado";
+    string rol = string.Empty;
+    bool autenticado = false;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+    private void Home()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+    private void Registrarse()
+    {
+        NavigationManager.NavigateTo($"/Auth/usuario-registro");
+    }
+    private void IniciarSesion()
+    {
+        NavigationManager.NavigateTo($"/Auth/iniciar-sesion");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ValidarSesion();
+    }
+    private async Task CerrarSesion()
+    {
+        await LocalStorage.RemoveItemAsync("authToken");
+        await AuthStateProvider.GetAuthenticationStateAsync();
+        NavigationManager.NavigateTo("/", forceLoad: true);
+
+        await ValidarSesion();
+    }
+
+    private async Task ValidarSesion()
+    {
+        var authenticationState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+
+        var rolClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+        var nombreClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor);
+
+        if (rolClaim != null && (rolClaim.Value.Equals("Admin") || rolClaim.Value.Equals("Customer")))
+        {
+            autenticado = true;
+            rol = rolClaim.Value;
+        }
+        else
+        {
+            autenticado = false;
+        }
+
+        nombre = nombreClaim?.Value ?? "Invitado";
+    }
+
+}

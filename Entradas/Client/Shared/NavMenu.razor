@@ -1,0 +1,53 @@
+﻿@inject AuthenticationStateProvider AuthStateProvider
+
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Inicio</MudNavLink>
+   @*  <AuthorizeView>
+        <Authorized> *@
+            @if (rol.Equals("Customer") == true)
+            {
+                Console.WriteLine($"Rol Pagina: {rol.Equals("Customer")}");
+
+                <MudNavLink Href="/usuario/mis-pedidos" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Mis Pedidos</MudNavLink>
+            }
+
+            @if (rol.Equals("Admin") == true)
+            {
+                <MudNavGroup Title="Admin" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="false">
+                    <MudNavLink Href="/admin/Usuario/usuario-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Usuario</MudNavLink>
+                    <MudNavLink Href="/admin/categoria/categoria-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Category">Categorias</MudNavLink>
+                    <MudNavGroup Title="Evento" Icon="@Icons.Material.Filled.Event" Expanded="false">
+                        <MudNavLink Href="/admin/evento/evento-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EventAvailable">Eventos</MudNavLink>
+                        <MudNavLink Href="/admin/eventoentrada/evento-entrada-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EventSeat">Evento Entradas</MudNavLink>
+                        <MudNavLink Href="/admin/eventofecha/evento-fecha-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Evento Fechas</MudNavLink>
+                    </MudNavGroup>
+                    <MudNavLink Href="/admin/orden/orden-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Ordenes</MudNavLink>
+                    <MudNavLink Href="/admin/banner/banner-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Banners</MudNavLink>
+                </MudNavGroup>
+            }
+@*         </Authorized>
+    </AuthorizeView> *@
+
+</MudNavMenu>
+
+@code {   
+    string rol = "Invitado";
+    string nombre = "Invitado";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await AuthStateProvider.GetAuthenticationStateAsync();
+        var rolClaim = response.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+        var nombreClaim = response.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+
+        if (rolClaim != null)
+        {
+            rol = rolClaim.Value;         
+        }
+
+        if (nombreClaim != null)
+        {
+            nombre = nombreClaim.Value;
+        }
+    }
+}

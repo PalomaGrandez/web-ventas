@@ -1,0 +1,127 @@
+﻿@page "/admin/categoria/categoria-listado"
+
+@inject ICategoriaService CategoriaService
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject AuthenticationStateProvider AuthStateProvider
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <PageTitle>@tituloPagina</PageTitle>
+
+        <div style="height:20px"></div>
+
+        <MudContainer MaxWidth="MaxWidth.Large">
+            <MudCard Elevation="3" Class="p-2 m-2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">@tituloPagina</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                       Variant="Variant.Filled"
+                                       Size="Size.Large"
+                                       Color="Color.Success"
+                                       Style="border-radius:20px"
+                                       Title="Nueva Categoria"
+                                       OnClick="Nuevo">
+                        </MudIconButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField @bind-Value="busqueda" Placeholder="Busqueda" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
+                                  AdornmentColor="Color.Info" IconSize="Size.Medium" Variant="Variant.Outlined" Class="mt-0"></MudTextField>
+                </MudCardContent>
+            </MudCard>
+
+            <MudTable Items="@CategoriaService.Categorias" Context="CategoriaContext" Hover="true" Striped="true" Elevation="3" Loading="@_cargando" Breakpoint="Breakpoint.Sm" Dense="true" Class="p-2 m-2">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>NOMBRE</MudTh>
+                    <MudTh>ACTUALIZAR</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="ID">@CategoriaContext.CategoriaId</MudTd>
+                    <MudTd DataLabel="NOMBRES">@CategoriaContext.Nombre</MudTd>
+                    <MudTd><MudFab Size="Size.Small" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Info" DisableElevation="true" OnClick="()=> Actualizar(CategoriaContext.CategoriaId)"></MudFab></MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    @*<MudTablePager HideRowsPerPage="true" InfoFormat="@($"{infoFormat}")" HorizontalAlignment="HorizontalAlignment.Center" />*@
+                    <div class="d-flex flex-column align-center">
+                        <MudPagination Variant="Variant.Filled" Count="paginasTotales" SelectedChanged="PaginaSeleccionada" Class="pa-4" />
+                    </div>
+                </PagerContent>
+            </MudTable>
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        <PaginaNoAutorizada />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    public int id;
+
+    private bool _cargando = true;
+    private int paginaActual = 1;
+    private int paginasTotales;
+    private string tituloPagina = "Categorias";
+    private string busqueda = string.Empty;
+    private bool autenticado;
+    private string rol = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await AuthService.IsUserAuthenticated();
+        rol = await AuthService.GetUserRole();
+        if (isAuthenticated && rol.Equals("Admin"))
+        {
+            await CargarCategorias();
+        }        
+    }
+    private async Task PaginaSeleccionada(int pagina)
+    {
+        paginaActual = pagina;
+        await CargarCategorias(pagina);
+    }
+
+    private async Task CargarCategorias(int pagina = 1)
+    {
+        _cargando = true;
+        CategoriaService.OnChange += StateHasChanged;
+        await CategoriaService.GetCategoriasPaginado(pagina);
+        paginasTotales = CategoriaService.PaginasTotales;
+        _cargando = false;
+    }
+
+    private void Busqueda()
+    {
+    }
+    private void Nuevo()
+    {
+        NavigationManager.NavigateTo($"/admin/categoria/categoria");
+    }
+    private void Actualizar(int id)
+    {
+        NavigationManager.NavigateTo($"/admin/categoria/categoria/{id}");
+    }
+    private async Task ValidarSesion()
+    {
+        var authenticationState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+
+        var rolClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+        var nombreClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+
+        if (rolClaim != null && (rolClaim.Value.Equals("Admin") || rolClaim.Value.Equals("Customer")))
+        {
+            autenticado = true;
+            rol = rolClaim.Value;
+        }
+        else
+        {
+            autenticado = false;
+        }
+    }
+}
