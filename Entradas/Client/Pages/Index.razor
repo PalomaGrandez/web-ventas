@@ -35,7 +35,7 @@
 </MudCarousel>
 <div style="height:20px" />
 <center>
-    <MudText Typo="Typo.h4">Productos Destacados</MudText>
+    <MudText Typo="Typo.h4" Style="font-weight: bold; font-size: 2rem;">Productos Destacados</MudText>
 </center>
 
 <div style="margin: 20px 10%; display: flex; justify-content: center;">
@@ -57,11 +57,11 @@
                         <MudCardMedia Image="@evento.Imagen" Height="220" Style="width:450px" />
                         <MudCardContent>
                             <MudText Typo="Typo.subtitle2">@evento.Ubicacion</MudText>
-                            <MudText Typo="Typo.h6">@evento.Nombre </MudText>
+                            <MudText Typo="Typo.h6" Style="font-weight: bold; font-size: 1.5rem;">@evento.Nombre</MudText>
                             @* <MudText Typo="Typo.body2">@evento.</MudText> *@
                         </MudCardContent>
                         <MudCardActions Class="justify-content-end ">
-                            <MudButton Variant="Variant.Outlined" ButtonType="ButtonType.Button" StartIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="()=>EventoDetalle(evento.EventoId)">Ver Detalle</MudButton>
+                            <MudButton Variant="Variant.Outlined" ButtonType="ButtonType.Button" StartIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="()=>EventoDetalle(evento.EventoId)">Ver Producto</MudButton>
                         </MudCardActions>
                     </MudCard>
                 </MudPaper>
