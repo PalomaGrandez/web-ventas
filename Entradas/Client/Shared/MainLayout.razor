@@ -126,7 +126,7 @@
         var user = authenticationState.User;
 
         var rolClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-        var nombreClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor);
+        var nombreClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
 
         if (rolClaim != null && (rolClaim.Value.Equals("Admin") || rolClaim.Value.Equals("Customer")))
         {
