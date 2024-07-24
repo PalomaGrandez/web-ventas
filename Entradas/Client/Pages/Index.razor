@@ -39,12 +39,31 @@
 </center>
 
 <div style="margin: 20px 10%; display: flex; justify-content: center;">
-    <MudTextField @bind-Value="searchQuery" Placeholder="Buscar eventos..." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Variant="Variant.Outlined" Class="mud-width-full mud-max-width-600" OnKeyUp="PerformSearch">
+    <MudTextField @bind-Value="searchQuery" Placeholder="Buscar eventos..." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Variant="Variant.Outlined" Class="mud-width-full mud-max-width-600 custom-text-field" OnKeyUp="PerformSearch">
             <Adornment AdornmentPosition="AdornmentPosition.End">
             <IconButton Icon="@Icons.Material.Filled.Search" OnClick="PerformSearch" />
         </Adornment>
     </MudTextField>
 </div>
+
+<style>
+    .custom-text-field input::placeholder {
+        color: rgba(255, 255, 255, 0.6); /* Color blanco opaco */
+    }
+
+    .custom-text-field .mud-input-outlined {
+        border-color: rgba(255, 255, 255, 0.6); /* Color blanco opaco para los bordes */
+    }
+
+    .custom-text-field .mud-input-outlined:hover {
+        border-color: rgba(255, 255, 255, 1); /* Color blanco completo al pasar el cursor */
+    }
+
+    .custom-text-field .mud-input-outlined:focus {
+        border-color: rgba(255, 255, 255, 1); /* Color blanco completo al enfocar */
+    }
+</style>
+
 
 <MudGrid Class="d-flex justify-center p-3">
     @if (filteredEventos.Count > 0)
