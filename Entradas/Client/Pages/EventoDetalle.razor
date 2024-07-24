@@ -18,9 +18,11 @@
             </MudItem>
         }
         else {
-        <MudItem lg="12" sm="12" Class="d-flex justify-center">
-            <MudText Typo="Typo.h3">@evento.Nombre </MudText>
-        </MudItem>
+            <MudItem lg="12" sm="12" Class="d-flex justify-center">
+                <MudText Typo="Typo.h3" Style="font-weight: bold; font-size: 2.5rem;">
+                    @evento.Nombre
+                </MudText>
+            </MudItem>
         <MudItem lg="12" sm="12" Class="d-flex justify-center">
             <MudPaper Elevation="3" Class="p-2" Style="border-radius:10px">
                 <MudContainer>
@@ -52,11 +54,11 @@
                                 <MudListItem Icon="@Icons.Material.Filled.GpsFixed">
                                 Dirección: Camino Centenario y 514, La Plata
                                 </MudListItem> *@
-                                <MudListItem Icon="@Icons.Material.Filled.GpsFixed">
-                                    Lugar: @evento.Ubicacion
+                                    <MudListItem Icon="@Icons.Material.Filled.MusicNote">
+                                    Tipo de Instrumento @evento.Ubicacion
                                 </MudListItem>
-                                <MudListItem Icon="@Icons.Material.Filled.Numbers">
-                                    Capacidad: @evento.CapacidadTotal
+                                <MudListItem Icon="@Icons.Material.Filled.PriceCheck">
+                                    Precio: @evento.CapacidadTotal
                                 </MudListItem>
                             </MudList>
                             <div style="height:20px"> </div>
@@ -68,15 +70,15 @@
             </MudPaper>
         </MudItem>
         <MudItem lg="12" sm="12" Class="d-flex justify-center">
-            <MudText Typo="Typo.h3">DETALLE DEL EVENTO </MudText>
+            <MudText Typo="Typo.h3">Detalle del Producto </MudText>
         </MudItem>
         <MudItem lg="12" sm="12" Class="d-flex justify-center">
             <MudPaper Elevation="3" Class="p-3" Style="border-radius:10px ">
                 <MudText Typo="Typo.h5"> @evento.Nombre</MudText>
                 @* <MudText Typo="Typo.subtitle1"> El Parque inflable más grande de Argentina con un recorrido emocionante<br /> </MudText> *@
-                <MudText Typo="Typo.body1" Align="Align.Justify">
-                    @evento.Informacion
-                </MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Justify" Style="font-weight: bold;">
+                        @evento.Informacion
+                    </MudText>
             </MudPaper>
         </MudItem>
         <MudItem lg="12" sm="12" Class="d-flex justify-center">
