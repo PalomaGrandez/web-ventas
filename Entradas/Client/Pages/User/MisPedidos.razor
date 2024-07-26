@@ -21,7 +21,6 @@
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
-
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -73,29 +72,23 @@
                     </TemplateColumn>
                     <TemplateColumn Title="DETALLE">
                         <CellTemplate>
-                            @* @if (context.Item.Estado.Equals("APROBADO")) *@
-                            @* { *@
                             <MudFab Size="Size.Medium"
                                     StartIcon="@Icons.Material.Filled.List"
                                     Color="Color.Info"
                                     DisableElevation="true"
                                     OnClick="()=> VerDetalle(context.Item.OrdenId,userId)">
                             </MudFab>
-                            @* } *@
                         </CellTemplate>
                     </TemplateColumn>
                     <TemplateColumn Title="TICKETS">
                         <CellTemplate>
-
-
                             <MudFab Size="Size.Medium"
                                     StartIcon="@Icons.Material.Filled.Receipt"
                                     Color="Color.Warning"
                                     DisableElevation="true"
-                                    OnClick="()=> AbrirCulqi()">
+                                    Id="btn_pagar"
+                                    OnClick="AbrirCulqi">
                             </MudFab>
-
-
                         </CellTemplate>
                     </TemplateColumn>
                 </Columns>
@@ -107,14 +100,15 @@
             </div>
         </MudItem>
     </MudGrid>
-
 </MudContainer>
+
 @code {
     private string tituloPagina = "Mis Pedidos";
     private bool _cargando = false;
     private int paginasTotales = 0;
     private int paginaActual = 1;
     private int userId;
+
     protected override async Task OnInitializedAsync()
     {
         userId = await AuthService.GetUserId();
@@ -147,9 +141,24 @@
         NavigationManager.NavigateTo($"/pedido-ticket/{ordenId}");
     }
 
-    private void AbrirCulqi()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        JS.InvokeVoidAsync("openCulqiCheckout");
+        if (firstRender)
+        {
+            // Inicializar Culqi cuando se renderiza por primera vez
+            await JS.InvokeVoidAsync("initCulqi", "btn_pagar");
+        }
     }
-
+    private async Task AbrirCulqi()
+    {
+        try
+        {
+            // Llamar a la función de JavaScript para abrir el checkout de Culqi
+            await JS.InvokeVoidAsync("AbrirCulqi");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al intentar abrir Culqi: {ex.Message}");
+        }
+    }
 }
