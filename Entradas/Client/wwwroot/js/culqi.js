@@ -1,8 +1,16 @@
 const settings = {
-    title: 'Culqi  store 2',
+    title: 'Realizacion de pago',
     currency: 'PEN',
-    amount: 8000,
-}
+    amount: 600, // Asegúrate de que el monto está en centavos
+};
+
+//c2391c29-3b71-4a27-b55e-bac3457ecb1f
+/* -----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDSGBntzxDV2WecsK5MicVaXb3J
+sz1QFAIO6GYkcsQGic4aug1zYESr06sCzSCPXQT1N1P + uss8CgasPeNtmE + LHm + q
+HvvqMv6 + yjzWeNon4QiqbOHvRu4ZwHhNok53c3abnNQ + OufTwcbQv7puOkvAhyIq
+OXgb2n / A79IFmX63mwIDAQAB
+----- END PUBLIC KEY-----*/
 
 const paymentMethods = {
     tarjeta: false,
@@ -23,7 +31,7 @@ const options = {
 };
 
 const client = {
-    email: 'soporte@fabrica.pe',
+    email: 'mario.correa@fabrica.pe',
 };
 
 const appearance = {
@@ -33,6 +41,7 @@ const appearance = {
     hiddenBanner: false,
     hiddenToolBarAmount: false,
     menuType: "sidebar",
+    buttonCardPayText: "Pagar 6.00 PEN",
     logo: null,
     defaultStyle: {
         bannerColor: "blue",
@@ -44,43 +53,6 @@ const appearance = {
     },
 };
 
-
-const handleCulqiAction = async () => {
-    if (Culqi.token) {
-        const token = Culqi.token.id;
-        console.log('Se ha creado un Token: ', token);
-
-        const response = await fetch('https://localhost:7122/api/pagos/procesar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                TokenId: token
-            }),
-        });
-
-        const result = await response.json();
-        console.log('Respuesta del backend: ', result);
-
-        if (response.ok) {
-            alert('Pago procesado exitosamente.');
-        } else {
-            alert('Error al procesar el pago: ' + result.message);
-        }
-    } else if (Culqi.order) {
-        const order = Culqi.order;
-        console.log('Se ha creado el objeto Order: ', order);
-    } else {
-        console.log('Errorrr : ', Culqi.error);
-    }
-}
-
-window.AbrirCulqi = function (settings) {
-
-    Culqi.open();
-};
-
 const config = {
     settings,
     client,
@@ -88,8 +60,63 @@ const config = {
     appearance,
 };
 
-const publicKey = 'pk_test_3153d0c7ed6a853a'; 
+const publicKey = 'pk_test_3153d0c7ed6a853a';
 
 const Culqi = new CulqiCheckout(publicKey, config);
 
+window.initCulqi = function (buttonId) {
+    const btn_pagar = document.getElementById(buttonId);
+    if (btn_pagar) {
+        btn_pagar.addEventListener('click', function (e) {
+            Culqi.open();
+            e.preventDefault();
+        });
+    }
+};
+
+window.AbrirCulqi = function () {
+    Culqi.open();
+};
+
+const handleCulqiAction = async () => {
+    if (Culqi.token) {
+        const token = Culqi.token.id;
+        console.log('Se ha creado un Token: ', token);
+
+        try {
+            const response = await fetch('https://localhost:7122/api/pagos/procesar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    TokenId: token
+                }),
+            });
+
+            const result = await response.json();
+            console.log('Respuesta del backend: ', result);
+
+            if (response.ok) {
+                alert('Pago procesado exitosamente.');
+            } else {
+                alert('Error al procesar el pago: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error en la solicitud de pago:', error);
+            alert('Error en la solicitud de pago.');
+        }
+
+        Culqi.close();
+    } else if (Culqi.order) {
+        const order = Culqi.order;
+        console.log('Se ha creado el objeto Order: ', order);
+    } else {
+        console.log('Error : ', Culqi.error);
+    }
+};
+
 Culqi.culqi = handleCulqiAction;
+
+
+

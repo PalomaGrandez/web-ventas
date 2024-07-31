@@ -13,7 +13,12 @@ namespace Entradas.Server.Controllers
         {
             // Log para verificar que el token se recibe correctamente
             Console.WriteLine($"Token recibido: {request.TokenId}");
-        
+
+            if (string.IsNullOrEmpty(request.TokenId))
+            {
+                return BadRequest(new { message = "El TokenId es requerido" });
+            }
+
             // Crear una instancia del cliente RestSharp
             var client = new RestClient("https://api.culqi.com/v2/charges");
 
@@ -28,13 +33,13 @@ namespace Entradas.Server.Controllers
             // Crear el payload usando solo el token recibido
             var payload = new
             {
-                amount = request.Amount, // Monto en céntimos, ajusta según sea necesario
+                amount = 600, // Monto en céntimos, ajusta según sea necesario
                 currency_code = "PEN",
                 source_id = request.TokenId, // El token recibido del frontend
                 capture = true,
                 description = "Pago realizado con Yape", // Descripción del pago
-                email = "soporte@fabrica.pe",
-                    
+                email = "mario.correa@fabrica.pe",
+
             };
 
             // Agregar el cuerpo de la solicitud
@@ -61,6 +66,6 @@ namespace Entradas.Server.Controllers
     {
         public string TokenId { get; set; }
 
-        public int Amount { get; set; }
+        //public int Amount { get; set; }
     }
 }

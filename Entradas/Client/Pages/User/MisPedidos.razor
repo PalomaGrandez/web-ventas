@@ -155,13 +155,13 @@
         try
         {   
             // Convertir el precio a entero (por ejemplo, a céntimos)
-            int precioTotalEntero = (int)(precioTotal * 10);
+            int precioTotalEntero = (int)(precioTotal * 100);
 
             var settings = new
             {
                 title = "Realizacion de pago",
                 currency = "PEN",
-                amount = precioTotal
+                amount = precioTotalEntero
             };  
 
             // Llamar a la función de JavaScript para abrir el checkout de Culqi con el precio total
