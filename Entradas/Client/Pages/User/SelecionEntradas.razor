@@ -49,7 +49,7 @@
                             </MudItem>
 
                             <MudItem lg="6" sm="12" xs="12">
-                                <MudSelect T="int?" Label="Tipo de Entrada" Disabled="@_cargandoEventoEntrada"
+                                <MudSelect T="int?" Label="Tipo de Instrumento" Disabled="@_cargandoEventoEntrada"
                                            AnchorOrigin="Origin.BottomCenter"
                                            Value="@ordenRegistroDto!.EventoEntradaId"
                                            ValueChanged="@((int? eventoEntradaSeleccionado) => CargarEventoFecha((int)eventoEntradaSeleccionado!))"
@@ -68,6 +68,7 @@
                                     }
                                 </MudSelect>
                             </MudItem>
+                           
                             <MudItem lg="4" sm="12" xs="12">
                                 <MudSelect T="int?" Label="Fecha"
                                            Disabled="@_cargandoEventoFecha"
@@ -89,6 +90,7 @@
                                     }
                                 </MudSelect>
                             </MudItem>
+       
                             <MudItem lg="4" sm="12" xs="12">
                                 <MudNumericField T="decimal"
                                                  Label="Precio"
@@ -129,8 +131,9 @@
                 <MudCardContent>
                     <MudTable Items="@ordenDetalle" Context="detalleContext" Class="p-3" Hover="true" Striped="true" Elevation="3" Breakpoint="Breakpoint.Sm" RowsPerPage="100">
                         <HeaderContent>
-                            <MudTh>FECHA</MudTh>
-                            <MudTh>TIPO DE ENTRADA</MudTh>
+                            
+                            @*<MudTh>FECHA</MudTh>*@
+                            <MudTh>TIPO DE INSTRUMENTO</MudTh>
                             <MudTh>PRECIO</MudTh>
                             <MudTh>CANTIDAD</MudTh>
                             <MudTh>TOTAL</MudTh>
@@ -138,7 +141,7 @@
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd DataLabel="FECHA">@detalleContext.Fecha</MudTd>
-                            <MudTd DataLabel="TIPO DE ENTRADA">@detalleContext.EntradaTipo</MudTd>
+                            <MudTd DataLabel="TIPO DE INTRUMENTO">@detalleContext.EntradaTipo</MudTd>
                             <MudTd DataLabel="PRECIO">@detalleContext.PrecioRegular</MudTd>
                             <MudTd DataLabel="CANTIDAD">@detalleContext.Cantidad</MudTd>
                             <MudTd DataLabel="TOTAL">@detalleContext.PrecioTotal</MudTd>
