@@ -87,7 +87,7 @@
                                     Color="Color.Warning"
                                     DisableElevation="true"
                                     Id="btn_pagar"
-                                    OnClick="AbrirCulqi">
+                                    OnClick="() => AbrirCulqi(context.Item.PrecioTotal)">
                             </MudFab>
                         </CellTemplate>
                     </TemplateColumn>
@@ -141,19 +141,30 @@
         NavigationManager.NavigateTo($"/pedido-ticket/{ordenId}");
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            // Inicializar Culqi cuando se renderiza por primera vez
-            await JS.InvokeVoidAsync("initCulqi", "btn_pagar");
-        }
-    }
-    private async Task AbrirCulqi()
+   /* protected override async Task OnAfterRenderAsync(bool firstRender)
+     {
+         if (firstRender)
+         {
+             // Inicializar Culqi cuando se renderiza por primera vez
+             await JS.InvokeVoidAsync("initCulqi", "btn_pagar");
+         }
+     }*/
+
+    private async Task AbrirCulqi(decimal? precioTotal)
     {
         try
-        {
-            // Llamar a la función de JavaScript para abrir el checkout de Culqi
+        {   
+            // Convertir el precio a entero (por ejemplo, a céntimos)
+            int precioTotalEntero = (int)(precioTotal * 10);
+
+            var settings = new
+            {
+                title = "Realizacion de pago",
+                currency = "PEN",
+                amount = precioTotal
+            };  
+
+            // Llamar a la función de JavaScript para abrir el checkout de Culqi con el precio total
             await JS.InvokeVoidAsync("AbrirCulqi");
         }
         catch (Exception ex)
@@ -161,4 +172,5 @@
             Console.WriteLine($"Error al intentar abrir Culqi: {ex.Message}");
         }
     }
+
 }
