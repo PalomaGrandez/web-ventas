@@ -8,8 +8,8 @@ namespace Entradas.Shared.DTO.OrdenDto
         [Range(minimum: 1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar un evento.")]
         public int? EventoId { get; set; }
 
-        [Required(ErrorMessage = "Debe seleccionar una entrada para el evento.")]
-        [Range(minimum: 1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar una entrada para el evento.")]
+        [Required(ErrorMessage = "Debe seleccionar un instrumento.")]
+        [Range(minimum: 1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar un instrumento.")]
         public int? EventoEntradaId { get; set; }
 
         public string EntradaTipo { get; set; } = string.Empty;
@@ -21,8 +21,8 @@ namespace Entradas.Shared.DTO.OrdenDto
         public DateTime Fecha { get; set; }
         public decimal PrecioRegular { get; set; }
 
-        [Required(ErrorMessage = "La cantidad de entradas debe ser mayor a 0.")]
-        [Range(minimum: 1, maximum: int.MaxValue, ErrorMessage = "La cantidad de entradas debe ser mayor a 0.")]
+        [Required(ErrorMessage = "La cantidad debe ser mayor a 0 con un maximo de 5 instrumentos.")]
+        [Range(minimum: 1, maximum: int.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0 con un maximo de 5 instrumentos.")]
         public int Cantidad { get; set; }
         public decimal PrecioTotal { get; set; }
     }

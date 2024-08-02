@@ -1,7 +1,7 @@
 /*const settings = {
     title: 'Realizacion de pago',
     currency: 'PEN',
-    amount: 10000, // Asegúrate de que el monto está en centavos
+    amount: 10000, // AsegÃºrate de que el monto estÃ¡ en centavos
 };
 
 const client = {
@@ -24,7 +24,7 @@ const options = {
     modal: true,
     container: "#culqi-container", // Opcional - Div donde quieres cargar el checkout
     paymentMethods: paymentMethods,
-    paymentMethodsSort: Object.keys(paymentMethods), // las opciones se ordenan según se configuren en paymentMethods
+    paymentMethodsSort: Object.keys(paymentMethods), // las opciones se ordenan segÃºn se configuren en paymentMethods
 };
 
 const appearance = {
@@ -101,7 +101,6 @@ window.AbrirCulqi = function (settings, client) {
                 console.error('Error en la solicitud de pago:', error);
                 alert('Error en la solicitud de pago.');
             }
-
             Culqi.close();
         } else if (Culqi.order) {
             const order = Culqi.order;

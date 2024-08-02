@@ -72,8 +72,9 @@ namespace Entradas.Server.Services.AuthService
             List<Claim> claims = new()
             {
                 new(ClaimTypes.NameIdentifier, usuario.UsuarioId.ToString()),
-                new(ClaimTypes.Name, usuario.Email),
+                new(ClaimTypes.Email, usuario.Email),
                 new(ClaimTypes.Role, usuario.Rol),
+                new(ClaimTypes.Name, usuario.Nombres),
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
