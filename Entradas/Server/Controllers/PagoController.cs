@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RestSharp;
 using System.Threading.Tasks;
+using static MudBlazor.FilterOperator;
+using static QRCoder.PayloadGenerator;
 
 namespace Entradas.Server.Controllers
 {
@@ -13,6 +15,9 @@ namespace Entradas.Server.Controllers
         {
             // Log para verificar que el token se recibe correctamente
             Console.WriteLine($"Token recibido: {request.TokenId}");
+            Console.WriteLine($"monto recibido: {request.Amount}");
+            Console.WriteLine($"monto recibido: {request.Email}");
+            Console.WriteLine($"monto recibido: {request.Telefono}");
 
             if (string.IsNullOrEmpty(request.TokenId))
             {
@@ -33,13 +38,18 @@ namespace Entradas.Server.Controllers
             // Crear el payload usando solo el token recibido
             var payload = new
             {
-                amount = 600, // Monto en céntimos, ajusta según sea necesario
+                amount = request.Amount, // Monto en céntimos, ajusta según sea necesario
                 currency_code = "PEN",
                 source_id = request.TokenId, // El token recibido del frontend
                 capture = true,
                 description = "Pago realizado con Yape", // Descripción del pago
-                email = "mario.correa@fabrica.pe",
-
+                email = request.Email,
+                antifraud_details = new
+                {
+                    first_name = request.Nombre,
+                    last_name = request.Apellido,
+                    phone_number = request.Telefono
+                }
             };
 
             // Agregar el cuerpo de la solicitud
@@ -66,6 +76,14 @@ namespace Entradas.Server.Controllers
     {
         public string TokenId { get; set; }
 
-        //public int Amount { get; set; }
+        public int Amount { get; set; }
+
+        public string Email { get; set; }
+
+        public string Nombre { get; set; }
+
+        public string Apellido { get; set; }
+
+        public string Telefono { get; set; }
     }
 }

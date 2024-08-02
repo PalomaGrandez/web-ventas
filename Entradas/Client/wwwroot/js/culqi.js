@@ -1,17 +1,14 @@
-const settings = {
+/*const settings = {
     title: 'Realizacion de pago',
     currency: 'PEN',
-    amount: 600, // Asegúrate de que el monto está en centavos
+    amount: 10000, // Asegúrate de que el monto está en centavos
 };
 
-//c2391c29-3b71-4a27-b55e-bac3457ecb1f
-/* -----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDSGBntzxDV2WecsK5MicVaXb3J
-sz1QFAIO6GYkcsQGic4aug1zYESr06sCzSCPXQT1N1P + uss8CgasPeNtmE + LHm + q
-HvvqMv6 + yjzWeNon4QiqbOHvRu4ZwHhNok53c3abnNQ + OufTwcbQv7puOkvAhyIq
-OXgb2n / A79IFmX63mwIDAQAB
------ END PUBLIC KEY-----*/
+const client = {
+    email: 'soporte@fabrica.pe',
+};
 
+*/
 const paymentMethods = {
     tarjeta: false,
     yape: true,
@@ -28,10 +25,6 @@ const options = {
     container: "#culqi-container", // Opcional - Div donde quieres cargar el checkout
     paymentMethods: paymentMethods,
     paymentMethodsSort: Object.keys(paymentMethods), // las opciones se ordenan según se configuren en paymentMethods
-};
-
-const client = {
-    email: 'mario.correa@fabrica.pe',
 };
 
 const appearance = {
@@ -53,70 +46,77 @@ const appearance = {
     },
 };
 
-const config = {
-    settings,
-    client,
-    options,
-    appearance,
-};
+window.AbrirCulqi = function (settings, client) {
 
-const publicKey = 'pk_test_3153d0c7ed6a853a';
+    const config = {
+        settings: settings,
+        client: client,
+        options,
+        appearance,
+    };
 
-const Culqi = new CulqiCheckout(publicKey, config);
+    const publicKey = 'pk_test_3153d0c7ed6a853a';
 
-window.initCulqi = function (buttonId) {
-    const btn_pagar = document.getElementById(buttonId);
-    if (btn_pagar) {
-        btn_pagar.addEventListener('click', function (e) {
-            Culqi.open();
-            e.preventDefault();
-        });
-    }
-};
+    const Culqi = new CulqiCheckout(publicKey, config);
 
-window.AbrirCulqi = function () {
+    const handleCulqiAction = async () => {
+        if (Culqi.token) {
+            const token = Culqi.token.id;
+            const amount = config.settings.amount;
+            const email = config.client.email;
+            const nombre = config.client.fist_name;
+            const apellido = config.client.last_name;
+            const telefono = config.client.phone_number;
+            console.log('Se ha creado un Token: ', token);
+            console.log('El golpe es: ', amount);
+            console.log('Su mail del causa es: ', email);
+            console.log('el nombre del causa es: ', nombre + " " + apellido);
+            console.log('el fono del causa es: ', telefono);
+
+            try {
+                const response = await fetch('https://localhost:7122/api/pagos/procesar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        TokenId: token,
+                        Amount: amount,
+                        Email: email,
+                        Nombre: nombre,
+                        Apellido: apellido,
+                        Telefono: telefono
+                    }),
+                });
+
+                const result = await response.json();
+                console.log('Respuesta del backend: ', result);
+
+                if (response.ok) {
+                    alert('Pago procesado exitosamente.');
+                } else {
+                    alert('Error al procesar el pago: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error en la solicitud de pago:', error);
+                alert('Error en la solicitud de pago.');
+            }
+
+            Culqi.close();
+        } else if (Culqi.order) {
+            const order = Culqi.order;
+            console.log('Se ha creado el objeto Order: ', order);
+        } else {
+            console.log('Error : ', Culqi.error);
+        }
+    };
+
+    Culqi.culqi = handleCulqiAction;
+
     Culqi.open();
 };
 
-const handleCulqiAction = async () => {
-    if (Culqi.token) {
-        const token = Culqi.token.id;
-        console.log('Se ha creado un Token: ', token);
 
-        try {
-            const response = await fetch('https://localhost:7122/api/pagos/procesar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    TokenId: token
-                }),
-            });
-
-            const result = await response.json();
-            console.log('Respuesta del backend: ', result);
-
-            if (response.ok) {
-                alert('Pago procesado exitosamente.');
-            } else {
-                alert('Error al procesar el pago: ' + result.message);
-            }
-        } catch (error) {
-            console.error('Error en la solicitud de pago:', error);
-            alert('Error en la solicitud de pago.');
-        }
-
-        Culqi.close();
-    } else if (Culqi.order) {
-        const order = Culqi.order;
-        console.log('Se ha creado el objeto Order: ', order);
-    } else {
-        console.log('Error : ', Culqi.error);
-    }
-};
-
-Culqi.culqi = handleCulqiAction;
 
 
 

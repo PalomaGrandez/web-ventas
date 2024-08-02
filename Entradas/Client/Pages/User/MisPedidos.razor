@@ -164,8 +164,16 @@
                 amount = precioTotalEntero
             };  
 
+            var client = new
+            {
+                email = "soporte@fabrica.pe",
+                fist_name = "Pana",
+                last_name = "Miguel",
+                phone_number = "900123456"
+            };
+
             // Llamar a la función de JavaScript para abrir el checkout de Culqi con el precio total
-            await JS.InvokeVoidAsync("AbrirCulqi");
+            await JS.InvokeVoidAsync("AbrirCulqi", settings, client);
         }
         catch (Exception ex)
         {
