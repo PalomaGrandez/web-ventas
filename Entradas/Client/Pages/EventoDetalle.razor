@@ -54,8 +54,8 @@
                                 <MudListItem Icon="@Icons.Material.Filled.GpsFixed">
                                 Dirección: Camino Centenario y 514, La Plata
                                 </MudListItem> *@
-                                    <MudListItem Icon="@Icons.Material.Filled.MusicNote">
-                                    Tipo de Instrumento: @evento.Ubicacion
+                                    <MudListItem Icon="@Icons.Material.Filled.Casino">  @*"@Icons.Material.Filled.MusicNote"*@
+                                    Tipo de Juego: @evento.Ubicacion
                                 </MudListItem>
                                 <MudListItem Icon="@Icons.Material.Filled.PriceCheck">
                                     Precio: @evento.CapacidadTotal
@@ -72,7 +72,7 @@
         <MudItem lg="12" sm="12" Class="d-flex justify-center">
             <MudText Typo="Typo.h3">Detalle del Producto </MudText>
         </MudItem>
-        <MudItem lg="12" sm="12" Class="d-flex justify-center">
+        <MudItem lg="12" sm="12" Class="d-flex justify-center" >
             <MudPaper Elevation="3" Class="p-3" Style="border-radius:10px ">
                 <MudText Typo="Typo.h5"> @evento.Nombre</MudText>
                 @* <MudText Typo="Typo.subtitle1"> El Parque inflable más grande de Argentina con un recorrido emocionante<br /> </MudText> *@
@@ -105,7 +105,7 @@
                                  LoadingProgressColor="Color.Primary"
                                  Breakpoint="Breakpoint.Xs">
                         <Columns>
-                            <PropertyColumn Title="MARCA"
+                            <PropertyColumn Title="COLECCION"
                                             Property="x => x.Tipo"
                                             CellStyle="font-size:20px;text-align:center;"
                                             HeaderStyle="font-size:25px;text-align:center;font-weight: bold;" />
