@@ -75,6 +75,7 @@ namespace Entradas.Server.Services.AuthService
                 new(ClaimTypes.Email, usuario.Email),
                 new(ClaimTypes.Role, usuario.Rol),
                 new(ClaimTypes.Name, usuario.Nombres),
+                new(ClaimTypes.GivenName, usuario.ApellidoPaterno),
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8

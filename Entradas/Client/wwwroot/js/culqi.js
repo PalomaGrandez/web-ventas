@@ -64,7 +64,7 @@ window.AbrirCulqi = function (settings, client) {
             const token = Culqi.token.id;
             const amount = config.settings.amount;
             const email = config.client.email;
-            const nombre = config.client.fist_name;
+            const nombre = config.client.first_name;
             const apellido = config.client.last_name;
             const telefono = config.client.phone_number;
             console.log('Se ha creado un Token: ', token);
@@ -74,7 +74,7 @@ window.AbrirCulqi = function (settings, client) {
             console.log('el fono del causa es: ', telefono);
 
             try {
-                const response = await fetch('https://web-ventas-eqfqhgczandmcgcy.centralus-01.azurewebsites.net/api/pagos/procesar', {
+                const response = await fetch('https://localhost:7122/api/pagos/procesar', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

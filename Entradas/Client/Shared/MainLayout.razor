@@ -111,6 +111,7 @@
     {
         await ValidarSesion();
     }
+
     private async Task CerrarSesion()
     {
         await LocalStorage.RemoveItemAsync("authToken");

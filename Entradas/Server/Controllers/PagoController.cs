@@ -16,8 +16,9 @@ namespace Entradas.Server.Controllers
             // Log para verificar que el token se recibe correctamente
             Console.WriteLine($"Token recibido: {request.TokenId}");
             Console.WriteLine($"monto recibido: {request.Amount}");
-            Console.WriteLine($"monto recibido: {request.Email}");
-            Console.WriteLine($"monto recibido: {request.Telefono}");
+            Console.WriteLine($"nombre recibido: {request.Nombre}");
+            Console.WriteLine($"correo recibido: {request.Email}");
+            Console.WriteLine($"telefono recibido: {request.Telefono}");
 
             if (string.IsNullOrEmpty(request.TokenId))
             {

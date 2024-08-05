@@ -4,6 +4,7 @@
 @inject IOrdenService OrdenService
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>@tituloPagina</PageTitle>
 
@@ -109,11 +110,20 @@
     private int paginaActual = 1;
     private int userId;
 
+
+    string user = "Invitado";
+    string nombre = "Invitado";
+    string email = "Invitado";
+    string apellido = "Invitado";
+    string rol = string.Empty;
+    bool autenticado = false;
+
     protected override async Task OnInitializedAsync()
     {
         userId = await AuthService.GetUserId();
         Console.WriteLine($"User Id: {userId}");
         await CargarOrdenes();
+        await ValidarSesion();
     }
 
     private async Task CargarOrdenes(int pagina = 1)
@@ -141,19 +151,48 @@
         NavigationManager.NavigateTo($"/pedido-ticket/{ordenId}");
     }
 
-   /* protected override async Task OnAfterRenderAsync(bool firstRender)
-     {
-         if (firstRender)
-         {
-             // Inicializar Culqi cuando se renderiza por primera vez
-             await JS.InvokeVoidAsync("initCulqi", "btn_pagar");
-         }
-     }*/
+    /* protected override async Task OnAfterRenderAsync(bool firstRender)
+          {
+              if (firstRender)
+              {
+              // Inicializar Culqi cuando se renderiza por primera vez
+              await JS.InvokeVoidAsync("initCulqi", "btn_pagar");
+      }
+      }*/
+
+    private async Task ValidarSesion()
+    {
+        var authenticationState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+
+        var rolClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+        var nombreClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+        var apellidoClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName);
+        var emailClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+        if (rolClaim != null && (rolClaim.Value.Equals("Admin") || rolClaim.Value.Equals("Customer")))
+        {
+            autenticado = true;
+            rol = rolClaim.Value;
+        }
+        else
+        {
+            autenticado = false;
+        }
+
+        nombre = nombreClaim?.Value ?? "Invitado";
+        apellido = apellidoClaim?.Value;
+        email = emailClaim?.Value;
+        Console.WriteLine($"apellido inicializado: {apellidoClaim?.Value}"); // Registro de depuración
+        Console.WriteLine($"apellido inicializado: {apellido}"); // Registro de depuración
+        Console.WriteLine($"Nombre inicializado: {nombre}"); // Registro de depuración
+    }
 
     private async Task AbrirCulqi(decimal? precioTotal)
     {
         try
         {   
+            Console.WriteLine(nombre + apellido + email);
             // Convertir el precio a entero (por ejemplo, a céntimos)
             int precioTotalEntero = (int)(precioTotal * 100);
 
@@ -166,12 +205,13 @@
 
             var client = new
             {
-                email = "soporte@fabrica.pe",
-                fist_name = "Pana",
-                last_name = "Miguel",
+                email = email,
+                first_name = nombre,
+                last_name = apellido,
                 phone_number = "900123456"
             };
 
+            Console.WriteLine(nombre);
             // Llamar a la función de JavaScript para abrir el checkout de Culqi con el precio total
             await JS.InvokeVoidAsync("AbrirCulqi", settings, client);
         }
