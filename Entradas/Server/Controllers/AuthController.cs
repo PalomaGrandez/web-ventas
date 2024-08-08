@@ -30,7 +30,7 @@ namespace Entradas.Server.Controllers
                     Para = request.Email,
                     Asunto = "Fabrica de Entradas - Registro"
                 };
-                await _emailService.SendEmailRegistroUsuarioAsync(emailRequest);
+                //await _emailService.SendEmailRegistroUsuarioAsync(emailRequest);
                 return Ok(response);
             }
             return BadRequest(response);

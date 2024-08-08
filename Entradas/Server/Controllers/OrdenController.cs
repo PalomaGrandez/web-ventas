@@ -12,13 +12,13 @@ namespace Entradas.Server.Controllers
     public class OrdenController : ControllerBase
     {
         private readonly IOrdenService _ordenService;
-        private readonly IEmailService _emailService;
+        //private readonly IEmailService _emailService;
         private readonly IAuthService _authService;
 
         public OrdenController(IOrdenService ordenService, IEmailService emailService, IAuthService authService)
         {
             _ordenService = ordenService;
-            _emailService = emailService;
+            //_emailService = emailService;
             _authService = authService;
         }
 
@@ -40,7 +40,7 @@ namespace Entradas.Server.Controllers
                 //emailRequestDto.Para = usuario!.Email;
                 //emailRequestDto.Asunto = "Pedido Registrado";
                 var orderId = response.Data;
-                await _emailService.SendEmailRegistroPedidoAsync(orderId, (int)dto.UsuarioId!);
+                //await _emailService.SendEmailRegistroPedidoAsync(orderId, (int)dto.UsuarioId!);
 
                 return Ok(response);
             }
@@ -138,7 +138,7 @@ namespace Entradas.Server.Controllers
                     Asunto = "Tickets Generados"
                 };
 
-                await _emailService.SendEmailGenerarTicketsAsync(emailRequestDto,ordenId );
+                // await _emailService.SendEmailGenerarTicketsAsync(emailRequestDto,ordenId );
 
                 return Ok(response);
             }

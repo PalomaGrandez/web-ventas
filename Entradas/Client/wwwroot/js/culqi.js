@@ -55,7 +55,7 @@ window.AbrirCulqi = function (settings, client) {
         appearance,
     };
 
-    const publicKey = 'pk_test_3153d0c7ed6a853a';
+    const publicKey = 'pk_live_f88f5d1d2457d6af';
 
     const Culqi = new CulqiCheckout(publicKey, config);
 
@@ -74,7 +74,7 @@ window.AbrirCulqi = function (settings, client) {
             console.log('el fono del causa es: ', telefono);
 
             try {
-                const response = await fetch('https://localhost:7122/api/pagos/procesar', {
+                const response = await fetch('https://web-ventas-eqfqhgczandmcgcy.centralus-01.azurewebsites.net/api/pagos/procesar', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -69,7 +69,7 @@
                                 </MudSelect>
                             </MudItem>
                            
-                            <MudItem lg="4" sm="12" xs="12">
+                          @*  <MudItem lg="4" sm="12" xs="12">
                                 <MudSelect T="int?" Label="Fecha"
                                            Disabled="@_cargandoEventoFecha"
                                            AnchorOrigin="Origin.BottomCenter"
@@ -89,7 +89,7 @@
                                         }
                                     }
                                 </MudSelect>
-                            </MudItem>
+                            </MudItem>*@
        
                             <MudItem lg="4" sm="12" xs="12">
                                 <MudNumericField T="decimal"
@@ -320,10 +320,14 @@
         ordenRegistroDto.EventoFechaId = eventoFechaId;
         var response = await EventoFechaService.GetEventoFechaPorId(eventoFechaId);
 
-        ordenRegistroDto.Fecha = (DateTime)response.Data!.Fecha!;
+        ordenRegistroDto.Fecha = DateTime.Now;
     }
     private async Task OnValidSubmit()
-    {
+    {   
+        ordenRegistroDto.EventoFechaId = 1;
+
+        ordenRegistroDto.Fecha = DateTime.Now;
+
         ordenRegistroDto.PrecioTotal = ordenRegistroDto.PrecioRegular * ordenRegistroDto.Cantidad;
 
         await OrdenService.AgregarItemLocal(ordenRegistroDto);

@@ -289,7 +289,7 @@ namespace Entradas.Server.Services.OrdenService
                     // Obtener la lista de eventos paginados desde la base de datos
                     var ordenes = await _context.Orden
                         .Where(x => x.UsuarioId == usuarioId)
-                        .OrderBy(c => c.OrdenId)
+                        .OrderByDescending(c => c.FechaOrden)
                         .Skip((pagina - 1) * (int)resultadosPorPagina)
                         .Take((int)resultadosPorPagina)
                         .ToListAsync();

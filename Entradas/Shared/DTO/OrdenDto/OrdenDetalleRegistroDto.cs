@@ -14,8 +14,8 @@ namespace Entradas.Shared.DTO.OrdenDto
 
         public string EntradaTipo { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Debe seleccionar una fecha para el evento.")]
-        [Range(minimum: 1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar una fecha para el evento.")]
+       // [Required(ErrorMessage = "Debe seleccionar una fecha para el evento.")]
+       // [Range(minimum: 1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar una fecha para el evento.")]
         public int? EventoFechaId { get; set; }
 
         public DateTime Fecha { get; set; }
