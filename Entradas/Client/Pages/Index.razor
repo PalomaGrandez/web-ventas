@@ -71,20 +71,20 @@
         @foreach (var evento in filteredEventos)
         {
             <MudItem xs="12" sm="6" lg="4" md="6" Class="d-flex justify-center ">
-                <MudPaper MaxWidth="450px">
-                    <MudCard Elevation="3">
+                <MudPaper MaxWidth="450px" Style="border-radius: 15px">
+                    <MudCard Elevation="3" Style="border-radius: 15px">
                         <MudCardMedia Image="@evento.Imagen" Height="220" Style="width:450px" />
-                        <MudCardContent>
+                        <MudCardContent Style="border-radius: 15px">
                             <MudText Typo="Typo.subtitle2">@evento.Ubicacion</MudText>
                             <MudText Typo="Typo.h6" Style="font-weight: bold; font-size: 1.5rem;">@evento.Nombre</MudText>
-                            @* <MudText Typo="Typo.body2">@evento.</MudText> *@
                         </MudCardContent>
-                        <MudCardActions Class="justify-content-end ">
-                            <MudButton Variant="Variant.Outlined" ButtonType="ButtonType.Button" StartIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="()=>EventoDetalle(evento.EventoId)">Ver Producto</MudButton>
+                        <MudCardActions Class="justify-content-end">
+                            <MudButton Style="margin-bottom: 15px; margin-right:10px" Variant="Variant.Outlined" ButtonType="ButtonType.Button" StartIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="()=>EventoDetalle(evento.EventoId)">Ver Producto</MudButton>
                         </MudCardActions>
                     </MudCard>
                 </MudPaper>
             </MudItem>
+
         }
         <MudItem xs="12" sm="12" lg="12">
             <div class="d-flex flex-column align-center">
