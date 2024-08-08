@@ -21,23 +21,23 @@
                 <DataAnnotationsValidator />
                 <MudCard Elevation="3">
                     <MudCardHeader>
-                        <MudText Typo="Typo.h4">Seleccione sus entradas </MudText>
+                        <MudText Typo="Typo.h4">Seleccione sus Juegos </MudText>
                     </MudCardHeader>
                     <MudCardContent>
 
                         <MudGrid>
                             <MudItem lg="6" sm="12" xs="12">
-                                <MudSelect T="int?" Label="Evento" Disabled="@_cargandoEvento"
+                                <MudSelect T="int?" Label="Juego" Disabled="@_cargandoEvento"
                                            AnchorOrigin="Origin.BottomCenter"
                                            Value="@ordenRegistroDto!.EventoId"
                                            ValueChanged="@((int? eventoSeleccionado) => CargarEventoEntrada((int)eventoSeleccionado))"
                                            Adornment="Adornment.Start"
-                                           Placeholder="Seleccione el evento"
+                                           Placeholder="Seleccione el juego"
                                            Variant="Variant.Outlined"
-                                           HelperText="Seleccione el evento"
+                                           HelperText="Seleccione el juego"
                                            ReadOnly="@_eventoSoloLectura"
                                            For="@(() => ordenRegistroDto!.EventoId)">
-                                    <MudSelectItem Value="@((int?) 0)">Seleccione el evento</MudSelectItem>
+                                    <MudSelectItem Value="@((int?) 0)">Seleccione el juego</MudSelectItem>
                                     @if (EventoService.Eventos.Count > 0)
                                     {
                                         @foreach (var evento in EventoService.Eventos)
@@ -49,14 +49,14 @@
                             </MudItem>
 
                             <MudItem lg="6" sm="12" xs="12">
-                                <MudSelect T="int?" Label="Tipo de Instrumento" Disabled="@_cargandoEventoEntrada"
+                                <MudSelect T="int?" Label="Coleccion" Disabled="@_cargandoEventoEntrada"
                                            AnchorOrigin="Origin.BottomCenter"
                                            Value="@ordenRegistroDto!.EventoEntradaId"
                                            ValueChanged="@((int? eventoEntradaSeleccionado) => CargarEventoFecha((int)eventoEntradaSeleccionado!))"
                                            Adornment="Adornment.Start"
-                                           Placeholder="Seleccione el tipo de entrada"
+                                           Placeholder="Coleccio"
                                            Variant="Variant.Outlined"
-                                           HelperText="Seleccione el evento"
+                                           HelperText="Seleccione la coleccion"
                                            For="@(() => ordenRegistroDto!.EventoEntradaId)">
                                     <MudSelectItem Value="@((int?) 0)">Seleccione el evento</MudSelectItem>
                                     @if (EventoEntradaService.EventoEntradas.Count > 0)
@@ -76,9 +76,9 @@
                                            Value="@ordenRegistroDto!.EventoFechaId"
                                            ValueChanged="@((int? eventoFechaId)=>FechaSeleccionada((int)eventoFechaId!))"
                                            Adornment="Adornment.Start"
-                                           Placeholder="Seleccione la fecha"
+                                           
                                            Variant="Variant.Outlined"
-                                           HelperText="Seleccione el evento"
+                                           HelperText="Seleccione la fecha"
                                            For="@(() => ordenRegistroDto!.EventoFechaId)">
                                     <MudSelectItem Value="@((int?) 0)">Seleccione el evento</MudSelectItem>
                                     @if (EventoFechaService.EventoFechas.Count > 0)
@@ -105,7 +105,7 @@
                                                  Variant="Variant.Outlined"
                                                  @bind-Value="@ordenRegistroDto.Cantidad"
                                                  For="@(() => ordenRegistroDto!.Cantidad)"
-                                                 HelperText="Ingrese la cantidad de entradas" Max="5" />
+                                                 HelperText="Ingrese la cantidad deseada" Max="5" />
                             </MudItem>
                         </MudGrid>
 
@@ -133,7 +133,7 @@
                         <HeaderContent>
                             
                             @*<MudTh>FECHA</MudTh>*@
-                            <MudTh>TIPO DE INSTRUMENTO</MudTh>
+                            <MudTh>COLECCION</MudTh>
                             <MudTh>PRECIO</MudTh>
                             <MudTh>CANTIDAD</MudTh>
                             <MudTh>TOTAL</MudTh>
