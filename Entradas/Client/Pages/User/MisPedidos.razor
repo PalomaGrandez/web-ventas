@@ -30,7 +30,7 @@
                 <Columns>
                     <PropertyColumn Property="x => x.OrdenId" Title="N° DE ORDEN" />
                     <PropertyColumn Property="x => x.FechaOrden" Title="FECHA DE COMPRA" />
-                    <TemplateColumn Title="MEDIO DE PAGO">
+                   @* <TemplateColumn Title="MEDIO DE PAGO">
                         <CellTemplate>
                             @if (context.Item.MedioPago.Equals("PLIN"))
                             {
@@ -42,10 +42,10 @@
                             }
                             else
                             {
-                                @* <MudImage Src="" Height="50" Width="50" /> *@
+                                @* <MudImage Src="" Height="50" Width="50" /> 
                             }
                         </CellTemplate>
-                    </TemplateColumn>
+                    </TemplateColumn>*@
                     <PropertyColumn Property="x => x.PrecioTotal" Title="TOTAL" Culture="@CultureInfo.InvariantCulture" Format="F2" />
                     <TemplateColumn Title="ESTADO">
                         <CellTemplate>
