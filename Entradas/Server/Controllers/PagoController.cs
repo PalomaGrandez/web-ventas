@@ -30,7 +30,7 @@ namespace Entradas.Server.Controllers
 
             // Crear una solicitud POST
             var restRequest = new RestRequest();
-            restRequest.AddHeader("Authorization", "Bearer sk_live_6d709dfb06d8fea5"); // Usa tu llave secreta de prueba
+            restRequest.AddHeader("Authorization", "Bearer sk_test_47b1d0312b63a309"); // Usa tu llave secreta de prueba
             restRequest.AddHeader("Content-Type", "application/json");
 
             // Configurar el método HTTP como POST
