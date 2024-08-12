@@ -9,7 +9,7 @@
 @inject ISnackbar Snackbar
 @inject IAuthService AuthService
 
-<PageTitle>Seleccione sus entradas</PageTitle>
+<PageTitle>Realice su compra</PageTitle>
 <div style="height:20px" />
 
 
@@ -21,35 +21,51 @@
                 <DataAnnotationsValidator />
                 <MudCard Elevation="3">
                     <MudCardHeader>
-                        <MudText Typo="Typo.h4">Seleccione sus Juegos </MudText>
+                        <MudText Typo="Typo.h4">Realice su compra</MudText>
                     </MudCardHeader>
                     <MudCardContent>
 
                         <MudGrid>
-                            <MudItem lg="6" sm="12" xs="12">
-                                <MudSelect T="int?" Label="Juego" Disabled="@_cargandoEvento"
-                                           AnchorOrigin="Origin.BottomCenter"
-                                           Value="@ordenRegistroDto!.EventoId"
-                                           ValueChanged="@((int? eventoSeleccionado) => CargarEventoEntrada((int)eventoSeleccionado))"
-                                           Adornment="Adornment.Start"
-                                           Placeholder="Seleccione el juego"
-                                           Variant="Variant.Outlined"
-                                           HelperText="Seleccione el juego"
-                                           ReadOnly="@_eventoSoloLectura"
-                                           For="@(() => ordenRegistroDto!.EventoId)">
-                                    <MudSelectItem Value="@((int?) 0)">Seleccione el juego</MudSelectItem>
-                                    @if (EventoService.Eventos.Count > 0)
-                                    {
-                                        @foreach (var evento in EventoService.Eventos)
-                                        {
-                                            <MudSelectItem Value="@((int?)evento.EventoId)">@evento.Nombre</MudSelectItem>
-                                        }
-                                    }
-                                </MudSelect>
-                            </MudItem>
 
                             <MudItem lg="6" sm="12" xs="12">
-                                <MudSelect T="int?" Label="Coleccion" Disabled="@_cargandoEventoEntrada"
+                                <MudTextField T="string"
+                                              Label="Carta"
+                                              Disabled="@_cargandoEvento"
+                                              Value="@eventoNombre"
+                                              ReadOnly="true"
+                                              Adornment="Adornment.Start"
+                                              Placeholder="Seleccione el juego"
+                                              Variant="Variant.Outlined"
+                                              HelperText="Nombre del evento seleccionado"
+                                              For="@(() => eventoNombre)">
+                                </MudTextField>
+                            </MudItem>
+                            @* <MudItem lg="6" sm="12" xs="12">
+                                <MudSelect T="int?" Label="Carta" Disabled="@_cargandoEvento"
+                                AnchorOrigin="Origin.BottomCenter"
+                                Value="@ordenRegistroDto!.EventoId"
+                                ValueChanged="@((int? eventoSeleccionado) => CargarEventoEntrada((int)eventoSeleccionado))"
+                                Adornment="Adornment.Start"
+
+                                Variant="Variant.Outlined"
+                                HelperText="Seleccione el juego"
+                                ReadOnly="@_eventoSoloLectura"
+                                For="@(() => ordenRegistroDto!.EventoId)">
+                                <MudSelectItem Value="@((int?) 0)">Seleccione el juego</MudSelectItem>
+                                @if (EventoService.Eventos.Count > 0)
+                                {
+                                @foreach (var evento in EventoService.Eventos)
+                                {
+                                <MudSelectItem Value="@((int?)evento.EventoId)">@evento.Nombre</MudSelectItem>
+                                }
+                                }
+                                </MudSelect>
+
+                               
+                            </MudItem>*@
+
+                            <MudItem lg="6" sm="12" xs="12">
+                                <MudSelect T="int?" Label="Condicion" Disabled="@_cargandoEventoEntrada"
                                            AnchorOrigin="Origin.BottomCenter"
                                            Value="@ordenRegistroDto!.EventoEntradaId"
                                            ValueChanged="@((int? eventoEntradaSeleccionado) => CargarEventoFecha((int)eventoEntradaSeleccionado!))"
@@ -68,29 +84,29 @@
                                     }
                                 </MudSelect>
                             </MudItem>
-                           
-                          @*  <MudItem lg="4" sm="12" xs="12">
-                                <MudSelect T="int?" Label="Fecha"
-                                           Disabled="@_cargandoEventoFecha"
-                                           AnchorOrigin="Origin.BottomCenter"
-                                           Value="@ordenRegistroDto!.EventoFechaId"
-                                           ValueChanged="@((int? eventoFechaId)=>FechaSeleccionada((int)eventoFechaId!))"
-                                           Adornment="Adornment.Start"
-                                           
-                                           Variant="Variant.Outlined"
-                                           HelperText="Seleccione la fecha"
-                                           For="@(() => ordenRegistroDto!.EventoFechaId)">
-                                    <MudSelectItem Value="@((int?) 0)">Seleccione el evento</MudSelectItem>
-                                    @if (EventoFechaService.EventoFechas.Count > 0)
-                                    {
-                                        @foreach (var eventoFecha in EventoFechaService.EventoFechas)
-                                        {
-                                            <MudSelectItem Value="@((int?)eventoFecha.EventoFechaId)">@eventoFecha.Fecha</MudSelectItem>
-                                        }
-                                    }
-                                </MudSelect>
+
+                            @*  <MudItem lg="4" sm="12" xs="12">
+                            <MudSelect T="int?" Label="Fecha"
+                            Disabled="@_cargandoEventoFecha"
+                            AnchorOrigin="Origin.BottomCenter"
+                            Value="@ordenRegistroDto!.EventoFechaId"
+                            ValueChanged="@((int? eventoFechaId)=>FechaSeleccionada((int)eventoFechaId!))"
+                            Adornment="Adornment.Start"
+
+                            Variant="Variant.Outlined"
+                            HelperText="Seleccione la fecha"
+                            For="@(() => ordenRegistroDto!.EventoFechaId)">
+                            <MudSelectItem Value="@((int?) 0)">Seleccione el evento</MudSelectItem>
+                            @if (EventoFechaService.EventoFechas.Count > 0)
+                            {
+                            @foreach (var eventoFecha in EventoFechaService.EventoFechas)
+                            {
+                            <MudSelectItem Value="@((int?)eventoFecha.EventoFechaId)">@eventoFecha.Fecha</MudSelectItem>
+                            }
+                            }
+                            </MudSelect>
                             </MudItem>*@
-       
+
                             <MudItem lg="4" sm="12" xs="12">
                                 <MudNumericField T="decimal"
                                                  Label="Precio"
@@ -125,39 +141,44 @@
             <MudCard Elevation="3">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Align="Align.Center" Typo="Typo.h5">Resumen</MudText>
+                        <MudText Align="Align.Center" Typo="Typo.h5">Resumen de la compra</MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
                     <MudTable Items="@ordenDetalle" Context="detalleContext" Class="p-3" Hover="true" Striped="true" Elevation="3" Breakpoint="Breakpoint.Sm" RowsPerPage="100">
                         <HeaderContent>
-                            
-                            @*<MudTh>FECHA</MudTh>*@
-                            <MudTh>COLECCION</MudTh>
+                            <MudTh>CARTA</MudTh>
+                            <MudTh>CONDICION</MudTh>
                             <MudTh>PRECIO</MudTh>
                             <MudTh>CANTIDAD</MudTh>
                             <MudTh>TOTAL</MudTh>
                             <MudTh>ELIMINAR</MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd DataLabel="FECHA">@detalleContext.Fecha</MudTd>
-                            <MudTd DataLabel="TIPO DE INTRUMENTO">@detalleContext.EntradaTipo</MudTd>
+                            <MudTd DataLabel="CARTA">@eventoNombre</MudTd>
+                            <MudTd DataLabel="CONDICION">@detalleContext.EntradaTipo</MudTd>
                             <MudTd DataLabel="PRECIO">@detalleContext.PrecioRegular</MudTd>
-                            <MudTd DataLabel="CANTIDAD">@detalleContext.Cantidad</MudTd>
+                            <MudTd DataLabel="CANTIDAD">
+                                <div class="d-flex align-items-center">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Small" Color="Color.Error" OnClick="() => DisminuirCantidad(detalleContext)" Disabled="@((detalleContext.Cantidad <= 1))" />
+                                    <MudText Typo="Typo.h6" Class="mx-2">@detalleContext.Cantidad</MudText>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" Color="Color.Primary" OnClick="() => AumentarCantidad(detalleContext)" Disabled="@((detalleContext.Cantidad >= 10))" />
+                                </div>
+                            </MudTd>
                             <MudTd DataLabel="TOTAL">@detalleContext.PrecioTotal</MudTd>
                             <MudTd DataLabel="ELIMINAR">
                                 <MudFab Variant="Variant.Filled"
                                         StartIcon="@Icons.Material.Filled.Delete"
                                         Color="Color.Error"
                                         Size="Size.Small"
-                                        OnClick="()=> RemoverItemLocal((int) detalleContext.EventoId!,
-                                                                           (int)detalleContext.EventoEntradaId!,
-                                                                           (int)detalleContext.EventoFechaId!)" />
+                                        OnClick="() => RemoverItemLocal((int)detalleContext.EventoId!,
+                                                     (int)detalleContext.EventoEntradaId!,
+                                                     (int)detalleContext.EventoFechaId!)" />
                             </MudTd>
                         </RowTemplate>
                         <FooterContent>
                             <MudTd colspan="3" Style="align-content:end"><MudText Typo="Typo.h6">TOTAL GENERAL:</MudText> </MudTd>
-                            <MudTd Style="align-content:end"> <MudText Typo="Typo.h6">S/.@ordenDetalle.Sum(pd => pd.Cantidad * pd.PrecioRegular) </MudText> </MudTd>
+                            <MudTd Style="align-content:end"><MudText Typo="Typo.h6">S/.@ordenDetalle.Sum(pd => pd.Cantidad * pd.PrecioRegular)</MudText></MudTd>
                         </FooterContent>
                         <PagerContent>
                             <div class="d-flex flex-column align-center">
@@ -224,6 +245,8 @@
     private bool _eventoSoloLectura = false;
     private bool _guardando = false;
 
+    private string eventoNombre = ""; // Variable para almacenar el nombre del evento seleccionado
+
     private string btnText = "REALIZAR PEDIDO";
     private OrdenDetalleRegistroDto ordenRegistroDto = new();
     private List<OrdenDetalleRegistroDto> ordenDetalle = new();
@@ -257,7 +280,7 @@
             Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
             return;
         }
-      
+
         orden.FechaOrden = DateTime.Now;
         orden.Estado = EstadosOrden.REGISTRADO;
         orden.Items = ordenDetalle;
@@ -283,6 +306,33 @@
         }
     }
 
+    private void AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
+    {
+        // Verifica si el detalleContext existe en la lista
+        var item = ordenDetalle.FirstOrDefault(d => d.EventoId == detalleContext.EventoId &&
+                                                    d.EventoEntradaId == detalleContext.EventoEntradaId &&
+                                                    d.EventoFechaId == detalleContext.EventoFechaId);
+        if (item != null && item.Cantidad < 10)
+        {
+            item.Cantidad++;
+            item.PrecioTotal = item.PrecioRegular * item.Cantidad;
+            StateHasChanged(); // Actualizar la vista
+        }
+    }
+
+    private void DisminuirCantidad(OrdenDetalleRegistroDto detalleContext)
+    {
+        // Verifica si el detalleContext existe en la lista
+        var item = ordenDetalle.FirstOrDefault(d => d.EventoId == detalleContext.EventoId &&
+                                                    d.EventoEntradaId == detalleContext.EventoEntradaId &&
+                                                    d.EventoFechaId == detalleContext.EventoFechaId);
+        if (item != null && item.Cantidad > 1)
+        {
+            item.Cantidad--;
+            item.PrecioTotal = item.PrecioRegular * item.Cantidad;
+            StateHasChanged(); // Actualizar la vista
+        }
+    }
 
     private async Task CargarEventos()
     {
@@ -291,16 +341,34 @@
         await EventoService.GetEventos();
         _cargandoEvento = false;
     }
+
     private async Task CargarEventoEntrada(int eventoSeleccionado)
     {
         ordenRegistroDto.EventoId = eventoSeleccionado;
         _cargandoEventoEntrada = true;
+
+        // Obtener las entradas del evento seleccionado
         await EventoEntradaService.GetEventoEntradasPorEvento(1, eventoSeleccionado);
+
+        // Buscar el evento seleccionado en la lista de eventos
+        var evento = EventoService.Eventos.FirstOrDefault(e => e.EventoId == eventoSeleccionado);
+        if (evento != null)
+        {
+            // Actualizar el nombre del evento para mostrarlo en el campo de texto
+            eventoNombre = evento.Nombre;
+        }
+        else
+        {
+            eventoNombre = "Evento no encontrado"; // En caso de que el evento no se encuentre
+        }
+
+        // Suscribirse al evento OnChange del servicio para actualizar la UI
         EventoEntradaService.OnChange += StateHasChanged;
+
         _cargandoEventoEntrada = false;
-
-
+        StateHasChanged(); // Forzar la actualización de la UI
     }
+
     private async Task CargarEventoFecha(int eventoEntradaSeleccionado)
     {
         ordenRegistroDto.EventoEntradaId = eventoEntradaSeleccionado;
@@ -322,21 +390,38 @@
 
         ordenRegistroDto.Fecha = DateTime.Now;
     }
+
     private async Task OnValidSubmit()
-    {   
-        ordenRegistroDto.EventoFechaId = 1;
-
-        ordenRegistroDto.Fecha = DateTime.Now;
-
-        ordenRegistroDto.PrecioTotal = ordenRegistroDto.PrecioRegular * ordenRegistroDto.Cantidad;
+    {
+        // Actualiza las cantidades y agrega el nuevo producto a la lista
+        var existingItem = ordenDetalle.FirstOrDefault(d => d.EventoId == ordenRegistroDto.EventoId &&
+                                                            d.EventoEntradaId == ordenRegistroDto.EventoEntradaId &&
+                                                            d.EventoFechaId == ordenRegistroDto.EventoFechaId);
+        if (existingItem != null)
+        {
+            // Actualiza el producto existente
+            existingItem.Cantidad = ordenRegistroDto.Cantidad;
+            existingItem.PrecioTotal = existingItem.PrecioRegular * existingItem.Cantidad;
+        }
+        else
+        {
+            // Agrega un nuevo producto a la lista
+            ordenDetalle.Add(new OrdenDetalleRegistroDto
+                {
+                    EventoId = ordenRegistroDto.EventoId,
+                    EventoEntradaId = ordenRegistroDto.EventoEntradaId,
+                    EventoFechaId = ordenRegistroDto.EventoFechaId,
+                    PrecioRegular = ordenRegistroDto.PrecioRegular,
+                    Cantidad = ordenRegistroDto.Cantidad,
+                    PrecioTotal = ordenRegistroDto.PrecioRegular * ordenRegistroDto.Cantidad,
+                    EntradaTipo = ordenRegistroDto.EntradaTipo
+                });
+        }
 
         await OrdenService.AgregarItemLocal(ordenRegistroDto);
         await CargarOrdenLocal();
 
-        // ordenRegistroDto.EventoEntradaId = 0;
-        // ordenRegistroDto.EventoFechaId = 0;
-        // ordenRegistroDto.PrecioRegular = 0;
-        // ordenRegistroDto.Cantidad = 0;
+        // Limpia el formulario
         ordenRegistroDto = new();
         ordenRegistroDto.EventoId = eventoId;
         StateHasChanged();

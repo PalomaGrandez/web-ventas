@@ -3,6 +3,8 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
+@inject IEventoService EventoService
+
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -14,16 +16,48 @@
 
         <MudImage Src="icons/mago.png" Height="50" Width="50" onclick="@Home" Style="cursor: pointer; padding-top:5px" />
         <div style="width: 20px"></div>
-        <MudText Typo="Typo.h5" onclick="@Home" Class="tipo"  Style=" padding-top: 10px;  cursor: pointer">LUDIKINGDOM</MudText>
+        <MudText Typo="Typo.h3" onclick="@Home" Class="tipo" Style="padding-top: 10px; cursor: pointer; font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif;">
+            LUDIKINGDOM
+        </MudText>
 
         <MudSpacer />
+
+        <!-- Agrega el layout para el buscador -->
+        @* <div style="margin: 20px 10%; display: flex; justify-content: center;">
+            <MudTextField @bind-Value="searchQuery" Placeholder="Buscar producto..." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Variant="Variant.Outlined" Class="mud-width-full mud-max-width-400 custom-text-field" OnKeyUp="PerformSearch" Style="height: 30px; width: 250px;">
+                <Adornment AdornmentPosition="AdornmentPosition.End">
+                    <IconButton Icon="@Icons.Material.Filled.Search" OnClick="PerformSearch" />
+                </Adornment>
+            </MudTextField>
+        </div>
+
+        <style>
+            .custom-text-field input::placeholder {
+                color: white; /* Color blanco */
+                font-size: 12px; /* Tamaño de fuente más pequeño */
+            }
+
+            .custom-text-field .mud-input-outlined {
+                background-color: #325980; /* Fondo azul oscuro */
+                border-radius: 10px; /* Bordes redondeados */
+                color: white; /* Color de texto blanco */
+                height: 30px; /* Ajuste de altura */
+            }
+
+                .custom-text-field .mud-input-outlined:hover,
+                .custom-text-field .mud-input-outlined:focus {
+                    border-color: rgba(255, 255, 255, 1); /* Color blanco completo al pasar el cursor o enfocar */
+                }
+        </style>*@
 
         @if (autenticado)
         {
             <MudText Typo="Typo.h6" Class="mt-1">Hola, @nombre</MudText>
 
-              <MudButton ButtonType="ButtonType.Button"
-                       StartIcon="@Icons.Material.Filled.ShoppingCart"
+            <div style="width: 20px"></div>
+
+            <MudButton ButtonType="ButtonType.Button"
+                       EndIcon="@Icons.Material.Filled.ShoppingCart"
                        Size="Size.Large"
                        Color="Color.Inherit"
                        Variant="Variant.Text"
@@ -32,8 +66,10 @@
                 Carrito
             </MudButton>
 
+            <div style="width: 20px"></div>
+
             <MudButton ButtonType="ButtonType.Button"
-                       StartIcon="@Icons.Material.Filled.Login"
+                       EndIcon="@Icons.Material.Filled.Logout"
                        Size="Size.Large"
                        Color="Color.Inherit"
                        Variant="Variant.Text"
@@ -44,23 +80,24 @@
 
             <div style="width: 20px"></div>
 
-          
+
         }
         else
         {
             <MudButton ButtonType="ButtonType.Button"
-                       StartIcon="@Icons.Material.Filled.Login"
+                       EndIcon="@Icons.Material.Filled.Login"
                        Size="Size.Large"
                        Color="Color.Inherit"
                        Variant="Variant.Text"
                        OnClick="IniciarSesion"
                        Style="border-radius: 20px; padding-top: 20px;">
-
                 Iniciar Sesión
             </MudButton>
+
             <div style="width: 20px"></div>
+
             <MudButton ButtonType="ButtonType.Button"
-                       StartIcon="@Icons.Material.Filled.AppRegistration"
+                       EndIcon="@Icons.Material.Filled.AppRegistration"
                        Size="Size.Large"
                        Color="Color.Inherit"
                        Variant="Variant.Text"
@@ -91,6 +128,9 @@
     string rol = string.Empty;
     bool autenticado = false;
 
+    private string searchQuery = string.Empty;
+    private List<Evento> filteredEventos = new List<Evento>();
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -110,7 +150,7 @@
 
     private void CarritoCompras()
     {
-        NavigationManager.NavigateTo($"/usuario/mis-pedidos");
+        NavigationManager.NavigateTo($"/usuario/carrito-comprar");
     }
 
     protected override async Task OnInitializedAsync()
@@ -148,4 +188,25 @@
         nombre = nombreClaim?.Value ?? "Invitado";
     }
 
+    private void PerformSearch(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            SearchEventos();
+        }
+    }
+
+    private void SearchEventos()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            filteredEventos = EventoService.Eventos;
+        }
+        else
+        {
+            filteredEventos = EventoService.Eventos.Where(e => e.Nombre.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) || e.Ubicacion.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        StateHasChanged();
+    }
 }

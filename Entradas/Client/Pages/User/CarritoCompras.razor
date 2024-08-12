@@ -1,0 +1,185 @@
+﻿@page "/usuario/carrito-comprar"
+@inject NavigationManager NavigationManager
+@inject IOrdenService OrdenService
+@inject ISnackbar Snackbar
+@inject IAuthService AuthService
+
+<PageTitle>Carrito de Compras</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <div style="height:20px" />
+    <MudCard Elevation="3">
+        <MudCardHeader>
+            <MudText Align="Align.Center" Typo="Typo.h5">Resumen de la compra</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTable Items="@ordenDetalle" Context="detalleContext" Class="p-3" Hover="true" Striped="true" Elevation="3" Breakpoint="Breakpoint.Sm" RowsPerPage="100">
+                <HeaderContent>
+                    <MudTh>CARTA</MudTh>
+                    <MudTh>CONDICION</MudTh>
+                    <MudTh>PRECIO</MudTh>
+                    <MudTh>CANTIDAD</MudTh>
+                    <MudTh>TOTAL</MudTh>
+                    <MudTh>ELIMINAR</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="CARTA">@detalleContext.EntradaTipo</MudTd>
+                    <MudTd DataLabel="CONDICION">@detalleContext.EntradaTipo</MudTd>
+                    <MudTd DataLabel="PRECIO">@detalleContext.PrecioRegular</MudTd>
+                    <MudTd DataLabel="CANTIDAD">
+                        <div class="d-flex align-items-center">
+                            <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Small" Color="Color.Error" OnClick="() => DisminuirCantidad(detalleContext)" Disabled="@((detalleContext.Cantidad <= 1))" />
+                            <MudText Typo="Typo.h6" Class="mx-2">@detalleContext.Cantidad</MudText>
+                            <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" Color="Color.Primary" OnClick="() => AumentarCantidad(detalleContext)" Disabled="@((detalleContext.Cantidad >= 10))" />
+                        </div>
+                    </MudTd>
+                    <MudTd DataLabel="TOTAL">@detalleContext.PrecioTotal</MudTd>
+                    <MudTd DataLabel="ELIMINAR">
+                        <MudFab Variant="Variant.Filled"
+                                StartIcon="@Icons.Material.Filled.Delete"
+                                Color="Color.Error"
+                                Size="Size.Small"
+                                OnClick="() => RemoverItemLocal((int)detalleContext.EventoId!,
+                                             (int)detalleContext.EventoEntradaId!,
+                                             (int)detalleContext.EventoFechaId!)" />
+                    </MudTd>
+                </RowTemplate>
+                <FooterContent>
+                    <MudTd colspan="3" Style="align-content:end"><MudText Typo="Typo.h6">TOTAL GENERAL:</MudText> </MudTd>
+                    <MudTd Style="align-content:end"><MudText Typo="Typo.h6">S/.@ordenDetalle.Sum(pd => pd.Cantidad * pd.PrecioRegular)</MudText></MudTd>
+                </FooterContent>
+            </MudTable>
+        </MudCardContent>
+        <MudCardActions Class="d-flex">
+            <MudGrid Justify="Justify.Center">
+                <MudItem>
+                    <MudButton ButtonType="ButtonType.Button"
+                               Size="Size.Large"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Disabled="@_guardando"
+                               StartIcon="@Icons.Material.Filled.SaveAlt"
+                               OnClick="RealizarPedido"
+                               Class="mx-2">
+
+                        @if (_guardando)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ms-2">Guardando</MudText>
+                        }
+                        else
+                        {
+                            @btnText
+                        }
+                    </MudButton>
+                </MudItem>
+                <MudItem>
+                    <MudButton ButtonType="ButtonType.Button"
+                               Size="Size.Large"
+                               Variant="Variant.Filled"
+                               Color="Color.Error"
+                               OnClick="Cancelar"
+                               StartIcon="@Icons.Material.Filled.Cancel" Class="mx-2">
+                        Cancelar
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private bool _guardando = false;
+    private string btnText = "REALIZAR PEDIDO";
+    private List<OrdenDetalleRegistroDto> ordenDetalle = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarOrdenLocal();
+    }
+
+    private async Task RealizarPedido()
+    {
+        _guardando = true;
+
+        var userId = await AuthService.GetUserId();
+
+        if (!ordenDetalle.Any())
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
+            return;
+        }
+
+        var orden = new OrdenRegistroDto
+            {
+                FechaOrden = DateTime.Now,
+                Estado = EstadosOrden.REGISTRADO,
+                Items = ordenDetalle,
+                UsuarioId = userId,
+                PrecioTotal = (decimal)ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular)
+            };
+
+        var response = await OrdenService.CreateOrden(orden);
+
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        if (response.Success)
+        {
+            await OrdenService.LimpiarItemLocal();
+            _guardando = false;
+
+            Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
+            NavigationManager.NavigateTo("/confirmacion-compra");
+        }
+        else
+        {
+            _guardando = false;
+            Snackbar.Add($"Ha sucedido un error: {response.Message}", Severity.Error);
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private void AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
+    {
+        var item = ordenDetalle.FirstOrDefault(d => d.EventoId == detalleContext.EventoId &&
+                                                    d.EventoEntradaId == detalleContext.EventoEntradaId &&
+                                                    d.EventoFechaId == detalleContext.EventoFechaId);
+        if (item != null && item.Cantidad < 10)
+        {
+            item.Cantidad++;
+            item.PrecioTotal = item.PrecioRegular * item.Cantidad;
+            StateHasChanged();
+        }
+    }
+
+    private void DisminuirCantidad(OrdenDetalleRegistroDto detalleContext)
+    {
+        var item = ordenDetalle.FirstOrDefault(d => d.EventoId == detalleContext.EventoId &&
+                                                    d.EventoEntradaId == detalleContext.EventoEntradaId &&
+                                                    d.EventoFechaId == detalleContext.EventoFechaId);
+        if (item != null && item.Cantidad > 1)
+        {
+            item.Cantidad--;
+            item.PrecioTotal = item.PrecioRegular * item.Cantidad;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CargarOrdenLocal()
+    {
+        ordenDetalle = await OrdenService.ObtenerOrdenDetalleLocal();
+    }
+
+    public async Task RemoverItemLocal(int eventoId, int eventoEntradaId, int eventoFecha)
+    {
+        await OrdenService.RemoverItemLocal(eventoId, eventoEntradaId, eventoFecha);
+        await CargarOrdenLocal();
+        StateHasChanged();
+    }
+
+    private async Task Cancelar()
+    {
+        await OrdenService.LimpiarItemLocal();
+        NavigationManager.NavigateTo("/");
+    }
+}
