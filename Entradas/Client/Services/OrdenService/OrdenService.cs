@@ -20,8 +20,8 @@
             List<OrdenDetalleRegistroDto> orden = await _sessionStorage.GetItemAsync<List<OrdenDetalleRegistroDto>>("orden") ?? new List<OrdenDetalleRegistroDto>();
 
             var itemRepetido = orden.FirstOrDefault(x => x.EventoId == ordenRegistroDto.EventoId
-                                                        && x.EventoEntradaId == ordenRegistroDto.EventoEntradaId
-                                                        && x.EventoFechaId == ordenRegistroDto.EventoFechaId);
+                                                         && x.EventoEntradaId == ordenRegistroDto.EventoEntradaId
+                                                         && x.EventoFechaId == ordenRegistroDto.EventoFechaId);
 
             if (itemRepetido == null)
             {
@@ -29,9 +29,12 @@
             }
             else
             {
+                // Mantén la cantidad que ya se había actualizado antes, sin sobrescribirla
+                itemRepetido.Cantidad += ordenRegistroDto.Cantidad;
+
+                // Solo actualiza las propiedades que no han sido cambiadas manualmente
                 itemRepetido.Fecha = ordenRegistroDto.Fecha;
                 itemRepetido.EntradaTipo = ordenRegistroDto.EntradaTipo;
-                itemRepetido.Cantidad += ordenRegistroDto.Cantidad;
                 itemRepetido.PrecioRegular = ordenRegistroDto.PrecioRegular;
                 itemRepetido.PrecioTotal = itemRepetido.Cantidad * itemRepetido.PrecioRegular;
             }
