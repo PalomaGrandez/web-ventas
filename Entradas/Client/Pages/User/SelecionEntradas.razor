@@ -49,14 +49,14 @@
                             </MudItem>
 
                             <MudItem lg="6" sm="12" xs="12">
-                                <MudSelect T="int?" Label="Coleccion" Disabled="@_cargandoEventoEntrada"
+                                <MudSelect T="int?" Label="Estado" Disabled="@_cargandoEventoEntrada"
                                            AnchorOrigin="Origin.BottomCenter"
                                            Value="@ordenRegistroDto!.EventoEntradaId"
                                            ValueChanged="@((int? eventoEntradaSeleccionado) => CargarEventoFecha((int)eventoEntradaSeleccionado!))"
                                            Adornment="Adornment.Start"
-                                           Placeholder="Coleccio"
+                                           Placeholder="Estado"
                                            Variant="Variant.Outlined"
-                                           HelperText="Seleccione la coleccion"
+                                           HelperText="Seleccione el estado"
                                            For="@(() => ordenRegistroDto!.EventoEntradaId)">
                                     <MudSelectItem Value="@((int?) 0)">Seleccione el evento</MudSelectItem>
                                     @if (EventoEntradaService.EventoEntradas.Count > 0)
@@ -133,7 +133,7 @@
                         <HeaderContent>
                             
                             @*<MudTh>FECHA</MudTh>*@
-                            <MudTh>COLECCION</MudTh>
+                            <MudTh>ESTADO</MudTh>
                             <MudTh>PRECIO</MudTh>
                             <MudTh>CANTIDAD</MudTh>
                             <MudTh>TOTAL</MudTh>
