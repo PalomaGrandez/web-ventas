@@ -197,7 +197,7 @@
                                        Color="Color.Primary"
                                        Disabled="@_guardando"
                                        StartIcon="@Icons.Material.Filled.SaveAlt"
-                                       OnClick="RealizarPedido"
+                                       OnClick="ConfirmacionCompra"
                                        Class="mx-2">
 
                                 @if (_guardando)
@@ -268,6 +268,23 @@
         // }
     }
 
+    private async Task ConfirmacionCompra()
+    {
+        // Verificar si hay items en la orden
+        if (!ordenDetalle.Any())
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
+            return;
+        }
+
+        // Calcular el total de la orden y convertirlo a entero
+        var totalOrden = (int)(ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular));
+
+        // Navegar a la pantalla de confirmación de compra pasando el monto total como parámetro
+        NavigationManager.NavigateTo($"/usuario/confirmacion-compra/{totalOrden}");
+    }
+
     private async Task RealizarPedido()
     {
         _guardando = true;
@@ -304,6 +321,42 @@
             Snackbar.Add($"Ha sucedido un error: {response.Message}", Severity.Error);
             NavigationManager.NavigateTo("/");
         }
+    }
+
+        private async Task OnValidSubmit()
+    {
+        // Actualiza las cantidades y agrega el nuevo producto a la lista
+        var existingItem = ordenDetalle.FirstOrDefault(d => d.EventoId == ordenRegistroDto.EventoId &&
+                                                            d.EventoEntradaId == ordenRegistroDto.EventoEntradaId &&
+                                                            d.EventoFechaId == ordenRegistroDto.EventoFechaId);
+        if (existingItem != null)
+        {
+            // Actualiza el producto existente
+            existingItem.Cantidad = ordenRegistroDto.Cantidad;
+            existingItem.PrecioTotal = existingItem.PrecioRegular * existingItem.Cantidad;
+        }
+        else
+        {
+            // Agrega un nuevo producto a la lista
+            ordenDetalle.Add(new OrdenDetalleRegistroDto
+                {
+                    EventoId = ordenRegistroDto.EventoId,
+                    EventoEntradaId = ordenRegistroDto.EventoEntradaId,
+                    EventoFechaId = ordenRegistroDto.EventoFechaId,
+                    PrecioRegular = ordenRegistroDto.PrecioRegular,
+                    Cantidad = ordenRegistroDto.Cantidad,
+                    PrecioTotal = ordenRegistroDto.PrecioRegular * ordenRegistroDto.Cantidad,
+                    EntradaTipo = ordenRegistroDto.EntradaTipo
+                });
+        }
+
+        await OrdenService.AgregarItemLocal(ordenRegistroDto);
+        await CargarOrdenLocal();
+
+        // Limpia el formulario
+        ordenRegistroDto = new();
+        ordenRegistroDto.EventoId = eventoId;
+        StateHasChanged();
     }
 
     private void AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
@@ -389,42 +442,6 @@
         var response = await EventoFechaService.GetEventoFechaPorId(eventoFechaId);
 
         ordenRegistroDto.Fecha = DateTime.Now;
-    }
-
-    private async Task OnValidSubmit()
-    {
-        // Actualiza las cantidades y agrega el nuevo producto a la lista
-        var existingItem = ordenDetalle.FirstOrDefault(d => d.EventoId == ordenRegistroDto.EventoId &&
-                                                            d.EventoEntradaId == ordenRegistroDto.EventoEntradaId &&
-                                                            d.EventoFechaId == ordenRegistroDto.EventoFechaId);
-        if (existingItem != null)
-        {
-            // Actualiza el producto existente
-            existingItem.Cantidad = ordenRegistroDto.Cantidad;
-            existingItem.PrecioTotal = existingItem.PrecioRegular * existingItem.Cantidad;
-        }
-        else
-        {
-            // Agrega un nuevo producto a la lista
-            ordenDetalle.Add(new OrdenDetalleRegistroDto
-                {
-                    EventoId = ordenRegistroDto.EventoId,
-                    EventoEntradaId = ordenRegistroDto.EventoEntradaId,
-                    EventoFechaId = ordenRegistroDto.EventoFechaId,
-                    PrecioRegular = ordenRegistroDto.PrecioRegular,
-                    Cantidad = ordenRegistroDto.Cantidad,
-                    PrecioTotal = ordenRegistroDto.PrecioRegular * ordenRegistroDto.Cantidad,
-                    EntradaTipo = ordenRegistroDto.EntradaTipo
-                });
-        }
-
-        await OrdenService.AgregarItemLocal(ordenRegistroDto);
-        await CargarOrdenLocal();
-
-        // Limpia el formulario
-        ordenRegistroDto = new();
-        ordenRegistroDto.EventoId = eventoId;
-        StateHasChanged();
     }
 
     private async Task CargarOrdenLocal()

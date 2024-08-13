@@ -59,7 +59,7 @@
                                Color="Color.Primary"
                                Disabled="@_guardando"
                                StartIcon="@Icons.Material.Filled.SaveAlt"
-                               OnClick="RealizarPedido"
+                               OnClick="ConfirmacionCompra"
                                Class="mx-2">
 
                         @if (_guardando)
@@ -96,6 +96,23 @@
     protected override async Task OnInitializedAsync()
     {
         await CargarOrdenLocal();
+    }
+
+    private async Task ConfirmacionCompra()
+    {
+        // Verificar si hay items en la orden
+        if (!ordenDetalle.Any())
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
+            return;
+        }
+
+        // Calcular el total de la orden y convertirlo a entero
+        var totalOrden = (int)(ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular));
+
+        // Navegar a la pantalla de confirmación de compra pasando el monto total como parámetro
+        NavigationManager.NavigateTo($"/usuario/confirmacion-compra/{totalOrden}");
     }
 
     private async Task RealizarPedido()
