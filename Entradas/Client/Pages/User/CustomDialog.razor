@@ -1,0 +1,28 @@
+﻿@using MudBlazor
+
+<MudDialog>
+    <MudDialogContent>
+        <MudItem>
+            <MudGrid AlignItems="AlignItems.Center" Style="margin-bottom:10px">
+                <MudItem Style="margin-top:20px"> 
+                    <MudImage Src="icons/mago.png" Style="height: 50px; width: 50px; margin-right: 8px;" />
+                </MudItem>
+                <MudItem Style="margin-top:30px">
+                    <MudText Typo="Typo.h5" Style="font-weight:600;" Class="tipo" Align="Align.Center">Gracias por su compra!</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+    </MudDialogContent>
+    <MudDialogActions>
+        <MudButton OnClick="Close">Cerrar</MudButton>
+    </MudDialogActions>
+</MudDialog>
+
+@code {
+    private void Close()
+    {
+        MudDialogInstance?.Close();
+    }
+
+    [CascadingParameter] public MudDialogInstance MudDialogInstance { get; set; }
+}

@@ -1,0 +1,48 @@
+﻿@page "/usuario/notificacion-envio"
+
+@inject NavigationManager NavigationManager
+
+<PageTitle>Notificación de Envío</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+
+    <MudGrid Justify="Justify.Center">
+        <MudItem lg="12">
+            <MudCard Elevation="3">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h4" Align="Align.Center">Notificación de Envío</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body1">
+                        Su pedido estará disponible para ser recogido a partir del día siguiente,
+                        dentro de los días hábiles de lunes a sábado en el horario de 9 a.m. a 9 p.m.
+                        La dirección de recogida es: <strong>Avenida San Martin 721, pasaje D-44, Pueblo Libre</strong>.
+                    </MudText>
+                    <div style="height:20px" />
+                    <MudText Typo="Typo.body2" Align="Align.Center">
+                        Pulse "Realizar pedido" para completar la compra.
+                    </MudText>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-center">
+                    <MudButton ButtonType="ButtonType.Button"
+                               Size="Size.Large"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               OnClick="@(() => NavigationManager.NavigateTo("/realizar-pago"))"
+                               StartIcon="@Icons.Material.Filled.ShoppingCart"
+                               Class="mx-2">
+                        Realizar Pago
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+</MudContainer>
+
+@code {
+    private void RealizarPago()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

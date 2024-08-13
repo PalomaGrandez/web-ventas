@@ -1,64 +1,236 @@
-﻿@page "/confirmacion-compra"
+﻿@page "/usuario/confirmacion-compra/{montoTotal:int}"
+@inject IJSRuntime JS
 @inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject IOrdenService OrdenService
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IDialogService DialogService
 
-<PageTitle>Pedido Realizado</PageTitle>
-<div style="height:20px" />
+<PageTitle>Confirmación de Compra</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large">
+<div style="height:25px" />
+
+<MudContainer MaxWidth="MaxWidth.Medium">
     <MudGrid Justify="Justify.Center">
         <MudItem lg="12">
             <MudCard Elevation="3">
                 <MudCardHeader>
                     <CardHeaderContent>
                         <MudText Typo="Typo.h4" Align="Align.Center" Style="font-weight: 700; font-size: 1.6rem;">
-                            Pedido N°2023-08-000001 Realizado exitosamente
+                            COMPLETE SU COMPRA
                         </MudText>
-
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
                     <MudGrid Justify="Justify.Center">
                         <MudItem lg="12">
-                            <MudText Typo="Typo.body1" Align="Align.Center" Style="margin-left: 55px; margin-right: 55px;">
-                                Realice su pago con Yape y envíe el comprobante a soporte@fabrica.pe con el asunto: Pago Pedido N° xxxx-xx-xxxxxx. Tras validar el pago, coordinaremos el envío. Verá sus productos en 'Mis Productos'.
+                            <MudText Typo="Typo.body1" Align="Align.Center" Style="margin-left: 25px; margin-right: 25px;">
+                                Su pedido estará disponible para ser recogido a partir del día siguiente,
+                                dentro de los días hábiles de lunes a sábado en el horario de 9 a.m. a 9 p.m.
+                                La dirección de recogida es: <strong>Avenida San Martin 721, pasaje D-44, Pueblo Libre</strong>.
+                                <br /><br />
+                                Realice su pago con Yape y envíe el comprobante a soporte@fabrica.pe con el asunto: Pago Pedido N° xxxx-xx-xxxxxx. Verá sus productos en 'Mis Pedidos'.
                             </MudText>
                         </MudItem>
                         <MudItem lg="12">
                             <div class="d-flex justify-center">
-                                <MudImage Height="300"  ObjectPosition="ObjectPosition.Center" Src="pago/cod_aprobacion.png" Class="rounded-lg" ObjectFit="ObjectFit.Contain" Fluid="true" Style="max-height:500px" />
+                                <MudImage Height="300" ObjectPosition="ObjectPosition.Center" Src="pago/cod_aprobacion.png" Class="rounded-lg" ObjectFit="ObjectFit.Contain" Fluid="true" Style="max-height:500px" />
                             </div>
                         </MudItem>
                         <MudItem>
-                            <MudGrid AlignItems="AlignItems.Center" Style="margin-bottom:10px">
-                                <MudItem Style="margin-top:20px"> 
-                                    <MudImage Src="icons/mago.png" Style="height: 50px; width: 50px; margin-right: 8px;" />
-                                </MudItem>
-                                <MudItem Style="margin-top:30px">
-                                    <MudText Typo="Typo.h5" Style="font-weight:600;" Class="tipo" Align="Align.Center">Gracias por su compra!</MudText>
-                                </MudItem>
-                            </MudGrid>
+                            <MudText Typo="Typo.body2" Align="Align.Center" Style="font-size: 1.2rem; margin-top:20px;">
+                                Pulse "Realizar pedido" para completar la compra.
+                            </MudText>
                         </MudItem>
-
                     </MudGrid>
                 </MudCardContent>
 
-                <MudCardActions>
-                    <MudGrid Justify="Justify.Center">
-                        <MudItem lg="12" Class="d-flex justify-center" Style="margin-bottom:20px">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Home" Color="Color.Success" OnClick="Inicio">
-                                Aceptar
-                            </MudButton>
-                        </MudItem>
-                    </MudGrid>
+                <MudCardActions Class="d-flex justify-center">
+                    <MudButton ButtonType="ButtonType.Button"
+                               Size="Size.Large"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Id="btn_pagar"
+                               OnClick="AbrirCulqi"
+                               StartIcon="@Icons.Material.Filled.ShoppingCart"
+                               Class="mx-2">
+                        Realizar Pago
+                    </MudButton>
+
+                    @* <MudButton OnClick="OpenMudDialog">Abrir diálogo con servicio</MudButton>*@
+
                 </MudCardActions>
             </MudCard>
         </MudItem>
     </MudGrid>
+
+
 </MudContainer>
 
+
+
 @code {
-    private void Inicio()
+    [Parameter]
+    public int MontoTotal { get; set; } // Parámetro para recibir el monto total
+    public int eventoId { get; set; }
+    private bool _cargandoEvento = false;
+    private bool _cargandoEventoEntrada = false;
+    private bool _cargandoEventoFecha = false;
+
+    private bool _dialogOpen = false;
+
+    private string btnText = "REALIZAR PEDIDO";
+    private OrdenDetalleRegistroDto ordenRegistroDto = new();
+    private List<OrdenDetalleRegistroDto> ordenDetalle = new();
+    private OrdenRegistroDto orden = new();
+
+
+    private bool _eventoSoloLectura = false;
+    private bool _guardando = false;
+    string user = "Invitado";
+    string nombre = "Invitado";
+    string email = "Invitado";
+    string apellido = "Invitado";
+
+    protected override async Task OnInitializedAsync()
     {
-        NavigationManager.NavigateTo("/");
+        await ValidarSesion();
+    }
+
+    private async Task ValidarSesion()
+    {
+        var authenticationState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+
+        var rolClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+        var nombreClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+        var apellidoClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName);
+        var emailClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+        nombre = nombreClaim?.Value ?? "Invitado";
+        apellido = apellidoClaim?.Value;
+        email = emailClaim?.Value;
+        Console.WriteLine($"apellido inicializado: {apellidoClaim?.Value}"); // Registro de depuración
+        Console.WriteLine($"apellido inicializado: {apellido}"); // Registro de depuración
+        Console.WriteLine($"Nombre inicializado: {nombre}"); // Registro de depuración
+    }
+
+
+
+    private void OpenMudDialog()
+    {
+        var parameters = new DialogParameters { ["ContentText"] = "Esto es un diálogo de prueba usando el servicio." };
+        DialogService.Show<MudDialog>("Diálogo de Prueba", parameters);
+    }
+
+    private async Task AbrirCulqi()
+    {
+        try
+        {
+            Console.WriteLine(nombre + apellido + email);
+            // Convertir el precio a entero (por ejemplo, a céntimos)
+            int precioTotalEntero = MontoTotal * 100;
+
+            var settings = new
+            {
+                title = "Realización de pago",
+                currency = "PEN",
+                amount = precioTotalEntero
+            };
+
+            var client = new
+            {
+                email = email,
+                first_name = nombre,
+                last_name = apellido,
+                phone_number = "900123456"
+            };
+
+            // Llamar a la función de JavaScript para abrir el checkout de Culqi con el precio total
+            await JS.InvokeVoidAsync("AbrirCulqi", settings, client);
+
+            // Mostrar el cuadro de diálogo después de que el pago se haya realizado
+            _dialogOpen = true;
+            StateHasChanged(); // Forzar la actualización de la interfaz de usuario
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al intentar abrir Culqi: {ex.Message}");
+        }
+    }
+
+
+    private async Task RealizarPedido()
+    {
+        _guardando = true;
+
+        // Verificar si hay ítems en la orden
+        if (!ordenDetalle.Any())
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
+            _guardando = false;
+            return;
+        }
+
+        // Calcular el total de la orden
+        var totalOrden = (decimal)ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular);
+
+        // Preparar la orden
+        var orden = new OrdenRegistroDto
+            {
+                FechaOrden = DateTime.Now,
+                Estado = EstadosOrden.REGISTRADO,
+                Items = ordenDetalle,
+                UsuarioId = await AuthService.GetUserId(),
+                PrecioTotal = totalOrden
+            };
+
+        try
+        {
+            // Abrir el checkout de Culqi
+            int precioTotalEntero = (int)(totalOrden * 100);
+
+            var settings = new
+            {
+                title = "Realización de pago",
+                currency = "PEN",
+                amount = precioTotalEntero
+            };
+
+            var client = new
+            {
+                email = email,
+                first_name = nombre,
+                last_name = apellido,
+                phone_number = "900123456"
+            };
+
+            await JS.InvokeVoidAsync("AbrirCulqi", settings, client);
+
+            // Asumir que el pago se ha realizado exitosamente
+            var response = await OrdenService.CreateOrden(orden);
+
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            if (response.Success)
+            {
+                await OrdenService.LimpiarItemLocal();
+                _guardando = false;
+
+                Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
+                NavigationManager.NavigateTo("/confirmacion-compra");
+            }
+            else
+            {
+                Snackbar.Add($"Ha sucedido un error: {response.Message}", Severity.Error);
+                NavigationManager.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al intentar realizar el pago: {ex.Message}", Severity.Error);
+            _guardando = false;
+        }
     }
 }
