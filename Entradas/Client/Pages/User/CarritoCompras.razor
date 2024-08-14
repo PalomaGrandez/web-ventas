@@ -23,8 +23,8 @@
                     <MudTh>ELIMINAR</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="CARTA">@detalleContext.EntradaTipo</MudTd>
-                    <MudTd DataLabel="CONDICION">@detalleContext.EntradaTipo</MudTd>
+                    <MudTd DataLabel="FECHA">@detalleContext.EntradaTipo</MudTd>
+                    <MudTd DataLabel="TIPO DE INTRUMENTO">@detalleContext.EntradaTipo</MudTd>
                     <MudTd DataLabel="PRECIO">@detalleContext.PrecioRegular</MudTd>
                     <MudTd DataLabel="CANTIDAD">
                         <div class="d-flex align-items-center">
@@ -39,9 +39,8 @@
                                 StartIcon="@Icons.Material.Filled.Delete"
                                 Color="Color.Error"
                                 Size="Size.Small"
-                                OnClick="() => RemoverItemLocal((int)detalleContext.EventoId!,
-                                             (int)detalleContext.EventoEntradaId!,
-                                             (int)detalleContext.EventoFechaId!)" />
+                                OnClick="()=> RemoverItemLocal((int) detalleContext.EventoId!,
+                                                                           (int)detalleContext.EventoEntradaId!)" />
                     </MudTd>
                 </RowTemplate>
                 <FooterContent>
@@ -187,9 +186,9 @@
         ordenDetalle = await OrdenService.ObtenerOrdenDetalleLocal();
     }
 
-    public async Task RemoverItemLocal(int eventoId, int eventoEntradaId, int eventoFecha)
+    public async Task RemoverItemLocal(int eventoId, int eventoEntradaId)
     {
-        await OrdenService.RemoverItemLocal(eventoId, eventoEntradaId, eventoFecha);
+        await OrdenService.RemoverItemLocal(eventoId, eventoEntradaId);
         await CargarOrdenLocal();
         StateHasChanged();
     }

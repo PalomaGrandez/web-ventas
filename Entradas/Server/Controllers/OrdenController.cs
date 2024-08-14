@@ -27,23 +27,24 @@ namespace Entradas.Server.Controllers
         [Route("CreateOrden")]
         public async Task<ActionResult<ServiceResponse<int>>> CreateOrden(OrdenRegistroDto dto)
         {
+
             var response = await _ordenService.CreateOrden(dto);
-            if (response.Success)
+          /*  if (response.Success)
             {
-                //var usuarioResponse = await _authService.GetUsuarioById((int)dto.UsuarioId!);
-                //var usuario = usuarioResponse.Data;
+               var usuarioResponse = await _authService.GetUsuarioById((int)dto.UsuarioId!);
+               var usuario = usuarioResponse.Data;
 
-                //var ordenResponse = await _ordenService.GetOrdenPorOrdenIdPorUsuarioId(response.Data, (int)dto.UsuarioId);
-                //var orden = ordenResponse.Data;
+                var ordenResponse = await _ordenService.GetOrdenPorOrdenIdPorUsuarioId(response.Data, (int)dto.UsuarioId);
+                var orden = ordenResponse.Data;
 
-                //EmailRequestDto emailRequestDto = new();
-                //emailRequestDto.Para = usuario!.Email;
-                //emailRequestDto.Asunto = "Pedido Registrado";
+                EmailRequestDto emailRequestDto = new();
+               emailRequestDto.Para = usuario!.Email;
+                emailRequestDto.Asunto = "Pedido Registrado";
                 var orderId = response.Data;
-                //await _emailService.SendEmailRegistroPedidoAsync(orderId, (int)dto.UsuarioId!);
+             //  await _emailService.SendEmailRegistroPedidoAsync(orderId, (int)dto.UsuarioId!);
 
                 return Ok(response);
-            }
+            }*/
             return BadRequest(response);
         }
 

@@ -101,6 +101,14 @@
     protected override async Task OnInitializedAsync()
     {
         await ValidarSesion();
+        await CargarOrdenLocal();
+
+    }
+
+    private async Task CargarOrdenLocal()
+    {
+        ordenDetalle = await OrdenService.ObtenerOrdenDetalleLocal();
+        Console.WriteLine(ordenDetalle.Count);
     }
 
     private async Task ValidarSesion()
@@ -132,11 +140,50 @@
         return DialogService.ShowAsync<CustomDialog>(null, options);
     }
 
+    private async Task RealizarPedido()
+    {
+        _guardando = true;
+
+        var userId = await AuthService.GetUserId();
+
+        if (!ordenDetalle.Any())
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
+            return;
+        }
+
+        orden.FechaOrden = DateTime.Now;
+        orden.Estado = EstadosOrden.REGISTRADO;
+        orden.Items = ordenDetalle;
+        orden.UsuarioId = userId;
+        orden.PrecioTotal = (decimal)ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular);
+
+        var response = await OrdenService.CreateOrden(orden);
+
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        if (response.Success)
+        {
+            await OrdenService.LimpiarItemLocal();
+            _guardando = true;
+
+            Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
+            NavigationManager.NavigateTo("/confirmacion-compra");
+        }
+        else
+        {
+            _guardando = true;
+            Snackbar.Add($"Ha sucedido un error: {response.Message}", Severity.Error);
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
     private async Task AbrirCulqi()
     {
         try
         {
             Console.WriteLine(nombre + apellido + email);
+
             // Convertir el precio a entero (por ejemplo, a céntimos)
             int precioTotalEntero = MontoTotal * 100;
 
@@ -158,28 +205,30 @@
             // Llamar a la función de JavaScript para abrir el checkout de Culqi con el precio total
             await JS.InvokeVoidAsync("AbrirCulqi", settings, client);
 
-            // Mostrar el cuadro de diálogo después de que el pago se haya realizado
-            _dialogOpen = true;
-            StateHasChanged(); // Forzar la actualización de la interfaz de usuario
+            // Si llegamos aquí, asumimos que el pago se realizó correctamente
+            // Realizar el pedido
+            await RealizarPedido();
+
+            // Mostrar el diálogo de confirmación
+            await OpenDialogAsync();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error al intentar abrir Culqi: {ex.Message}");
         }
     }
-
-
+    /*
     private async Task RealizarPedido()
-    {
+        {
         _guardando = true;
 
         // Verificar si hay ítems en la orden
         if (!ordenDetalle.Any())
-        {
+            {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
             Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
             _guardando = false;
-            return;
+        return;
         }
 
         // Calcular el total de la orden
@@ -187,28 +236,28 @@
 
         // Preparar la orden
         var orden = new OrdenRegistroDto
-            {
+                {
                 FechaOrden = DateTime.Now,
                 Estado = EstadosOrden.REGISTRADO,
                 Items = ordenDetalle,
                 UsuarioId = await AuthService.GetUserId(),
                 PrecioTotal = totalOrden
-            };
+        };
 
         try
-        {
+            {
             // Abrir el checkout de Culqi
             int precioTotalEntero = (int)(totalOrden * 100);
 
             var settings = new
-            {
+                {
                 title = "Realización de pago",
                 currency = "PEN",
                 amount = precioTotalEntero
             };
 
             var client = new
-            {
+                {
                 email = email,
                 first_name = nombre,
                 last_name = apellido,
@@ -222,7 +271,7 @@
 
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
             if (response.Success)
-            {
+                {
                 await OrdenService.LimpiarItemLocal();
                 _guardando = false;
 
@@ -230,15 +279,15 @@
                 NavigationManager.NavigateTo("/confirmacion-compra");
             }
             else
-            {
+                {
                 Snackbar.Add($"Ha sucedido un error: {response.Message}", Severity.Error);
                 NavigationManager.NavigateTo("/");
-            }
+        }
         }
         catch (Exception ex)
-        {
+            {
             Snackbar.Add($"Error al intentar realizar el pago: {ex.Message}", Severity.Error);
             _guardando = false;
-        }
     }
+    }*/
 }

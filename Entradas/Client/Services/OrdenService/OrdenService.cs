@@ -65,7 +65,7 @@
             }
             return orden;
         }
-        public async Task RemoverItemLocal(int eventoId, int eventoEntradaId, int eventoFechaId)
+        public async Task RemoverItemLocal(int eventoId, int eventoEntradaId)
         {
             var orden = await _sessionStorage.GetItemAsync<List<OrdenDetalleRegistroDto>>("orden");
 
@@ -75,8 +75,7 @@
             }
 
             var ordenItem = orden.Find(x => x.EventoId == eventoId &&
-                                            x.EventoEntradaId == eventoEntradaId &&
-                                            x.EventoFechaId == eventoFechaId);
+                                            x.EventoEntradaId == eventoEntradaId);
             if (ordenItem != null)
             {
                 orden.Remove(ordenItem);

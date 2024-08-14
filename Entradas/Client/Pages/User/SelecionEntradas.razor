@@ -85,7 +85,7 @@
                                 </MudSelect>
                             </MudItem>
 
-                            @*  <MudItem lg="4" sm="12" xs="12">
+                          @*    <MudItem lg="4" sm="12" xs="12">
                             <MudSelect T="int?" Label="Fecha"
                             Disabled="@_cargandoEventoFecha"
                             AnchorOrigin="Origin.BottomCenter"
@@ -147,6 +147,7 @@
                 <MudCardContent>
                     <MudTable Items="@ordenDetalle" Context="detalleContext" Class="p-3" Hover="true" Striped="true" Elevation="3" Breakpoint="Breakpoint.Sm" RowsPerPage="100">
                         <HeaderContent>
+
                             <MudTh>CARTA</MudTh>
                             <MudTh>CONDICION</MudTh>
                             <MudTh>PRECIO</MudTh>
@@ -155,8 +156,8 @@
                             <MudTh>ELIMINAR</MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd DataLabel="CARTA">@eventoNombre</MudTd>
-                            <MudTd DataLabel="CONDICION">@detalleContext.EntradaTipo</MudTd>
+                            <MudTd DataLabel="FECHA">@eventoNombre</MudTd>
+                            <MudTd DataLabel="TIPO DE INTRUMENTO">@detalleContext.EntradaTipo</MudTd>
                             <MudTd DataLabel="PRECIO">@detalleContext.PrecioRegular</MudTd>
                             <MudTd DataLabel="CANTIDAD">
                                 <div class="d-flex align-items-center">
@@ -171,14 +172,13 @@
                                         StartIcon="@Icons.Material.Filled.Delete"
                                         Color="Color.Error"
                                         Size="Size.Small"
-                                        OnClick="() => RemoverItemLocal((int)detalleContext.EventoId!,
-                                                     (int)detalleContext.EventoEntradaId!,
-                                                     (int)detalleContext.EventoFechaId!)" />
+                                        OnClick="()=> RemoverItemLocal((int) detalleContext.EventoId!,
+                                                                           (int)detalleContext.EventoEntradaId!)" />
                             </MudTd>
                         </RowTemplate>
                         <FooterContent>
                             <MudTd colspan="3" Style="align-content:end"><MudText Typo="Typo.h6">TOTAL GENERAL:</MudText> </MudTd>
-                            <MudTd Style="align-content:end"><MudText Typo="Typo.h6">S/.@ordenDetalle.Sum(pd => pd.Cantidad * pd.PrecioRegular)</MudText></MudTd>
+                            <MudTd Style="align-content:end"> <MudText Typo="Typo.h6">S/.@ordenDetalle.Sum(pd => pd.Cantidad * pd.PrecioRegular) </MudText> </MudTd>
                         </FooterContent>
                         <PagerContent>
                             <div class="d-flex flex-column align-center">
@@ -323,7 +323,24 @@
         }
     }
 
-        private async Task OnValidSubmit()
+         private async Task OnValidSubmit()
+    {
+        ordenRegistroDto.PrecioTotal = ordenRegistroDto.PrecioRegular * ordenRegistroDto.Cantidad;
+        ordenRegistroDto.EventoFechaId = 1;
+
+        await OrdenService.AgregarItemLocal(ordenRegistroDto);
+        await CargarOrdenLocal();
+
+        // ordenRegistroDto.EventoEntradaId = 0;
+        ordenRegistroDto.EventoFechaId = 0;
+        // ordenRegistroDto.PrecioRegular = 0;
+        // ordenRegistroDto.Cantidad = 0;
+        ordenRegistroDto = new();
+        ordenRegistroDto.EventoId = eventoId;
+        StateHasChanged();
+    }
+
+    /*    private async Task OnValidSubmit()
     {
         // Actualiza las cantidades y agrega el nuevo producto a la lista
         var existingItem = ordenDetalle.FirstOrDefault(d => d.EventoId == ordenRegistroDto.EventoId &&
@@ -357,7 +374,7 @@
         ordenRegistroDto = new();
         ordenRegistroDto.EventoId = eventoId;
         StateHasChanged();
-    }
+    }*/
 
     private void AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
     {
@@ -436,6 +453,7 @@
         ordenRegistroDto.PrecioRegular = (decimal)responseEventoEntrada.Data!.PrecioRegular!;
         ordenRegistroDto.EntradaTipo = responseEventoEntrada.Data.Tipo;
     }
+
     private async Task FechaSeleccionada(int eventoFechaId)
     {
         ordenRegistroDto.EventoFechaId = eventoFechaId;
@@ -449,9 +467,9 @@
         ordenDetalle = await OrdenService.ObtenerOrdenDetalleLocal();
     }
 
-    public async Task RemoverItemLocal(int eventoId, int eventoEntradaId, int eventoFecha)
+    public async Task RemoverItemLocal(int eventoId, int eventoEntradaId)
     {
-        await OrdenService.RemoverItemLocal(eventoId, eventoEntradaId, eventoFecha);
+        await OrdenService.RemoverItemLocal(eventoId, eventoEntradaId);
         await CargarOrdenLocal();
         StateHasChanged();
     }

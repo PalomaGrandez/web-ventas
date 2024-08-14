@@ -9,7 +9,7 @@
         public int PaginasTotales { get; set; }
         Task AgregarItemLocal(OrdenDetalleRegistroDto orderRegistroDto);
         Task<List<OrdenDetalleRegistroDto>> ObtenerOrdenDetalleLocal();
-        Task RemoverItemLocal(int eventoId, int eventoEntradaId, int eventoFechaId);
+        Task RemoverItemLocal(int eventoId, int eventoEntradaId);
         Task LimpiarItemLocal();
         Task<ServiceResponse<int>> CreateOrden(OrdenRegistroDto dto);
         Task GetOrdenesPaginado(int pagina);
