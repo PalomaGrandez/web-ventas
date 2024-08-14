@@ -10,7 +10,8 @@
 @inject IAuthService AuthService
 
 <PageTitle>Realice su compra</PageTitle>
-<div style="height:20px" />
+
+<div style="border-radius: 20px; font-weight: bold; font-family: 'Poppins', sans-serif; height:20px" />
 
 
 <MudContainer MaxWidth="MaxWidth.Large">
@@ -36,7 +37,7 @@
                                               Adornment="Adornment.Start"
                                               Placeholder="Seleccione el juego"
                                               Variant="Variant.Outlined"
-                                              HelperText="Nombre del evento seleccionado"
+                                              HelperText="Nombre de la carta seleccionada"
                                               For="@(() => eventoNombre)">
                                 </MudTextField>
                             </MudItem>
@@ -65,14 +66,14 @@
                             </MudItem>*@
 
                             <MudItem lg="6" sm="12" xs="12">
-                                <MudSelect T="int?" Label="Condicion" Disabled="@_cargandoEventoEntrada"
+                                <MudSelect T="int?" Label="Condición" Disabled="@_cargandoEventoEntrada"
                                            AnchorOrigin="Origin.BottomCenter"
                                            Value="@ordenRegistroDto!.EventoEntradaId"
                                            ValueChanged="@((int? eventoEntradaSeleccionado) => CargarEventoFecha((int)eventoEntradaSeleccionado!))"
                                            Adornment="Adornment.Start"
-                                           Placeholder="Colección"
+                                           Placeholder="Condición"
                                            Variant="Variant.Outlined"
-                                           HelperText="Seleccione la colección"
+                                           HelperText="Seleccione la condición"
                                            For="@(() => ordenRegistroDto!.EventoEntradaId)">
                                     <MudSelectItem Value="@((int?) 0)">Seleccione el evento</MudSelectItem>
                                     @if (EventoEntradaService.EventoEntradas.Count > 0)
@@ -141,7 +142,7 @@
             <MudCard Elevation="3">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Align="Align.Center" Typo="Typo.h5">Resumen de la compra</MudText>
+                        <MudText Style= "font-weight: bold; font-family: 'Poppins', sans-serif; font-size:1.5rem" Align="Align.Center" Typo="Typo.h5">Resumen de la compra</MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>

@@ -17,7 +17,7 @@
         <MudImage Src="icons/mago.png" Height="50" Width="50" onclick="@Home" Style="cursor: pointer; padding-top:5px" />
         <div style="width: 20px"></div>
         <MudText Typo="Typo.h3" onclick="@Home" Class="tipo" Style="padding-top: 10px; cursor: pointer; font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif;">
-            LUDIKINGDOM
+            MANA GEEK
         </MudText>
 
         <MudSpacer />
@@ -52,7 +52,7 @@
 
         @if (autenticado)
         {
-            <MudText Typo="Typo.h6" Class="mt-1">Hola, @nombre</MudText>
+            <MudText Style="font-weight: bold; font-family: 'Poppins', sans-serif;" Typo="Typo.h6" Class="mt-1">Hola, @nombre</MudText>
 
             <div style="width: 20px"></div>
 
@@ -62,7 +62,7 @@
                        Color="Color.Inherit"
                        Variant="Variant.Text"
                        OnClick="CarritoCompras"
-                       Style="border-radius: 20px">
+                       Style="border-radius: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">
                 Carrito
             </MudButton>
 
@@ -74,7 +74,7 @@
                        Color="Color.Inherit"
                        Variant="Variant.Text"
                        OnClick="CerrarSesion"
-                       Style="border-radius: 20px">
+                       Style="border-radius: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">
                 Cerrar Sesión
             </MudButton>
 
@@ -90,7 +90,7 @@
                        Color="Color.Inherit"
                        Variant="Variant.Text"
                        OnClick="IniciarSesion"
-                       Style="border-radius: 20px; padding-top: 20px;">
+                       Style="border-radius: 20px; padding-top: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">
                 Iniciar Sesión
             </MudButton>
 
@@ -102,7 +102,7 @@
                        Color="Color.Inherit"
                        Variant="Variant.Text"
                        OnClick="Registrarse"
-                       Style="border-radius: 20px ; padding-top: 17px;">
+                       Style="border-radius: 20px ; padding-top: 17px; font-weight: bold; font-size: 1.2rem; font-family: 'Poppins', sans-serif">
                 Registrarse
             </MudButton>
         }

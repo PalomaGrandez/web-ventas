@@ -17,15 +17,15 @@
             <MudCard Elevation="3">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h4" Align="Align.Center" Style="font-weight: 700; font-size: 1.6rem;">
+                        <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: bold; font-family: 'Poppins', sans-serif">
                             COMPLETE SU COMPRA
                         </MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudGrid Justify="Justify.Center">
+                    <MudGrid Style="font-family: 'Poppins', sans-serif;" Justify="Justify.Center">
                         <MudItem lg="12">
-                            <MudText Typo="Typo.body1" Align="Align.Center" Style="margin-left: 25px; margin-right: 25px;">
+                            <MudText Typo="Typo.body1" Align="Align.Center">
                                 Su pedido estará disponible para ser recogido a partir del día siguiente,
                                 dentro de los días hábiles de lunes a sábado en el horario de 9 a.m. a 9 p.m.
                                 La dirección de recogida es: <strong>Avenida San Martin 721, pasaje D-44, Pueblo Libre</strong>.
@@ -40,7 +40,7 @@
                         </MudItem>
                         <MudItem>
                             <MudText Typo="Typo.body2" Align="Align.Center" Style="font-size: 1.2rem; margin-top:20px;">
-                                Pulse "Realizar pedido" para completar la compra.
+                                Pulse "Realizar pago" para completar la compra.
                             </MudText>
                         </MudItem>
                     </MudGrid>
@@ -54,6 +54,7 @@
                                Id="btn_pagar"
                                OnClick="AbrirCulqi"
                                StartIcon="@Icons.Material.Filled.ShoppingCart"
+                               Style="font-weight:bold"
                                Class="mx-2">
                         Realizar Pago
                     </MudButton>
@@ -65,6 +66,7 @@
                                Color="Color.Secondary"
                                OnClick="OpenDialogAsync"
                                StartIcon="@Icons.Material.Filled.Info"
+                               Style="font-weight:bold"
                                Class="mx-2">
                         Información
                     </MudButton>
