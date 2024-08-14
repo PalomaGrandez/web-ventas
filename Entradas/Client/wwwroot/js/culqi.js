@@ -74,7 +74,7 @@ window.AbrirCulqi = function (settings, client) {
             console.log('el fono del causa es: ', telefono);
 
             try {
-                const response = await fetch('https://localhost:7122/api/pagos/procesar', {
+                const response = await fetch('https://web-ventas-eqfqhgczandmcgcy.centralus-01.azurewebsites.net/api/pagos/procesar', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

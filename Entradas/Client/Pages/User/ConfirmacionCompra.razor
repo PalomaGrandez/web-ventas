@@ -58,14 +58,20 @@
                         Realizar Pago
                     </MudButton>
 
-                    @* <MudButton OnClick="OpenMudDialog">Abrir diálogo con servicio</MudButton>*@
-
+                    <!-- Nuevo botón para abrir el cuadro de diálogo -->
+                    <MudButton ButtonType="ButtonType.Button"
+                               Size="Size.Large"
+                               Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               OnClick="OpenDialogAsync"
+                               StartIcon="@Icons.Material.Filled.Info"
+                               Class="mx-2">
+                        Información
+                    </MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
     </MudGrid>
-
-
 </MudContainer>
 
 
@@ -84,7 +90,6 @@
     private OrdenDetalleRegistroDto ordenRegistroDto = new();
     private List<OrdenDetalleRegistroDto> ordenDetalle = new();
     private OrdenRegistroDto orden = new();
-
 
     private bool _eventoSoloLectura = false;
     private bool _guardando = false;
@@ -114,14 +119,17 @@
         Console.WriteLine($"apellido inicializado: {apellidoClaim?.Value}"); // Registro de depuración
         Console.WriteLine($"apellido inicializado: {apellido}"); // Registro de depuración
         Console.WriteLine($"Nombre inicializado: {nombre}"); // Registro de depuración
-    }
+    }  
 
-
-
-    private void OpenMudDialog()
+    private Task OpenDialogAsync()
     {
-        var parameters = new DialogParameters { ["ContentText"] = "Esto es un diálogo de prueba usando el servicio." };
-        DialogService.Show<MudDialog>("Diálogo de Prueba", parameters);
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = false, // Desactiva el cierre con la tecla Escape
+                DisableBackdropClick = true // Desactiva el cierre al hacer clic fuera del diálogo
+            };
+        // Muestra el diálogo
+        return DialogService.ShowAsync<CustomDialog>(null, options);
     }
 
     private async Task AbrirCulqi()

@@ -1,28 +1,40 @@
 ﻿@using MudBlazor
+@inject NavigationManager NavigationManager
 
 <MudDialog>
-    <MudDialogContent>
-        <MudItem>
-            <MudGrid AlignItems="AlignItems.Center" Style="margin-bottom:10px">
-                <MudItem Style="margin-top:20px"> 
-                    <MudImage Src="icons/mago.png" Style="height: 50px; width: 50px; margin-right: 8px;" />
-                </MudItem>
-                <MudItem Style="margin-top:30px">
-                    <MudText Typo="Typo.h5" Style="font-weight:600;" Class="tipo" Align="Align.Center">Gracias por su compra!</MudText>
-                </MudItem>
-            </MudGrid>
-        </MudItem>
-    </MudDialogContent>
-    <MudDialogActions>
-        <MudButton OnClick="Close">Cerrar</MudButton>
-    </MudDialogActions>
+    <TitleContent>
+        <MudText Typo="Typo.h5" Style="text-align: center; font-weight: 600;">
+            Pago Realizado con éxito!
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <div style="text-align: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px;">
+                <div style="margin-bottom: 5px;">
+                    <MudImage Src="icons/mago.png" Style="height: 100px; width: 100px;" />
+                </div>
+                <MudText Typo="Typo.body1" Style="margin-bottom: 5px; font-weight: 400;">
+                    Gracias por su preferencia.
+                </MudText>
+            </div>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <div style="display: flex; justify-content: center; width: 100%;">
+            <MudButton Color="Color.Success" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Check" OnClick="NavigateHome">
+                Aceptar
+            </MudButton>
+        </div>
+    </DialogActions>
 </MudDialog>
-
 @code {
-    private void Close()
+    [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
+
+    private void NavigateHome()
     {
-        MudDialogInstance?.Close();
+        MudDialog.Close(DialogResult.Ok(true));
+        NavigationManager.NavigateTo("/");
     }
 
-    [CascadingParameter] public MudDialogInstance MudDialogInstance { get; set; }
+ 
 }
