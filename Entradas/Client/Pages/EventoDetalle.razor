@@ -19,7 +19,7 @@
         }
         else {
             <MudItem lg="12" sm="12" Class="d-flex justify-center">
-                <MudText Typo="Typo.h3" Style="font-weight: bold; font-size: 2.5rem;">
+                <MudText Typo="Typo.h3" Style="border-radius: 20px; font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif">
                     @evento.Nombre
                 </MudText>
             </MudItem>
@@ -55,14 +55,24 @@
                                 Dirección: Camino Centenario y 514, La Plata
                                 </MudListItem> *@
                                     <MudListItem Icon="@Icons.Material.Filled.Casino">  @*"@Icons.Material.Filled.MusicNote"*@
-                                    Edicion: @evento.Ubicacion
+                                        <MudText> 
+                                            <span style="border-radius: 20px; font-size: 1rem; font-family: 'Poppins', sans-serif">
+                                            Edicion: 
+                                            </span>
+                                            @evento.Ubicacion
+                                        </MudText>
                                 </MudListItem>
-                                <MudListItem Icon="@Icons.Material.Filled.PriceCheck">
-                                    Precio: @evento.CapacidadTotal
-                                </MudListItem>
+                                    <MudListItem Icon="@Icons.Material.Filled.PriceCheck">
+                                        <MudText>
+                                            <span style="border-radius: 20px; font-size: 1rem; font-family: 'Poppins', sans-serif">
+                                                Precio:
+                                            </span>
+                                            @evento.CapacidadTotal
+                                        </MudText>
+                                    </MudListItem>
                             </MudList>
                             <div style="height:20px"> </div>
-                            <MudButton Variant="Variant.Filled" Size="Size.Large" StartIcon="@Icons.Material.Filled.Sell" Color="Color.Success" FullWidth="true" OnClick="()=>Comprar(evento.EventoId)">Comprar</MudButton>
+                            <MudButton Style="font-weight:bold" Variant="Variant.Filled" Size="Size.Large" StartIcon="@Icons.Material.Filled.Sell" Color="Color.Success" FullWidth="true" OnClick="()=>Comprar(evento.EventoId)">Comprar</MudButton>
                         </MudItem>
 
                     </MudGrid>
@@ -70,11 +80,11 @@
             </MudPaper>
         </MudItem>
         <MudItem lg="12" sm="12" Class="d-flex justify-center">
-            <MudText Typo="Typo.h3">Detalle del Producto </MudText>
+                <MudText Style="font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif;" Typo="Typo.h3">Detalle del Producto </MudText>
         </MudItem>
         <MudItem lg="12" sm="12" Class="d-flex justify-center" >
             <MudPaper Elevation="3" Class="p-3" Style="border-radius:10px ">
-                <MudText Typo="Typo.h5"> @evento.Nombre</MudText>
+                    <MudText Style="border-radius: 20px; font-weight: bold; font-family: 'Poppins', sans-serif" Typo="Typo.h5"> @evento.Nombre</MudText>
                 @* <MudText Typo="Typo.subtitle1"> El Parque inflable más grande de Argentina con un recorrido emocionante<br /> </MudText> *@
                     <MudText Typo="Typo.body1" Align="Align.Justify" Style="font-weight: bold;">
                         @evento.Informacion
@@ -88,7 +98,7 @@
             <MudCard Elevation="3">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h3" Align="Align.Center">COLECCION Y PRECIO </MudText>
+                            <MudText Style="border-radius: 20px; font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif" Typo="Typo.h3" Align="Align.Center">CONDICION Y PRECIO </MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
 
@@ -123,7 +133,7 @@
                     </MudDataGrid>
                 </MudCardContent>
                 <MudCardActions Class="d-flex justify-center">
-                    <MudButton Variant="Variant.Filled" Size="Size.Large" StartIcon="@Icons.Material.Filled.Sell" Color="Color.Success" FullWidth="false" OnClick="()=>Comprar(evento.EventoId)">Comprar</MudButton>
+                        <MudButton Style="font-weight:bold" Variant="Variant.Filled" Size="Size.Large" StartIcon="@Icons.Material.Filled.Sell" Color="Color.Success" FullWidth="false" OnClick="()=>Comprar(evento.EventoId)">Comprar</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
