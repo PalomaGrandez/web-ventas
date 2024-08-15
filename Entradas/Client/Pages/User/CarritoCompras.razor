@@ -23,8 +23,8 @@
                     <MudTh>ELIMINAR</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="CARTA">@detalleContext.EntradaTipo</MudTd>
-                    <MudTd DataLabel="CONDICION">@detalleContext.EntradaTipo</MudTd>
+                    <MudTd DataLabel="FECHA">@detalleContext.EntradaTipo</MudTd>
+                    <MudTd DataLabel="TIPO DE INTRUMENTO">@detalleContext.EntradaTipo</MudTd>
                     <MudTd DataLabel="PRECIO">@detalleContext.PrecioRegular</MudTd>
                     <MudTd DataLabel="CANTIDAD">
                         <div class="d-flex align-items-center">
@@ -39,9 +39,8 @@
                                 StartIcon="@Icons.Material.Filled.Delete"
                                 Color="Color.Error"
                                 Size="Size.Small"
-                                OnClick="() => RemoverItemLocal((int)detalleContext.EventoId!,
-                                             (int)detalleContext.EventoEntradaId!,
-                                             (int)detalleContext.EventoFechaId!)" />
+                                OnClick="()=> RemoverItemLocal((int) detalleContext.EventoId!,
+                                                                           (int)detalleContext.EventoEntradaId!)" />
                     </MudTd>
                 </RowTemplate>
                 <FooterContent>
@@ -115,47 +114,6 @@
         NavigationManager.NavigateTo($"/usuario/confirmacion-compra/{totalOrden}");
     }
 
-    private async Task RealizarPedido()
-    {
-        _guardando = true;
-
-        var userId = await AuthService.GetUserId();
-
-        if (!ordenDetalle.Any())
-        {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-            Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
-            return;
-        }
-
-        var orden = new OrdenRegistroDto
-            {
-                FechaOrden = DateTime.Now,
-                Estado = EstadosOrden.REGISTRADO,
-                Items = ordenDetalle,
-                UsuarioId = userId,
-                PrecioTotal = (decimal)ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular)
-            };
-
-        var response = await OrdenService.CreateOrden(orden);
-
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        if (response.Success)
-        {
-            await OrdenService.LimpiarItemLocal();
-            _guardando = false;
-
-            Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
-            NavigationManager.NavigateTo("/confirmacion-compra");
-        }
-        else
-        {
-            _guardando = false;
-            Snackbar.Add($"Ha sucedido un error: {response.Message}", Severity.Error);
-            NavigationManager.NavigateTo("/");
-        }
-    }
-
     private void AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
     {
         var item = ordenDetalle.FirstOrDefault(d => d.EventoId == detalleContext.EventoId &&
@@ -187,9 +145,9 @@
         ordenDetalle = await OrdenService.ObtenerOrdenDetalleLocal();
     }
 
-    public async Task RemoverItemLocal(int eventoId, int eventoEntradaId, int eventoFecha)
+    public async Task RemoverItemLocal(int eventoId, int eventoEntradaId)
     {
-        await OrdenService.RemoverItemLocal(eventoId, eventoEntradaId, eventoFecha);
+        await OrdenService.RemoverItemLocal(eventoId, eventoEntradaId);
         await CargarOrdenLocal();
         StateHasChanged();
     }
