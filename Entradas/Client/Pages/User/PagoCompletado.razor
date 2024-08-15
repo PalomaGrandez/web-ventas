@@ -1,0 +1,97 @@
+﻿@page "/usuario/pago-completo"
+@inject IJSRuntime JS
+@inject IOrdenService OrdenService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IDialogService DialogService
+@inject IAuthService AuthService
+
+<PageTitle>Pago Completo</PageTitle>
+
+@code {
+    [Parameter]
+    public int MontoTotal { get; set; } // Parámetro para recibir el monto total
+    public int eventoId { get; set; }
+    private bool _cargandoEvento = false;
+    private bool _cargandoEventoEntrada = false;
+    private bool _cargandoEventoFecha = false;
+
+    private bool _dialogOpen = false;
+
+    private string btnText = "REALIZAR PEDIDO";
+    private OrdenDetalleRegistroDto ordenRegistroDto = new();
+    private List<OrdenDetalleRegistroDto> ordenDetalle = new();
+    private OrdenRegistroDto orden = new();
+
+    private bool _eventoSoloLectura = false;
+    private bool _guardando = false;
+    string user = "Invitado";
+    string nombre = "Invitado";
+    string email = "Invitado";
+    string apellido = "Invitado";
+
+    protected override async Task OnInitializedAsync()
+    {   
+        await CargarOrdenLocal();
+        await RealizarPedido();
+       
+    }
+
+    private async Task CargarOrdenLocal()
+    {
+        ordenDetalle = await OrdenService.ObtenerOrdenDetalleLocal();
+        Console.WriteLine(ordenDetalle.Count);
+    }
+
+    public Task OpenDialogAsync()
+    {
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = false, // Desactiva el cierre con la tecla Escape
+                DisableBackdropClick = true // Desactiva el cierre al hacer clic fuera del diálogo
+            };
+        // Muestra el diálogo
+        return DialogService.ShowAsync<CustomDialog>(null, options);
+    }
+
+    public async Task RealizarPedido()
+    {
+        _guardando = true;
+
+        var userId = await AuthService.GetUserId();
+
+        if (!ordenDetalle.Any())
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
+            return;
+        }
+
+        orden.FechaOrden = DateTime.Now;
+        orden.Estado = EstadosOrden.REGISTRADO;
+        orden.Items = ordenDetalle;
+        orden.UsuarioId = userId;
+        orden.PrecioTotal = (decimal)ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular);
+
+        var response = await OrdenService.CreateOrden(orden);
+
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        if (response.Success)
+        {
+            await OrdenService.LimpiarItemLocal();
+            _guardando = true;
+
+            //Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
+            await OpenDialogAsync();
+           // NavigationManager.NavigateTo("/confirmacion-compra");
+        }
+        else
+        {
+            _guardando = true;
+            Snackbar.Add($"Ha sucedido un error: {response.Message}", Severity.Error);
+           // NavigationManager.NavigateTo("/");
+        }
+    }
+
+}

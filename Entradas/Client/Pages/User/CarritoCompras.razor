@@ -114,47 +114,6 @@
         NavigationManager.NavigateTo($"/usuario/confirmacion-compra/{totalOrden}");
     }
 
-    private async Task RealizarPedido()
-    {
-        _guardando = true;
-
-        var userId = await AuthService.GetUserId();
-
-        if (!ordenDetalle.Any())
-        {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-            Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
-            return;
-        }
-
-        var orden = new OrdenRegistroDto
-            {
-                FechaOrden = DateTime.Now,
-                Estado = EstadosOrden.REGISTRADO,
-                Items = ordenDetalle,
-                UsuarioId = userId,
-                PrecioTotal = (decimal)ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular)
-            };
-
-        var response = await OrdenService.CreateOrden(orden);
-
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        if (response.Success)
-        {
-            await OrdenService.LimpiarItemLocal();
-            _guardando = false;
-
-            Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
-            NavigationManager.NavigateTo("/confirmacion-compra");
-        }
-        else
-        {
-            _guardando = false;
-            Snackbar.Add($"Ha sucedido un error: {response.Message}", Severity.Error);
-            NavigationManager.NavigateTo("/");
-        }
-    }
-
     private void AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
     {
         var item = ordenDetalle.FirstOrDefault(d => d.EventoId == detalleContext.EventoId &&

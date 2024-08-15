@@ -323,7 +323,7 @@
         }
     }
 
-         private async Task OnValidSubmit()
+    private async Task OnValidSubmit()
     {
         ordenRegistroDto.PrecioTotal = ordenRegistroDto.PrecioRegular * ordenRegistroDto.Cantidad;
         ordenRegistroDto.EventoFechaId = 1;
@@ -390,7 +390,7 @@
         }
     }
 
-    private void DisminuirCantidad(OrdenDetalleRegistroDto detalleContext)
+    private async void  DisminuirCantidad(OrdenDetalleRegistroDto detalleContext)
     {
         // Verifica si el detalleContext existe en la lista
         var item = ordenDetalle.FirstOrDefault(d => d.EventoId == detalleContext.EventoId &&
@@ -400,6 +400,8 @@
         {
             item.Cantidad--;
             item.PrecioTotal = item.PrecioRegular * item.Cantidad;
+            await OrdenService.AgregarItemLocal(ordenRegistroDto);
+            await CargarOrdenLocal();
             StateHasChanged(); // Actualizar la vista
         }
     }
