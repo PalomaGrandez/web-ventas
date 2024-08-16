@@ -13,36 +13,42 @@
 
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudGrid Justify="Justify.Center">
-        <MudItem lg="12">
-            <MudCard Elevation="3">
-                <MudCardHeader>
+        <MudItem xs="12">
+            <MudCard Elevation="3" Class="rounded-lg">
+                <MudCardHeader Class="pb-0">
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: bold; font-family: 'Poppins', sans-serif">
+                        <MudText Typo="Typo.h4" Align="Align.Center" Style="font-weight: 700; font-family: 'Poppins', sans-serif;">
                             COMPLETE SU COMPRA
                         </MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
                     <MudGrid Style="font-family: 'Poppins', sans-serif;" Justify="Justify.Center">
-                        <MudItem lg="12">
+                        <MudItem xs="12">
+                            <MudPaper Elevation="0" Class="pa-4 rounded-lg" Style="background-color: #E5E7EB;">
+                                <MudText Typo="Typo.body1" Align="Align.Center">
+                                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Class="mr-2" /> Su pedido estará disponible para ser recogido a partir del día siguiente,
+                                    dentro de los días hábiles de lunes a sábado en el horario de 9 a.m. a 9 p.m.
+                                </MudText>
+                                <MudText Typo="Typo.body1" Align="Align.Center" Class="mt-3">
+                                    <MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="mr-2" /> <strong>Avenida San Martin 721, pasaje D-44, Pueblo Libre</strong>.
+                                </MudText>
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12" Class="mt-4">
                             <MudText Typo="Typo.body1" Align="Align.Center">
-                                Su pedido estará disponible para ser recogido a partir del día siguiente,
-                                dentro de los días hábiles de lunes a sábado en el horario de 9 a.m. a 9 p.m.
-                                La dirección de recogida es: <strong>Avenida San Martin 721, pasaje D-44, Pueblo Libre</strong>.
-                                <br /><br />
-                                Realice su pago con Yape y envíe el comprobante a soporte@fabrica.pe con el asunto: Pago Pedido N° xxxx-xx-xxxxxx. Verá sus productos en 'Mis Pedidos'.
+                                <MudIcon Icon="@Icons.Material.Filled.Payment" Class="mr-2" /> Realice su pago con Yape y envíe el comprobante a soporte@fabrica.pe con el asunto: Pago Pedido N° xxxx-xx-xxxxxx.
+                            </MudText>
+                            <MudText Typo="Typo.body1" Align="Align.Center" Class="mt-2">
+                                Verá sus productos en 'Mis Pedidos'.
                             </MudText>
                         </MudItem>
-                        <MudItem lg="12">
+                        <MudItem xs="12" Class="mt-4">
                             <div class="d-flex justify-center">
                                 <MudImage Height="300" ObjectPosition="ObjectPosition.Center" Src="pago/cod_aprobacion.png" Class="rounded-lg" ObjectFit="ObjectFit.Contain" Fluid="true" Style="max-height:500px" />
                             </div>
                         </MudItem>
-                        <MudItem>
-                            <MudText Typo="Typo.body2" Align="Align.Center" Style="font-size: 1.2rem; margin-top:20px;">
-                                Pulse "Realizar pago" para completar la compra.
-                            </MudText>
-                        </MudItem>
+
                     </MudGrid>
                 </MudCardContent>
 
@@ -54,8 +60,9 @@
                                Id="btn_pagar"
                                OnClick="AbrirCulqi"
                                StartIcon="@Icons.Material.Filled.ShoppingCart"
-                               Style="font-weight:bold"
-                               Class="mx-2">
+                               Style="font-weight:bold;margin: 0 8px;"
+                               Class=" hover-scale">
+                               
                         Realizar Pago
                     </MudButton>
 
@@ -66,8 +73,7 @@
                                Color="Color.Secondary"
                                OnClick="OpenDialogAsync"
                                StartIcon="@Icons.Material.Filled.Info"
-                               Style="font-weight:bold"
-                               Class="mx-2">
+                               Class=" hover-scale" Style="font-family: font-weight:bold; margin: 0 8px;">
                         Información
                     </MudButton>
                 </MudCardActions>
@@ -75,6 +81,15 @@
         </MudItem>
     </MudGrid>
 </MudContainer>
+<style>
+    .hover-scale {
+        transition: transform 0.3s ease;
+    }
+
+     .hover-scale:hover {
+            transform: scale(1.05);
+        }
+</style>
 
 
 

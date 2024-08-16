@@ -22,39 +22,11 @@
 
         <MudSpacer />
 
-        <!-- Agrega el layout para el buscador -->
-        @* <div style="margin: 20px 10%; display: flex; justify-content: center;">
-            <MudTextField @bind-Value="searchQuery" Placeholder="Buscar producto..." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Variant="Variant.Outlined" Class="mud-width-full mud-max-width-400 custom-text-field" OnKeyUp="PerformSearch" Style="height: 30px; width: 250px;">
-                <Adornment AdornmentPosition="AdornmentPosition.End">
-                    <IconButton Icon="@Icons.Material.Filled.Search" OnClick="PerformSearch" />
-                </Adornment>
-            </MudTextField>
-        </div>
-
-        <style>
-            .custom-text-field input::placeholder {
-                color: white; /* Color blanco */
-                font-size: 12px; /* Tamaño de fuente más pequeño */
-            }
-
-            .custom-text-field .mud-input-outlined {
-                background-color: #325980; /* Fondo azul oscuro */
-                border-radius: 10px; /* Bordes redondeados */
-                color: white; /* Color de texto blanco */
-                height: 30px; /* Ajuste de altura */
-            }
-
-                .custom-text-field .mud-input-outlined:hover,
-                .custom-text-field .mud-input-outlined:focus {
-                    border-color: rgba(255, 255, 255, 1); /* Color blanco completo al pasar el cursor o enfocar */
-                }
-        </style>*@
-
         @if (autenticado)
         {
-            <MudText Style="font-weight: bold; font-family: 'Poppins', sans-serif;" Typo="Typo.h6" Class="mt-1">Hola, @nombre</MudText>
+            @*  <MudText Style="font-weight: bold; font-family: 'Poppins', sans-serif;" Typo="Typo.h6" Class="mt-1">Hola, @nombre</MudText> *@
 
-            <div style="width: 20px"></div>
+            <div style="width: 10px"></div>
 
             <MudButton ButtonType="ButtonType.Button"
                        EndIcon="@Icons.Material.Filled.ShoppingCart"
@@ -66,7 +38,7 @@
                 Carrito
             </MudButton>
 
-            <div style="width: 20px"></div>
+            <div style="width: 10px"></div>
 
             <MudButton ButtonType="ButtonType.Button"
                        EndIcon="@Icons.Material.Filled.Logout"
@@ -78,7 +50,7 @@
                 Cerrar Sesión
             </MudButton>
 
-            <div style="width: 20px"></div>
+            <div style="width: 10px"></div>
 
 
         }
@@ -94,7 +66,7 @@
                 Iniciar Sesión
             </MudButton>
 
-            <div style="width: 20px"></div>
+            <div style="width: 10px"></div>
 
             <MudButton ButtonType="ButtonType.Button"
                        EndIcon="@Icons.Material.Filled.AppRegistration"
@@ -106,12 +78,13 @@
                 Registrarse
             </MudButton>
         }
+
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="2" ClipMode="DrawerClipMode.Always">
-        <div style="height: 20px"></div>
+        <div style="height: 10px"></div>
         <MudDrawerHeader>
             <MudAvatar Variant="Variant.Filled">@nombre?.Substring(0, 1)</MudAvatar>
-            <div style="width: 20px"></div>
+            <div style="width: 10px"></div>
             <MudText Typo="Typo.h5" Class="mt-1" Style="overflow-wrap: normal; max-width: 200px">@nombre</MudText>
         </MudDrawerHeader>
         <NavMenu></NavMenu>
@@ -120,6 +93,7 @@
         @Body
     </MudMainContent>
 </MudLayout>
+
 
 @code {
     bool _drawerOpen = false;
