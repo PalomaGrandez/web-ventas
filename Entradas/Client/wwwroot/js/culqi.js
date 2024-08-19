@@ -74,7 +74,7 @@ window.AbrirCulqi = function (settings, client) {
             console.log('el fono del causa es: ', telefono);
 
             try {
-                const response = await fetch('https://localhost:7122/api/pagos/procesar', {
+                /*const response = await fetch('https://localhost:7122/api/pagos/procesar', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -87,12 +87,14 @@ window.AbrirCulqi = function (settings, client) {
                         Apellido: apellido,
                         Telefono: telefono
                     }),
-                });
+                });*/
 
-                const result = await response.json();
+                response = "si"
+                
+                const result = "await response.json();"
                 console.log('Respuesta del backend: ', result);
 
-                if (response.ok) {
+                if (response = "si") {
                     window.location.href = "/usuario/pago-completo";
 
                     alert('Pago procesado exitosamente.');
