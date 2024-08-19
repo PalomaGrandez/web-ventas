@@ -1,4 +1,4 @@
-﻿@page "/seleccion-entradas/{eventoId:int}"
+﻿@page "/seleccion-producto/{eventoId:int}"
 
 
 @inject NavigationManager NavigationManager
@@ -285,7 +285,7 @@
         var totalOrden = (int)(ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular));
 
         // Navegar a la pantalla de confirmación de compra pasando el monto total como parámetro
-        NavigationManager.NavigateTo($"/usuario/confirmacion-compra/{totalOrden}");
+        NavigationManager.NavigateTo($"/usuario/completar-compra/{totalOrden}");
     }
 
     private async Task RealizarPedido()
@@ -316,7 +316,7 @@
             _guardando = true;
 
             Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
-            NavigationManager.NavigateTo("/confirmacion-compra");
+            NavigationManager.NavigateTo("/completar-compra");
         }
         else
         {
@@ -482,7 +482,7 @@
     private async Task Cancelar()
     {
         await OrdenService.LimpiarItemLocal();
-        NavigationManager.NavigateTo($"/evento-detalle/{eventoId}");
+        NavigationManager.NavigateTo($"/producto-detalle/{eventoId}");
     }
 }
 

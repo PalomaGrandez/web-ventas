@@ -111,7 +111,7 @@
         var totalOrden = (int)(ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular));
 
         // Navegar a la pantalla de confirmación de compra pasando el monto total como parámetro
-        NavigationManager.NavigateTo($"/usuario/confirmacion-compra/{totalOrden}");
+        NavigationManager.NavigateTo($"/usuario/completar-compra/{totalOrden}");
     }
 
     private void AumentarCantidad(OrdenDetalleRegistroDto detalleContext)

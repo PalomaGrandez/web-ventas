@@ -9,6 +9,34 @@
 
 <PageTitle>Pago Completo</PageTitle>
 
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-10">
+    <MudPaper Elevation="3" Class="pa-7 rounded-xl">
+        <MudGrid Justify="Justify.Center" Spacing="5">
+            <MudItem xs="12">
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Large" Class="d-block mx-auto mb-4" />
+            </MudItem>
+            <MudItem xs="12">
+                <MudText Style="font-weight: bold; font-family: 'Poppins', sans-serif;" Typo="Typo.h4" Align="Align.Center" Class="mb-4">¡Pago Completado!</MudText>
+            </MudItem>
+            <MudItem xs="12">
+                <MudText Style="font-family: 'Poppins', sans-serif;" Typo="Typo.subtitle1" Align="Align.Center" Class="mb-5">
+                    Gracias por tu compra. Tu pedido ha sido procesado con éxito.
+                </MudText>
+            </MudItem>
+
+            <MudItem xs="12" Class="d-flex justify-center mb-5">
+                <MudImage Src="/icons/mago.png" Alt="Imagen de éxito" Width="190" Height="190" ObjectFit="ObjectFit.Cover" Class="rounded-lg" />
+            </MudItem>
+
+            <MudItem xs="12" Class="d-flex justify-center">
+                <MudButton Style="font-family: 'Poppins', sans-serif; font-weight:bold" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large"
+                           EndIcon="@Icons.Material.Filled.Home" OnClick="GoToHome">
+                    Inicio
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
 @code {
     [Parameter]
     public int MontoTotal { get; set; } // Parámetro para recibir el monto total
@@ -30,11 +58,16 @@
     string nombre = "Invitado";
     string email = "Invitado";
     string apellido = "Invitado";
+    
+    private void GoToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
 
     protected override async Task OnInitializedAsync()
     {   
-        await CargarOrdenLocal();
-        await RealizarPedido();
+        // await CargarOrdenLocal();
+        // await RealizarPedido();
        
     }
 
@@ -83,7 +116,7 @@
             _guardando = true;
 
             //Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
-            await OpenDialogAsync();
+            //await OpenDialogAsync();
            // NavigationManager.NavigateTo("/confirmacion-compra");
         }
         else

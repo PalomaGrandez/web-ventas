@@ -1,4 +1,4 @@
-﻿@page "/usuario/confirmacion-compra/{montoTotal:int}"
+﻿@page "/usuario/completar-compra/{montoTotal:int}"
 @inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
@@ -68,7 +68,7 @@ using Microsoft.JSInterop;
                     </MudButton>
 
                     <!-- Nuevo botón para abrir el cuadro de diálogo -->
-                    <MudButton ButtonType="ButtonType.Button"
+                   @*  <MudButton ButtonType="ButtonType.Button"
                                Size="Size.Large"
                                Variant="Variant.Outlined"
                                Color="Color.Secondary"
@@ -76,7 +76,7 @@ using Microsoft.JSInterop;
                                StartIcon="@Icons.Material.Filled.Info"
                                Class=" hover-scale" Style="font-family: font-weight:bold; margin: 0 8px;">
                         Información
-                    </MudButton>
+                    </MudButton> *@
                 </MudCardActions>
             </MudCard>
         </MudItem>
@@ -186,7 +186,7 @@ using Microsoft.JSInterop;
             _guardando = true;
 
             Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
-            NavigationManager.NavigateTo("/confirmacion-compra");
+            NavigationManager.NavigateTo("/completar-compra");
         }
         else
         {
