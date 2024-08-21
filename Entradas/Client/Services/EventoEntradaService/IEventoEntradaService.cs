@@ -13,5 +13,6 @@
         Task GetEventoEntradasPaginado(int pagina);
         Task GetEventoEntradasPorEvento(int pagina,int eventoId);
         Task<ServiceResponse<EventoEntrada>> GetEventoEntradaPorId(int eventoEntradaId);
+
     }
 }
