@@ -34,13 +34,13 @@
         <MudItem lg="12">
             <MudDataGrid Items="@pedidoDetalle" Striped="true" Bordered="true" HeaderClass="" Class="d-flex justify-content-center" Elevation="3" Dense="false" Breakpoint="Breakpoint.Xs">
                 <Columns>
-                    <PropertyColumn Property="x => x.Evento" Title="EVENTO" />
-                    <PropertyColumn Property="x => x.TipoEntrada" Title="TIPO ENTRADA" />
-                    <PropertyColumn Property="x => x.Fecha" Title="FECHA DE EVENTO" Culture="CultureInfo.InvariantCulture" Format="dd/MM/yyyy" />
+                    <PropertyColumn Property="x => x.Evento" Title="CARTA" />
+                    <PropertyColumn Property="x => x.TipoEntrada" Title="CONCIDION DE CARTA" />
+                    <PropertyColumn Property="x => x.Fecha" Title="FECHA DE COMPRA" Culture="CultureInfo.InvariantCulture" Format="dd/MM/yyyy" />
                     <PropertyColumn Property="x => x.Cantidad" Title="CANTIDAD" />
                     <PropertyColumn Property="x => x.PrecioUnitario" Title="PRECIO UNITARIO" Culture="CultureInfo.InvariantCulture" Format="F2" />
                     <PropertyColumn Property="x => x.PrecioTotal" Title="PRECIO TOTAL" Culture="CultureInfo.InvariantCulture" Format="F2" />
-                    
+
                 </Columns>
             </MudDataGrid>
         </MudItem>

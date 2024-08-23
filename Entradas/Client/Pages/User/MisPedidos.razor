@@ -30,21 +30,21 @@
                 <Columns>
                     <PropertyColumn Property="x => x.OrdenId" Title="N° DE ORDEN" />
                     <PropertyColumn Property="x => x.FechaOrden" Title="FECHA DE COMPRA" />
-                   @* <TemplateColumn Title="MEDIO DE PAGO">
-                        <CellTemplate>
-                            @if (context.Item.MedioPago.Equals("PLIN"))
-                            {
-                                <MudImage Src="pago/plin-logo.png" Height="50" Width="50" />
-                            }
-                            else if (context.Item.MedioPago.Equals("YAPE"))
-                            {
-                                <MudImage Src="pago/yape-logo.png" Height="50" Width="50" />
-                            }
-                            else
-                            {
-                                @* <MudImage Src="" Height="50" Width="50" /> 
-                            }
-                        </CellTemplate>
+                    @* <TemplateColumn Title="MEDIO DE PAGO">
+                    <CellTemplate>
+                    @if (context.Item.MedioPago.Equals("PLIN"))
+                    {
+                    <MudImage Src="pago/plin-logo.png" Height="50" Width="50" />
+                    }
+                    else if (context.Item.MedioPago.Equals("YAPE"))
+                    {
+                    <MudImage Src="pago/yape-logo.png" Height="50" Width="50" />
+                    }
+                    else
+                    {
+                    @* <MudImage Src="" Height="50" Width="50" />
+                    }
+                    </CellTemplate>
                     </TemplateColumn>*@
                     <PropertyColumn Property="x => x.PrecioTotal" Title="TOTAL" Culture="@CultureInfo.InvariantCulture" Format="F2" />
                     <TemplateColumn Title="ESTADO">
@@ -81,17 +81,17 @@
                             </MudFab>
                         </CellTemplate>
                     </TemplateColumn>
-                    <TemplateColumn Title="TICKETS">
-                        <CellTemplate>
-                            <MudFab Size="Size.Medium"
-                                    StartIcon="@Icons.Material.Filled.Receipt"
-                                    Color="Color.Warning"
-                                    DisableElevation="true"
-                                    Id="btn_pagar"
-                                    OnClick="() => AbrirCulqi(context.Item.PrecioTotal)">
-                            </MudFab>
-                        </CellTemplate>
-                    </TemplateColumn>
+                    @*  <TemplateColumn Title="TICKETS">
+                    <CellTemplate>
+                    <MudFab Size="Size.Medium"
+                    StartIcon="@Icons.Material.Filled.Receipt"
+                    Color="Color.Warning"
+                    DisableElevation="true"
+                    Id="btn_pagar"
+                    OnClick="() => AbrirCulqi(context.Item.PrecioTotal)">
+                    </MudFab>
+                    </CellTemplate>
+                    </TemplateColumn> *@
                 </Columns>
             </MudDataGrid>
         </MudItem>
@@ -191,7 +191,7 @@
     private async Task AbrirCulqi(decimal? precioTotal)
     {
         try
-        {   
+        {
             Console.WriteLine(nombre + apellido + email);
             // Convertir el precio a entero (por ejemplo, a céntimos)
             int precioTotalEntero = (int)(precioTotal * 100);
@@ -201,7 +201,7 @@
                 title = "Realizacion de pago",
                 currency = "PEN",
                 amount = precioTotalEntero
-            };  
+            };
 
             var client = new
             {
