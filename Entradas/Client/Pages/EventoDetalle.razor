@@ -8,135 +8,107 @@
 
 <PageTitle>Evento Detalle</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large">
+<MudContainer MaxWidth="MaxWidth.Medium">
     <MudGrid Justify="Justify.Center" Class="p-3">
-           
-        @if(_cargando)
+
+        @if (_cargando)
         {
             <MudItem lg="12" sm="12" Class="d-flex justify-center" Style="margin-top:100px;">
                 <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size=Size.Large />
             </MudItem>
         }
-        else {
+        else
+        {
             <MudItem lg="12" sm="12" Class="d-flex justify-center">
                 <MudText Typo="Typo.h3" Style="border-radius: 20px; font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif">
                     @evento.Nombre
                 </MudText>
             </MudItem>
-        <MudItem lg="12" sm="12" Class="d-flex justify-center">
-            <MudPaper Elevation="3" Class="p-2" Style="border-radius:10px">
-                <MudContainer>
-                    <MudGrid Justify="Justify.Center">
-
-                        <MudItem lg="6" sm="6">
-                            <MudImage Src="@evento.Imagen" Height="220" Fluid="true" Style="border-radius:10px " ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
-                        </MudItem>
-                        <MudItem lg="6" sm="6">
-                            <MudList>
-                                @*  <MudListItem Icon="@Icons.Material.Filled.GpsFixed">
-                                Lugar: Camino Centenario y 514 - Estacionamiento Hipermercado
-                                </MudListItem>
-                                <MudListItem Icon="@Icons.Material.Filled.GpsFixed">
-                                Ciudad: La Plata
-                                </MudListItem>
-                                <MudListItem Icon="@Icons.Material.Filled.CalendarMonth">
-                                Fecha: 2023-08-06
-                                </MudListItem>
-                                <MudListItem Icon="@Icons.Material.Filled.LockClock">
-                                Hora: 2:00AM
-                                </MudListItem>
-                                <MudListItem Icon="@Icons.Material.Filled.Category">
-                                Categoría: Exposiciones
-                                </MudListItem>
-                                <MudListItem Icon="@Icons.Material.Filled.Info">
-                                Edad mínima de ingreso: de 3 a 70 Años
-                                </MudListItem>
-                                <MudListItem Icon="@Icons.Material.Filled.GpsFixed">
-                                Dirección: Camino Centenario y 514, La Plata
-                                </MudListItem> *@
-                                    <MudListItem Icon="@Icons.Material.Filled.Casino">  @*"@Icons.Material.Filled.MusicNote"*@
-                                        <MudText> 
+            <MudItem lg="12" sm="12" Class="d-flex justify-center">
+                <MudPaper Elevation="3" Class="p-2" Style="border-radius:10px">
+                    <MudContainer>
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem lg="6" sm="6">
+                                <MudImage Src="@evento.Imagen" Height="220" Fluid="true" Style="border-radius:10px " ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
+                            </MudItem>
+                            <MudItem lg="6" sm="6">
+                                <MudList>
+                                    <MudListItem Icon="@Icons.Material.Filled.Casino">
+                                        <MudText>
                                             <span style="border-radius: 20px; font-size: 1rem; font-family: 'Poppins', sans-serif">
-                                            Edicion: 
+                                                Edicion:
                                             </span>
                                             @evento.Ubicacion
                                         </MudText>
-                                </MudListItem>
+                                    </MudListItem>
                                     <MudListItem Icon="@Icons.Material.Filled.PriceCheck">
                                         <MudText>
                                             <span style="border-radius: 20px; font-size: 1rem; font-family: 'Poppins', sans-serif">
-                                                Precio:
+                                                Stock:
                                             </span>
                                             @evento.CapacidadTotal
                                         </MudText>
                                     </MudListItem>
-                            </MudList>
-                            <div style="height:20px"> </div>
-                            <MudButton Style="font-weight:bold" Variant="Variant.Filled" Size="Size.Large" StartIcon="@Icons.Material.Filled.Sell" Color="Color.Success" FullWidth="true" OnClick="()=>Comprar(evento.EventoId)">Comprar</MudButton>
-                        </MudItem>
+                                    <MudListItem>
+                                        <MudText Typo="Typo.body1" Align="Align.Justify" Style="font-weight: bold;">
+                                            @evento.Informacion
+                                        </MudText>
+                                    </MudListItem>
+                                </MudList>
+                                @* <div style="height:20px"> </div>
+                                <MudButton Style="font-weight:bold" Variant="Variant.Filled" Size="Size.Large" StartIcon="@Icons.Material.Filled.Sell" Color="Color.Success" FullWidth="true" OnClick="()=>Comprar(evento.EventoId)">Comprar</MudButton> *@
+                            </MudItem>
+                        </MudGrid>
+                    </MudContainer>
+                </MudPaper>
+            </MudItem>
+            <MudItem lg="12" sm="12" Class="d-flex justify-center">
+                @* <MudText Style="font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif;" Typo="Typo.h3">Detalle del Producto </MudText> *@
+            </MudItem>
 
-                    </MudGrid>
-                </MudContainer>
-            </MudPaper>
-        </MudItem>
-        <MudItem lg="12" sm="12" Class="d-flex justify-center">
-                <MudText Style="font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif;" Typo="Typo.h3">Detalle del Producto </MudText>
-        </MudItem>
-        <MudItem lg="12" sm="12" Class="d-flex justify-center" >
-            <MudPaper Elevation="3" Class="p-3" Style="border-radius:10px ">
-                    <MudText Style="border-radius: 20px; font-weight: bold; font-family: 'Poppins', sans-serif" Typo="Typo.h5"> @evento.Nombre</MudText>
-                @* <MudText Typo="Typo.subtitle1"> El Parque inflable más grande de Argentina con un recorrido emocionante<br /> </MudText> *@
-                    <MudText Typo="Typo.body1" Align="Align.Justify" Style="font-weight: bold;">
-                        @evento.Informacion
-                    </MudText>
-            </MudPaper>
-        </MudItem>
-        <MudItem lg="12" sm="12" Class="d-flex justify-center">
-
-        </MudItem>
-        <MudItem lg="12" sm="12" Class="justify-center">
-            <MudCard Elevation="3">
-                <MudCardHeader>
-                    <CardHeaderContent>
+            <MudItem lg="12" sm="12" Class="justify-center">
+                <MudCard Elevation="3">
+                    <MudCardHeader>
+                        <CardHeaderContent>
                             <MudText Style="border-radius: 20px; font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif" Typo="Typo.h3" Align="Align.Center">CONDICION Y PRECIO </MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
+                        </CardHeaderContent>
+                    </MudCardHeader>
 
-                <MudCardContent>
-                    <MudDataGrid Items="@EventoEntradaService.EventoEntradas"
-                                 Filterable="false"
-                                 SortMode="@SortMode.None"
-                                 Groupable="false"
-                                 Class="p-3 m-1"
-                                 Elevation="3"
-                                 Hover="true"
-                                 Striped="true"
-                                 Dense="false"
-                                 LoadingProgressColor="Color.Primary"
-                                 Breakpoint="Breakpoint.Xs">
-                        <Columns>
-                            <PropertyColumn Title="CONDICION"
-                                            Property="x => x.Tipo"
-                                            CellStyle="font-size:20px;text-align:center;"
-                                            HeaderStyle="font-size:25px;text-align:center;font-weight: bold;" />
-                            <PropertyColumn Title="PRECIO"
-                                            Property="x => x.PrecioRegular"
-                                            CellStyle="font-size:20px;text-align:center;"
-                                            Culture="CultureInfo.InvariantCulture"
-                                            Format="F2"
-                                            HeaderStyle="font-size:25px;text-align:center;font-weight: bold;" />
-                          @*<PropertyColumn Title="STOCK"
-                                            Property="x => x.Capacidad"
-                                            CellStyle="font-size:20px;text-align:center;"
+                    <MudCardContent>
+                        <MudDataGrid Items="@EventoEntradaService.EventoEntradas"
+                                     Filterable="false"
+                                     SortMode="@SortMode.None"
+                                     Groupable="false"
+                                     Class="p-3 m-1"
+                                     Elevation="3"
+                                     Hover="true"
+                                     Striped="true"
+                                     Dense="false"
+                                     LoadingProgressColor="Color.Primary"
+                                     Breakpoint="Breakpoint.Xs">
+                            <Columns>
+                                <PropertyColumn Title="CONDICION"
+                                                Property="x => x.Tipo"
+                                                CellStyle="font-size:20px;text-align:center;"
+                                                HeaderStyle="font-size:25px;text-align:center;font-weight: bold;" />
+                                <PropertyColumn Title="PRECIO"
+                                                Property="x => x.PrecioRegular"
+                                                CellStyle="font-size:20px;text-align:center;"
+                                                Culture="CultureInfo.InvariantCulture"
+                                                Format="F2"
+                                                HeaderStyle="font-size:25px;text-align:center;font-weight: bold;" />
+                                @*<PropertyColumn Title="STOCK"
+                            Property="x => x.Capacidad"
+                            CellStyle="font-size:20px;text-align:center;"
                             HeaderStyle="font-size:25px;text-align:center;font-weight: bold;" />*@
-                        </Columns>
-                    </MudDataGrid>
-                </MudCardContent>
-                <MudCardActions Class="d-flex justify-center">
+                            </Columns>
+                        </MudDataGrid>
+                    </MudCardContent>
+                    <MudCardActions Class="d-flex justify-center">
                         <MudButton Style="font-weight:bold" Variant="Variant.Filled" Size="Size.Large" StartIcon="@Icons.Material.Filled.Sell" Color="Color.Success" FullWidth="false" OnClick="()=>Comprar(evento.EventoId)">Comprar</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
         }
     </MudGrid>
 

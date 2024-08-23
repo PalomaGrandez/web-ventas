@@ -10,74 +10,45 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
-    <MudAppBar Elevation="1" Style="height: 75px; background-color: #002448;">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle" />
+<MudAppBar Elevation="1" Style="height: 75px; background-color: #002448;">
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle" />
+    <MudImage Src="icons/mago.png" Height="50" Width="50" onclick="@Home" Style="cursor: pointer;" />
 
-        <MudImage Src="icons/mago.png" Height="50" Width="50" onclick="@Home" Style="cursor: pointer; padding-top:5px" />
-        <div style="width: 20px"></div>
-        <MudText Typo="Typo.h3" onclick="@Home" Class="tipo" Style="padding-top: 10px; cursor: pointer; font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif;">
-            MANA GEEK
-        </MudText>
+    <MudText Typo="Typo.h3" onclick="@Home" Class="ml-2 d-none d-md-flex" Style="padding-top: 10px; cursor: pointer; font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif;">
+        MANA GEEK
+    </MudText>
 
-        <MudSpacer />
+    <MudText Typo="Typo.h5" onclick="@Home" Class="ml-2 d-flex d-md-none flex-column" Style="cursor: pointer; font-weight: bold; font-family: 'Poppins', sans-serif; line-height: 1;">
+        <span>MANA</span>
+        <span>GEEK</span>
+    </MudText>
 
-        @if (autenticado)
-        {
-            @*  <MudText Style="font-weight: bold; font-family: 'Poppins', sans-serif;" Typo="Typo.h6" Class="mt-1">Hola, @nombre</MudText> *@
+    <MudSpacer />
+    @if (autenticado)
+    {
+        <MudHidden Breakpoint="Breakpoint.SmAndDown">
+            <MudButton EndIcon="@Icons.Material.Filled.ShoppingCart" Color="Color.Inherit" OnClick="CarritoCompras" Style="border-radius: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">Carrito</MudButton>
+            <MudButton EndIcon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="CerrarSesion" Style="border-radius: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">Cerrar Sesión</MudButton>
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.MdAndUp">
+            <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Inherit" OnClick="CarritoCompras" />
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="CerrarSesion" />
+        </MudHidden>
+    }
+    else
+    {
+        <MudHidden Breakpoint="Breakpoint.SmAndDown">
+        <MudButton EndIcon="@Icons.Material.Filled.Login" Color="Color.Inherit" OnClick="IniciarSesion" Style="border-radius: 20px; padding-top: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">Iniciar Sesión</MudButton>
+            <MudButton EndIcon="@Icons.Material.Filled.AppRegistration" Color="Color.Inherit" OnClick="Registrarse" Style="border-radius: 20px ; padding-top: 17px; font-weight: bold; font-size: 1.2rem; font-family: 'Poppins', sans-serif">Registrarse</MudButton>
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.MdAndUp">
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End">
+                <MudMenuItem OnClick="IniciarSesion">Iniciar Sesión</MudMenuItem>
+                <MudMenuItem OnClick="Registrarse">Registrarse</MudMenuItem>
+            </MudMenu>
+        </MudHidden>
+    }
 
-            <div style="width: 10px"></div>
-
-            <MudButton ButtonType="ButtonType.Button"
-                       EndIcon="@Icons.Material.Filled.ShoppingCart"
-                       Size="Size.Large"
-                       Color="Color.Inherit"
-                       Variant="Variant.Text"
-                       OnClick="CarritoCompras"
-                       Style="border-radius: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">
-                Carrito
-            </MudButton>
-
-            <div style="width: 10px"></div>
-
-            <MudButton ButtonType="ButtonType.Button"
-                       EndIcon="@Icons.Material.Filled.Logout"
-                       Size="Size.Large"
-                       Color="Color.Inherit"
-                       Variant="Variant.Text"
-                       OnClick="CerrarSesion"
-                       Style="border-radius: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">
-                Cerrar Sesión
-            </MudButton>
-
-            <div style="width: 10px"></div>
-
-
-        }
-        else
-        {
-            <MudButton ButtonType="ButtonType.Button"
-                       EndIcon="@Icons.Material.Filled.Login"
-                       Size="Size.Large"
-                       Color="Color.Inherit"
-                       Variant="Variant.Text"
-                       OnClick="IniciarSesion"
-                       Style="border-radius: 20px; padding-top: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">
-                Iniciar Sesión
-            </MudButton>
-
-            <div style="width: 10px"></div>
-
-            <MudButton ButtonType="ButtonType.Button"
-                       EndIcon="@Icons.Material.Filled.AppRegistration"
-                       Size="Size.Large"
-                       Color="Color.Inherit"
-                       Variant="Variant.Text"
-                       OnClick="Registrarse"
-                       Style="border-radius: 20px ; padding-top: 17px; font-weight: bold; font-size: 1.2rem; font-family: 'Poppins', sans-serif">
-                Registrarse
-            </MudButton>
-        }
 
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="2" ClipMode="DrawerClipMode.Always">
@@ -92,7 +63,7 @@
     <MudMainContent>
         @Body
     </MudMainContent>
-</MudLayout>
+
 
 
 @code {

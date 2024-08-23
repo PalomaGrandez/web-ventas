@@ -39,13 +39,18 @@
     <MudText Typo="Typo.h4" Style="font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif;">PRODUCTOS DESTACADOS</MudText>
 </center>
 
-<div style="margin: 20px 10%; display: flex; justify-content: center;">
-    <MudTextField @bind-Value="searchQuery" Placeholder="Buscar producto..." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Variant="Variant.Outlined" Class="mud-width-full mud-max-width-600 custom-text-field" OnKeyUp="PerformSearch">
-            <Adornment AdornmentPosition="AdornmentPosition.End">
-            <IconButton Icon="@Icons.Material.Filled.Search" OnClick="PerformSearch" />
-        </Adornment>
-    </MudTextField>
+<div style="margin: 20px 10%; display: flex; justify-content: center; align-items: center;">
+    <MudTextField @bind-Value="searchQuery"
+                  Placeholder="Buscar producto..."
+                  Variant="Variant.Outlined"
+                  Class="mud-width-full mud-max-width-600 custom-text-field"
+                  OnKeyUp="PerformSearch" />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SearchEventos" Class="ml-2">
+        <MudIcon Icon="@Icons.Material.Filled.Search" />
+    </MudButton>
 </div>
+
 
 <style>
     .custom-text-field input::placeholder {
@@ -56,17 +61,17 @@
         border-color: rgba(255, 255, 255, 0.6); /* Color blanco opaco para los bordes */
     }
 
-    .custom-text-field .mud-input-outlined:hover {
-        border-color: rgba(255, 255, 255, 1); /* Color blanco completo al pasar el cursor */
-    }
+        .custom-text-field .mud-input-outlined:hover {
+            border-color: rgba(255, 255, 255, 1); /* Color blanco completo al pasar el cursor */
+        }
 
-    .custom-text-field .mud-input-outlined:focus {
-        border-color: rgba(255, 255, 255, 1); /* Color blanco completo al enfocar */
-    }
+        .custom-text-field .mud-input-outlined:focus {
+            border-color: rgba(255, 255, 255, 1); /* Color blanco completo al enfocar */
+        }
 </style>
 
 <MudGrid Class="d-flex justify-center p-3">
-    
+
     @if (filteredEventos.Count > 0)
     {
         @foreach (var evento in filteredEventos)
@@ -98,10 +103,18 @@
             </div>
         </MudItem>
     }
-    else
+    else if (_hayResultados)
     {
         <MudProgressCircular Indeterminate="true">
         </MudProgressCircular>
+    }
+    else
+    {
+        <MudItem xs="12" sm="12" lg="12">
+            <div class="d-flex flex-column align-center">
+                <MudText Typo="Typo.h5">No se encontraron resultados</MudText>
+            </div>
+        </MudItem>
     }
 </MudGrid>
 <style>
@@ -122,8 +135,9 @@
     private int paginaActual;
     private bool _cargandoBanners;
     private string searchQuery = string.Empty;
+    private bool _hayResultados = true;
     private List<Evento> filteredEventos = new List<Evento>();
-//
+    //
 
     protected override async Task OnInitializedAsync()
     {
@@ -174,10 +188,12 @@
         if (string.IsNullOrWhiteSpace(searchQuery))
         {
             filteredEventos = EventoService.Eventos;
+            _hayResultados = true;
         }
         else
         {
             filteredEventos = EventoService.Eventos.Where(e => e.Nombre.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) || e.Ubicacion.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+            _hayResultados = filteredEventos.Count > 0;
         }
 
         StateHasChanged();

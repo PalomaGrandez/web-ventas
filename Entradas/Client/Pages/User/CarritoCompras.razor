@@ -6,7 +6,7 @@
 
 <PageTitle>Carrito de Compras</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large">
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-10">
     <div style="height:20px" />
     <MudCard Elevation="3">
         <MudCardHeader>
@@ -78,14 +78,28 @@
                                Variant="Variant.Filled"
                                Color="Color.Error"
                                OnClick="Cancelar"
-                               StartIcon="@Icons.Material.Filled.Cancel" Class="mx-2">
+                               StartIcon="@Icons.Material.Filled.Cancel">
                         Cancelar
                     </MudButton>
+                    <MudButton ButtonType="ButtonType.Button"
+                               Size="Size.Large"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               EndIcon="@Icons.Material.Filled.Home" OnClick="GoToHome"
+                               Class="custom-button-spacing">
+                        SEGUIR NAVEGANDO
+                    </MudButton>
                 </MudItem>
+
             </MudGrid>
         </MudCardActions>
     </MudCard>
 </MudContainer>
+<style>
+    .custom-button-spacing {
+        margin-left: 1.5rem; /* Ajusta según sea necesario */
+    }
+</style>
 
 @code {
     private bool _guardando = false;
@@ -113,6 +127,8 @@
         // Navegar a la pantalla de confirmación de compra pasando el monto total como parámetro
         NavigationManager.NavigateTo($"/usuario/completar-compra/{totalOrden}");
     }
+
+    private void GoToHome() { NavigationManager.NavigateTo("/"); }
 
     private void AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
     {
