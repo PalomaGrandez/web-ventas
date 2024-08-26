@@ -42,11 +42,10 @@
             <MudButton EndIcon="@Icons.Material.Filled.AppRegistration" Color="Color.Inherit" OnClick="Registrarse" Style="border-radius: 20px ; padding-top: 17px; font-weight: bold; font-size: 1.2rem; font-family: 'Poppins', sans-serif">Registrarse</MudButton>
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.MdAndUp">
-            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End">
-                <MudMenuItem OnClick="IniciarSesion">Iniciar Sesión</MudMenuItem>
-                <MudMenuItem OnClick="Registrarse">Registrarse</MudMenuItem>
-            </MudMenu>
+                    <MudButton EndIcon="@Icons.Material.Filled.Login" Color="Color.Inherit" OnClick="IniciarSesion" />
+                    <MudButton EndIcon="@Icons.Material.Filled.AppRegistration" Color="Color.Inherit" OnClick="Registrarse" />
         </MudHidden>
+
     }
 
 

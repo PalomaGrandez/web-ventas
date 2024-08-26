@@ -23,7 +23,7 @@
                     <MudTh>ELIMINAR</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="FECHA">@detalleContext.EntradaTipo</MudTd>
+                    <MudTd DataLabel="FECHA">@detalleContext.NombreEvento</MudTd>
                     <MudTd DataLabel="TIPO DE INTRUMENTO">@detalleContext.EntradaTipo</MudTd>
                     <MudTd DataLabel="PRECIO">@detalleContext.PrecioRegular</MudTd>
                     <MudTd DataLabel="CANTIDAD">
@@ -49,56 +49,70 @@
                 </FooterContent>
             </MudTable>
         </MudCardContent>
-        <MudCardActions Class="d-flex">
-            <MudGrid Justify="Justify.Center">
-                <MudItem>
-                    <MudButton ButtonType="ButtonType.Button"
-                               Size="Size.Large"
-                               Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               Disabled="@_guardando"
-                               StartIcon="@Icons.Material.Filled.SaveAlt"
-                               OnClick="ConfirmacionCompra"
-                               Class="mx-2">
-
-                        @if (_guardando)
-                        {
-                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                            <MudText Class="ms-2">Guardando</MudText>
-                        }
-                        else
-                        {
-                            @btnText
-                        }
-                    </MudButton>
-                </MudItem>
-                <MudItem>
-                    <MudButton ButtonType="ButtonType.Button"
-                               Size="Size.Large"
-                               Variant="Variant.Filled"
-                               Color="Color.Error"
-                               OnClick="Cancelar"
-                               StartIcon="@Icons.Material.Filled.Cancel">
-                        Cancelar
-                    </MudButton>
-                    <MudButton ButtonType="ButtonType.Button"
-                               Size="Size.Large"
-                               Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               EndIcon="@Icons.Material.Filled.Home" OnClick="GoToHome"
-                               Class="custom-button-spacing">
-                        SEGUIR NAVEGANDO
-                    </MudButton>
-                </MudItem>
-
-            </MudGrid>
-        </MudCardActions>
-    </MudCard>
+        <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
+            <MudCard Elevation="0">
+                <MudCardActions>
+                    <MudGrid Justify="Justify.Center">
+                        <MudItem xs="12" sm="4" md="3">
+                            <MudButton ButtonType="ButtonType.Button"
+                                       Size="Size.Large"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Disabled="@_guardando"
+                                       StartIcon="@Icons.Material.Filled.SaveAlt"
+                                       OnClick="ConfirmacionCompra"
+                                       FullWidth="true"
+                                       Class="no-wrap">
+                                       
+                                @if (_guardando)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                    <MudText Class="ms-2">Guardando</MudText>
+                                }
+                                else
+                                {
+                                    @btnText
+                                }
+                            </MudButton>
+                        </MudItem>
+                        <MudItem xs="12" sm="4" md="3">
+                            <MudButton ButtonType="ButtonType.Button"
+                                       Size="Size.Large"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Error"
+                                       OnClick="Cancelar"
+                                       StartIcon="@Icons.Material.Filled.Cancel"
+                                       FullWidth="true"
+                                       Class="no-wrap">
+                                Cancelar
+                            </MudButton>
+                        </MudItem>
+                        <MudItem xs="12" sm="4" md="3">
+                            <MudButton ButtonType="ButtonType.Button"
+                                       Size="Size.Large"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       EndIcon="@Icons.Material.Filled.Home"
+                                       OnClick="GoToHome"
+                                       FullWidth="true"
+                                       Class="no-wrap">
+                                SEGUIR NAVEGANDO
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardActions>
+            </MudCard>
+        </MudContainer>
+</MudCard>
 </MudContainer>
+
 <style>
-    .custom-button-spacing {
-        margin-left: 1.5rem; /* Ajusta según sea necesario */
+    .no-wrap {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
+
 </style>
 
 @code {

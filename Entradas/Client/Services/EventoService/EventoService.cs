@@ -38,6 +38,25 @@ namespace Entradas.Client.Services.EventoService
             OnChange?.Invoke();
         }
 
+        public async Task GetEventosPaginado(int pagina)
+        {
+            var response = await _http.GetFromJsonAsync<ServiceResponse<EventoPaginadoDto>>($"api/evento/GetEventosPaginado?pagina={pagina}");
+
+            if (response != null && response.Data != null)
+            {
+                Eventos = response.Data.Eventos;
+                PaginaActual = response.Data.PaginaActual;
+                PaginasTotales = response.Data.Paginas;
+            }
+
+            if (Eventos.Count == 0)
+            {
+                Mensaje = response!.Message;
+            }
+
+            OnChange?.Invoke();
+        }
+
         public async Task<ServiceResponse<int>> CreateEvento(EventoRegistroDto dto)
         {
             var response = await _http.PostAsJsonAsync("api/Evento/CreateEvento", dto);
@@ -75,24 +94,7 @@ namespace Entradas.Client.Services.EventoService
             }
         }
 
-        public async Task GetEventosPaginado(int pagina)
-        {
-            var response = await _http.GetFromJsonAsync<ServiceResponse<EventoPaginadoDto>>($"api/evento/GetEventosPaginado?pagina={pagina}");
-
-            if (response != null && response.Data != null)
-            {
-                Eventos = response.Data.Eventos;
-                PaginaActual = response.Data.PaginaActual;
-                PaginasTotales = response.Data.Paginas;
-            }
-
-            if (Eventos.Count == 0)
-            {
-                Mensaje = response!.Message;
-            }
-
-            OnChange?.Invoke();
-        }
+      
 
         public async Task<ServiceResponse<int>> UpdateEvento(EventoRegistroDto dto)
         {
