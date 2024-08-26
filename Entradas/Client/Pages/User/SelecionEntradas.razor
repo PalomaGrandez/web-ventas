@@ -275,9 +275,9 @@
         await CargarEventos();
         await CargarOrdenLocal();
     }
-  
 
-  
+
+
     private async Task ConfirmacionCompra()
     {
         // Verificar si hay items en la orden
@@ -337,6 +337,7 @@
     {
         ordenRegistroDto.PrecioTotal = ordenRegistroDto.PrecioRegular * ordenRegistroDto.Cantidad;
         ordenRegistroDto.EventoFechaId = 1;
+        ordenRegistroDto.NombreEvento = eventoNombre;
 
         await OrdenService.AgregarItemLocal(ordenRegistroDto);
         await CargarOrdenLocal();

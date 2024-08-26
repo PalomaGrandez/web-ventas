@@ -25,5 +25,7 @@ namespace Entradas.Shared.DTO.OrdenDto
         [Range(minimum: 1, maximum: int.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0 con un maximo de 10 productos.")]
         public int Cantidad { get; set; }
         public decimal PrecioTotal { get; set; }
+
+        public string NombreEvento { get; set; }
     }
 }
