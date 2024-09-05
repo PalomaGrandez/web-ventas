@@ -10,6 +10,7 @@ namespace Entradas.Server.Services.EventoService
         Task<ServiceResponse<List<Evento>>> GetEventos();
         Task<ServiceResponse<EventoPaginadoDto>> GetEventosPaginado(int pagina);
         Task<ServiceResponse<EventoPaginadoDto>> BuscarEventoPaginado(int pagina, string? nombre, string? informacion, string? ubicacion);
+        Task<ServiceResponse<List<Evento>>> BuscarEvento(string? nombre, string? informacion, string? ubicacion);
         Task<ServiceResponse<Evento>> GetEventoPorId(int eventoId);
     }
 }

@@ -14,7 +14,7 @@ namespace Entradas.Server.Controllers
             _eventoService = eventoService;
         }
 
-        [Authorize(Roles =Roles.ADMIN)]
+        [Authorize(Roles = Roles.ADMIN)]
         [HttpPost]
         [Route("CreateEvento")]
         public async Task<ActionResult<ServiceResponse<int>>> CreateEvento(EventoRegistroDto dto)
@@ -42,12 +42,22 @@ namespace Entradas.Server.Controllers
 
         [HttpGet]
         [Route("BuscarEventoPaginado")]
-        public async Task<ActionResult<ServiceResponse<EventoPaginadoDto>>> BuscarEventoPaginado([FromQuery] int pagina, 
+        public async Task<ActionResult<ServiceResponse<EventoPaginadoDto>>> BuscarEventoPaginado([FromQuery] int pagina,
                                                                                                 [FromQuery] string? nombre,
                                                                                                 [FromQuery] string? informacion,
                                                                                                 [FromQuery] string? ubicacion)
         {
-            var result = await _eventoService.BuscarEventoPaginado(pagina,nombre,informacion,ubicacion);
+            var result = await _eventoService.BuscarEventoPaginado(pagina, nombre, informacion, ubicacion);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("BuscarEvento")]
+        public async Task<ActionResult<ServiceResponse<List<Evento>>>> BuscarEvento([FromQuery] string? nombre,
+                                                                                               [FromQuery] string? informacion,
+                                                                                               [FromQuery] string? ubicacion)
+        {
+            var result = await _eventoService.BuscarEvento( nombre, informacion, ubicacion);
             return Ok(result);
         }
 

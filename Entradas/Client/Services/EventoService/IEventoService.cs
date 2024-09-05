@@ -4,6 +4,7 @@
     {
         event Action? OnChange;
         public List<Evento> Eventos { get; set; }
+        public List<Evento> EventosBusqueda { get; set; }
         public string Mensaje { get; set; }
         public int PaginaActual { get; set; }
         public int PaginasTotales { get; set; }
@@ -13,6 +14,8 @@
         Task GetEventos();
         Task GetEventosPaginado(int pagina);
         Task BuscarEventoPaginado(int pagina, string? nombre, string? informacion, string? ubicacion);
+        Task BuscarEvento(string? nombre, string? informacion, string? ubicacion);
         Task<ServiceResponse<Evento>> GetEventoPorId(int id);
     }
 }
+

@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using System.Net.Http.Json;
-
-namespace Entradas.Client.Services.EventoService
+﻿namespace Entradas.Client.Services.EventoService
 {
     public class EventoService : IEventoService
     {
@@ -13,6 +10,7 @@ namespace Entradas.Client.Services.EventoService
             
         }
         public List<Evento> Eventos { get; set; } = new List<Evento>();
+        public List<Evento> EventosBusqueda { get; set; } = new List<Evento>();
         public string Mensaje { get; set; } = string.Empty;
         public int PaginaActual { get; set; } = 1;
         public int PaginasTotales { get; set; } = 0;
@@ -102,6 +100,23 @@ namespace Entradas.Client.Services.EventoService
             var response = await result.Content.ReadFromJsonAsync<ServiceResponse<int>>();
 
             return response!;
+        }
+
+        public async Task BuscarEvento(string? nombre, string? informacion, string? ubicacion)
+        {
+            var response = await _http.GetFromJsonAsync<ServiceResponse<List<Evento>>>($"api/evento/BuscarEvento?nombre={nombre}&informacion={informacion}&ubicacion={ubicacion}");
+
+            if (response != null && response.Data != null)
+            {
+                EventosBusqueda = response.Data;
+            }
+
+            if (EventosBusqueda.Count == 0)
+            {
+                Mensaje = response!.Message;
+            }
+
+            OnChange?.Invoke();
         }
     }
 }

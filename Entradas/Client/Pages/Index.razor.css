@@ -1,2 +1,23 @@
-﻿body {
+﻿.custom-text-field input::placeholder {
+    color: rgba(255, 255, 255, 0.6); /* Color blanco opaco */
 }
+
+.custom-text-field .mud-input-outlined {
+    border-color: rgba(255, 255, 255, 0.6); /* Color blanco opaco para los bordes */
+}
+
+    .custom-text-field .mud-input-outlined:hover {
+        border-color: rgba(255, 255, 255, 1); /* Color blanco completo al pasar el cursor */
+    }
+
+    .custom-text-field .mud-input-outlined:focus {
+        border-color: rgba(255, 255, 255, 1); /* Color blanco completo al enfocar */
+    }
+
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+    .hover-scale:hover {
+        transform: scale(1.05);
+    }

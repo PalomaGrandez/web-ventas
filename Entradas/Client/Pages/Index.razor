@@ -51,23 +51,7 @@
                      MinCharacters="1" />
 </div>
 
-<style>
-    .custom-text-field input::placeholder {
-        color: rgba(255, 255, 255, 0.6); /* Color blanco opaco */
-    }
 
-    .custom-text-field .mud-input-outlined {
-        border-color: rgba(255, 255, 255, 0.6); /* Color blanco opaco para los bordes */
-    }
-
-        .custom-text-field .mud-input-outlined:hover {
-            border-color: rgba(255, 255, 255, 1); /* Color blanco completo al pasar el cursor */
-        }
-
-        .custom-text-field .mud-input-outlined:focus {
-            border-color: rgba(255, 255, 255, 1); /* Color blanco completo al enfocar */
-        }
-</style>
 <MudGrid Class="d-flex justify-center p-3">
 
     @if (filteredEventos.Count > 0)
@@ -116,15 +100,7 @@
         </MudItem>
     }
 </MudGrid>
-<style>
-    .hover-scale {
-        transition: transform 0.3s ease;
-    }
 
-        .hover-scale:hover {
-            transform: scale(1.05);
-        }
-</style>
 
 @code {
     private bool _cargandoPagina = true;
@@ -140,12 +116,15 @@
 
     private async Task<IEnumerable<Evento>> BuscarEventos(string value)
     {
+        //await EventoService.BuscarEvento(string.Empty, string.Empty, string.Empty);
+
         if (string.IsNullOrWhiteSpace(value))
         {
-            return EventoService.Eventos;
-        }
 
-        return EventoService.Eventos
+            return EventoService.EventosBusqueda;
+        }
+        //await EventoService.BuscarEvento(value, value, value);
+        return EventoService.EventosBusqueda
             .Where(e => e.Nombre.Contains(value, StringComparison.OrdinalIgnoreCase) || e.Ubicacion.Contains(value, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -153,14 +132,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        EventoService.OnChange += StateHasChanged; 
+        EventoService.OnChange += StateHasChanged;
         await CargarBanners();
         await CargarEventos();
     }
 
     public void Dispose()
     {
-        EventoService.OnChange -= StateHasChanged; 
+        EventoService.OnChange -= StateHasChanged;
     }
 
     private void EventoDetalle(int id)
@@ -175,7 +154,7 @@
         Console.WriteLine($"Cargando eventos para la página {pagina}");
 
         await EventoService.GetEventosPaginado(pagina);
-
+        await EventoService.BuscarEvento(string.Empty,string.Empty,string.Empty);
 
         if (EventoService.Eventos.Count > 0)
         {
@@ -240,7 +219,7 @@
 
     private void SearchEventos()
     {
-       
+
         PerformSearch().GetAwaiter().GetResult();
     }
 }

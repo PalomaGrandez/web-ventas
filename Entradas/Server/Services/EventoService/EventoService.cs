@@ -187,6 +187,50 @@ namespace Entradas.Server.Services.EventoService
             return response;
         }
 
+        public async Task<ServiceResponse<List<Evento>>> BuscarEvento(string? nombre, string? informacion, string? ubicacion)
+        {
+            var response = new ServiceResponse<List<Evento>>();
+
+            try
+            {
+                var eventosQueryable = _context.Evento
+                    .Where(x => x.FlagEliminado == false) // Filtrar por eventos no eliminados
+                    .AsQueryable();
+
+                if (!string.IsNullOrEmpty(nombre))
+                    eventosQueryable = eventosQueryable.Where(x => x.Nombre.Contains(nombre));
+
+                if (!string.IsNullOrEmpty(informacion))
+                    eventosQueryable = eventosQueryable.Where(x => x.Informacion.Contains(informacion));
+
+                if (!string.IsNullOrEmpty(ubicacion))
+                    eventosQueryable = eventosQueryable.Where(x => x.Ubicacion.Contains(ubicacion));
+
+                var registrosTotales = await eventosQueryable.CountAsync();
+
+                if (registrosTotales == 0)
+                {
+                    response.Success = false;
+                    response.Message = "No se encontraron eventos registrados.";
+                    return response;
+                }
+
+                var eventos = await eventosQueryable
+                    .OrderBy(c => c.EventoId)
+                    .ToListAsync();
+                
+                response.Success = true;
+                response.Data = eventos;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = "Se produjo un error al buscar eventos: " + ex.Message;
+            }
+
+            return response;
+        }
+
         public async Task<ServiceResponse<int>> UpdateEvento(EventoRegistroDto dto)
         {
             var dbEvento = await _context.Evento.FirstOrDefaultAsync(c => c.EventoId == dto.EventoId);
