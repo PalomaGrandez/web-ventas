@@ -6,54 +6,38 @@
 @inject ISnackbar Snackbar
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IDialogService DialogService
-using Microsoft.JSInterop;
+@using Microsoft.JSInterop;
 
 <PageTitle>Confirmación de Compra</PageTitle>
 
-<div style="height:25px" />
-
-<MudContainer MaxWidth="MaxWidth.Medium">
-    <MudGrid Justify="Justify.Center">
-        <MudItem xs="12">
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-10">
+    <MudGrid Justify="Justify.SpaceAround">
+        <MudItem xs="12" sm="7">
             <MudCard Elevation="3" Class="rounded-lg">
-                <MudCardHeader Class="pb-0">
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h4" Align="Align.Center" Style="font-weight: 700; font-family: 'Poppins', sans-serif;">
-                            COMPLETE SU COMPRA
-                        </MudText>
-                    </CardHeaderContent>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h4" Align="Align.Center" Style="font-weight: bold; font-family: 'Poppins', sans-serif; font-size:1.5rem; text-align: center; width: 100%;">
+                        COMPLETE SU COMPRA
+                    </MudText>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudGrid Style="font-family: 'Poppins', sans-serif;" Justify="Justify.Center">
-                        <MudItem xs="12">
-                            <MudPaper Elevation="0" Class="pa-4 rounded-lg" Style="background-color: #E5E7EB;">
-                                <MudText Typo="Typo.body1" Align="Align.Center">
-                                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Class="mr-2" /> Su pedido estará disponible para ser recogido a partir del día siguiente,
-                                    dentro de los días hábiles de lunes a sábado en el horario de 9 a.m. a 9 p.m.
-                                </MudText>
-                                <MudText Typo="Typo.body1" Align="Align.Center" Class="mt-3">
-                                    <MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="mr-2" /> <strong>Avenida San Martin 721, pasaje D-44, Pueblo Libre</strong>.
-                                </MudText>
-                            </MudPaper>
-                        </MudItem>
-                        <MudItem xs="12" Class="mt-4">
-                            <MudText Typo="Typo.body1" Align="Align.Center">
-                                <MudIcon Icon="@Icons.Material.Filled.Payment" Class="mr-2" /> Realice su pago con Yape y envíe el comprobante a soporte@fabrica.pe con el asunto: Pago Pedido N° xxxx-xx-xxxxxx.
-                            </MudText>
-                            <MudText Typo="Typo.body1" Align="Align.Center" Class="mt-2">
-                                Verá sus productos en 'Mis Pedidos'.
-                            </MudText>
-                        </MudItem>
-                        <MudItem xs="12" Class="mt-4">
-                            <div class="d-flex justify-center">
-                                <MudImage Height="300" ObjectPosition="ObjectPosition.Center" Src="pago/cod_aprobacion.png" Class="rounded-lg" ObjectFit="ObjectFit.Contain" Fluid="true" Style="max-height:500px" />
-                            </div>
-                        </MudItem>
-
-                    </MudGrid>
+                    <MudText Typo="Typo.body1" Style="font-family: 'Poppins', sans-serif; text-align:center;">
+                        <MudIcon Icon="@Icons.Material.Filled.AccessTime" Class="mr-2" /> Su pedido estará disponible para ser recogido a partir del día siguiente,
+                        dentro de los días hábiles de lunes a sábado en el horario de 9 a.m. a 9 p.m.
+                    </MudText>
+                    <MudText Typo="Typo.body1" Style="font-family: 'Poppins', sans-serif; text-align:center;" Class="mt-3">
+                        <MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="mr-2" /> <strong>Avenida San Martin 721, pasaje D-44, Pueblo Libre</strong>.
+                    </MudText>
+                    <MudText Typo="Typo.body1" Style="font-family: 'Poppins', sans-serif; text-align:center;" Class="mt-4">
+                        <MudIcon Icon="@Icons.Material.Filled.Payment" Class="mr-2" /> Realice su pago con Yape y envíe el comprobante a soporte@fabrica.pe con el asunto: Pago Pedido N° xxxx-xx-xxxxxx.
+                    </MudText>
+                    <MudText Typo="Typo.body1" Style="font-family: 'Poppins', sans-serif; text-align:center;" Class="mt-2">
+                        Verá sus productos en 'Mis Pedidos'.
+                    </MudText>
+                    <div class="d-flex justify-center mt-4">
+                        <MudImage Style="width:700px height:auto" ObjectPosition="ObjectPosition.Center" Src="pago/cod_aprobacion.png" Class="rounded-lg" ObjectFit="ObjectFit.Contain" Fluid="true" />
+                    </div>
                 </MudCardContent>
-
-                <MudCardActions Class="d-flex justify-center">
+                <MudCardActions Class="d-flex justify-center mt-4">
                     <MudButton ButtonType="ButtonType.Button"
                                Size="Size.Large"
                                Variant="Variant.Filled"
@@ -62,64 +46,69 @@ using Microsoft.JSInterop;
                                OnClick="AbrirCulqi"
                                StartIcon="@Icons.Material.Filled.ShoppingCart"
                                Style="font-weight:bold;margin: 0 8px;"
-                               Class=" hover-scale">
-                               
+                               Class="hover-scale">
                         Realizar Pago
                     </MudButton>
-
-                    <!-- Nuevo botón para abrir el cuadro de diálogo -->
-                   @*  <MudButton ButtonType="ButtonType.Button"
-                               Size="Size.Large"
-                               Variant="Variant.Outlined"
-                               Color="Color.Secondary"
-                               OnClick="OpenDialogAsync"
-                               StartIcon="@Icons.Material.Filled.Info"
-                               Class=" hover-scale" Style="font-family: font-weight:bold; margin: 0 8px;">
-                        Información
-                    </MudButton> *@
                 </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="4">
+            <MudCard Elevation="3" Class="rounded-lg">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6" Align="Align.Center" Style="font-weight: bold; font-family: 'Poppins', sans-serif; font-size:1.5rem; text-align: center; width: 100%;">
+                        Resumen de Pedido
+                    </MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    @foreach (var item in ordenDetalle)
+                    {
+                        <MudPaper Elevation="0" Class="pa-2 mb-2 rounded-lg" Style="background-color: #F5F5F5;">
+                            <MudText Typo="Typo.body2" Align="Align.Left" Style="font-family: 'Poppins', sans-serif;">
+                                @item.NombreEvento (@item.EntradaTipo)
+                            </MudText>
+                            <MudText Typo="Typo.body2" Align="Align.Left" Style="font-family: 'Poppins', sans-serif;">
+                                Cantidad: @item.Cantidad
+                            </MudText>
+                            <MudText Typo="Typo.body2" Align="Align.Left" Style="font-family: 'Poppins', sans-serif;">
+                                Precio: S/.@item.PrecioTotal
+                            </MudText>
+                        </MudPaper>
+                    }
+                </MudCardContent>
+                <MudCardFooter>
+                    <MudText Typo="Typo.h6" Align="Align.Center" Style="font-weight: bold; font-family: 'Poppins', sans-serif; text-align:center;">
+                        Total: S/.@ordenDetalle.Sum(pd => pd.PrecioTotal)
+                    </MudText>
+                </MudCardFooter>
             </MudCard>
         </MudItem>
     </MudGrid>
 </MudContainer>
+
 <style>
     .hover-scale {
         transition: transform 0.3s ease;
     }
 
-     .hover-scale:hover {
-            transform: scale(1.05);
-        }
+    .hover-scale:hover {
+        transform: scale(1.05);
+    }
 </style>
-
-
 
 @code {
     [Parameter]
     public int MontoTotal { get; set; } // Parámetro para recibir el monto total
-    public int eventoId { get; set; }
-    private bool _cargandoEvento = false;
-    private bool _cargandoEventoEntrada = false;
-    private bool _cargandoEventoFecha = false;
 
-    private bool _dialogOpen = false;
-
-    private string btnText = "REALIZAR PEDIDO";
-    private OrdenDetalleRegistroDto ordenRegistroDto = new();
     private List<OrdenDetalleRegistroDto> ordenDetalle = new();
-    private OrdenRegistroDto orden = new();
-
-    private bool _eventoSoloLectura = false;
     private bool _guardando = false;
-    string user = "Invitado";
     string nombre = "Invitado";
-    string email = "Invitado";
     string apellido = "Invitado";
+    string email = "Invitado";
 
     protected override async Task OnInitializedAsync()
     {
         await ValidarSesion();
-
         await CargarOrdenLocal();
     }
 
@@ -134,98 +123,14 @@ using Microsoft.JSInterop;
         var authenticationState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authenticationState.User;
 
-        var rolClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
         var nombreClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
         var apellidoClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName);
         var emailClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
         nombre = nombreClaim?.Value ?? "Invitado";
-        apellido = apellidoClaim?.Value;
-        email = emailClaim?.Value;
-        Console.WriteLine($"apellido inicializado: {apellidoClaim?.Value}"); // Registro de depuración
-        Console.WriteLine($"apellido inicializado: {apellido}"); // Registro de depuración
-        Console.WriteLine($"Nombre inicializado: {nombre}"); // Registro de depuración
+        apellido = apellidoClaim?.Value ?? "Invitado";
+        email = emailClaim?.Value ?? "Invitado";
     }  
-
-    public Task OpenDialogAsync()
-    {
-        var options = new DialogOptions
-            {
-                CloseOnEscapeKey = false, // Desactiva el cierre con la tecla Escape
-                DisableBackdropClick = true // Desactiva el cierre al hacer clic fuera del diálogo
-            };
-        // Muestra el diálogo
-        return DialogService.ShowAsync<CustomDialog>(null, options);
-    }
-
-    public async Task RealizarPedido()
-    {
-        _guardando = true;
-
-        var userId = await AuthService.GetUserId();
-
-        if (!ordenDetalle.Any())
-        {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-            Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
-            return;
-        }
-
-        orden.FechaOrden = DateTime.Now;
-        orden.Estado = EstadosOrden.REGISTRADO;
-        orden.Items = ordenDetalle;
-        orden.UsuarioId = userId;
-        orden.PrecioTotal = (decimal)ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular);
-
-        var response = await OrdenService.CreateOrden(orden);
-
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        if (response.Success)
-        {
-            await OrdenService.LimpiarItemLocal();
-            _guardando = true;
-
-            Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
-            NavigationManager.NavigateTo("/completar-compra");
-        }
-        else
-        {
-            _guardando = true;
-            Snackbar.Add($"Ha sucedido un error: {response.Message}", Severity.Error);
-            NavigationManager.NavigateTo("/");
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            // Obtener el resultado del pago desde sessionStorage
-            var pagoExitoso = await JS.InvokeAsync<string>("sessionStorage.getItem", "PagoExitoso");
-
-            if (pagoExitoso == "true")
-            {
-                await RealizarPedido();
-                await OpenDialogAsync();
-
-                // Limpiar el valor en sessionStorage
-                await JS.InvokeVoidAsync("sessionStorage.removeItem", "PagoExitoso");
-            }
-            else if (pagoExitoso == "false")
-            {
-                // Manejar el caso de un pago fallido
-                Console.WriteLine("El pago no fue exitoso.");
-                await JS.InvokeVoidAsync("sessionStorage.removeItem", "PagoExitoso");
-            }
-        }
-    }
-
-    [JSInvokable("OnPagoCompletado")]
-    public async Task OnPagoCompletado()
-    {
-            await RealizarPedido();
-            await OpenDialogAsync();   
-    }
 
     public async Task AbrirCulqi()
     {
@@ -233,7 +138,6 @@ using Microsoft.JSInterop;
         {
             Console.WriteLine(nombre + apellido + email);
 
-            // Convertir el precio a entero (por ejemplo, a céntimos)
             int precioTotalEntero = MontoTotal * 100;
 
             var settings = new
@@ -251,16 +155,11 @@ using Microsoft.JSInterop;
                 phone_number = "900123456"
             };
 
-    
-            // Llamar a la función de JavaScript para abrir el checkout de Culqi
             await JS.InvokeVoidAsync("AbrirCulqi", settings, client);
-
-          
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error al intentar abrir Culqi: {ex.Message}");
         }
     }
-
 }

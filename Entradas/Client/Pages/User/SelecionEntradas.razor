@@ -274,6 +274,7 @@
     {
         await CargarEventos();
         await CargarOrdenLocal();
+        
     }
 
 
@@ -392,9 +393,8 @@
         StateHasChanged();
     }*/
 
-    private void AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
+    private async Task AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
     {
-        // Verifica si el detalleContext existe en la lista
         var item = ordenDetalle.FirstOrDefault(d => d.EventoId == detalleContext.EventoId &&
                                                     d.EventoEntradaId == detalleContext.EventoEntradaId &&
                                                     d.EventoFechaId == detalleContext.EventoFechaId);
@@ -402,13 +402,14 @@
         {
             item.Cantidad++;
             item.PrecioTotal = item.PrecioRegular * item.Cantidad;
-            StateHasChanged(); // Actualizar la vista
+            await OrdenService.AgregarItemLocal(item); // Actualiza el almacenamiento local
+            await CargarOrdenLocal(); // Recarga el carrito para reflejar los cambios
+            StateHasChanged();
         }
     }
 
-    private async void  DisminuirCantidad(OrdenDetalleRegistroDto detalleContext)
+    private async Task DisminuirCantidad(OrdenDetalleRegistroDto detalleContext)
     {
-        // Verifica si el detalleContext existe en la lista
         var item = ordenDetalle.FirstOrDefault(d => d.EventoId == detalleContext.EventoId &&
                                                     d.EventoEntradaId == detalleContext.EventoEntradaId &&
                                                     d.EventoFechaId == detalleContext.EventoFechaId);
@@ -416,11 +417,12 @@
         {
             item.Cantidad--;
             item.PrecioTotal = item.PrecioRegular * item.Cantidad;
-            await OrdenService.AgregarItemLocal(ordenRegistroDto);
-            await CargarOrdenLocal();
-            StateHasChanged(); // Actualizar la vista
+            await OrdenService.AgregarItemLocal(item); // Actualiza el almacenamiento local
+            await CargarOrdenLocal(); // Recarga el carrito para reflejar los cambios
+            StateHasChanged();
         }
     }
+
 
     private async Task CargarEventos()
     {
@@ -444,10 +446,12 @@
         {
             // Actualizar el nombre del evento para mostrarlo en el campo de texto
             eventoNombre = evento.Nombre;
+            ordenRegistroDto.Imagen = evento.Imagen; // Asignar la URL de la imagen
         }
         else
         {
             eventoNombre = "Evento no encontrado"; // En caso de que el evento no se encuentre
+            ordenRegistroDto.Imagen = ""; // No hay imagen disponible
         }
 
         // Suscribirse al evento OnChange del servicio para actualizar la UI
@@ -485,7 +489,9 @@
 
     private async Task CargarOrdenLocal()
     {
-        ordenDetalle = await OrdenService.ObtenerOrdenDetalleLocal();
+        
+        ordenDetalle = await OrdenService.ObtenerOrdenDetalleLocal(); // Carga la orden desde el almacenamiento local
+        StateHasChanged();
     }
 
     public async Task RemoverItemLocal(int eventoId, int eventoEntradaId)

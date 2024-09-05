@@ -16,6 +16,7 @@
             <MudTable Items="@ordenDetalle" Context="detalleContext" Class="p-3" Hover="true" Striped="true" Elevation="3" Breakpoint="Breakpoint.Sm" RowsPerPage="100">
                 <HeaderContent>
                     <MudTh>CARTA</MudTh>
+                    <MudTh>NOMBRE</MudTh>
                     <MudTh>CONDICION</MudTh>
                     <MudTh>PRECIO</MudTh>
                     <MudTh>CANTIDAD</MudTh>
@@ -23,6 +24,9 @@
                     <MudTh>ELIMINAR</MudTh>
                 </HeaderContent>
                 <RowTemplate>
+                    <MudTd DataLabel="IMAGEN">
+    <MudImage Src="@detalleContext.Imagen" Alt="@detalleContext.NombreEvento" Style="max-width:50px; height:auto;" />
+</MudTd>
                     <MudTd DataLabel="FECHA">@detalleContext.NombreEvento</MudTd>
                     <MudTd DataLabel="TIPO DE INTRUMENTO">@detalleContext.EntradaTipo</MudTd>
                     <MudTd DataLabel="PRECIO">@detalleContext.PrecioRegular</MudTd>
@@ -153,9 +157,11 @@
         {
             item.Cantidad++;
             item.PrecioTotal = item.PrecioRegular * item.Cantidad;
+            OrdenService.AgregarItemLocal(item);  // Esta línea asegura que se guarde la cantidad actualizada
             StateHasChanged();
         }
     }
+
 
     private void DisminuirCantidad(OrdenDetalleRegistroDto detalleContext)
     {
@@ -166,6 +172,7 @@
         {
             item.Cantidad--;
             item.PrecioTotal = item.PrecioRegular * item.Cantidad;
+            OrdenService.AgregarItemLocal(item);  // Esta línea asegura que se guarde la cantidad actualizada
             StateHasChanged();
         }
     }

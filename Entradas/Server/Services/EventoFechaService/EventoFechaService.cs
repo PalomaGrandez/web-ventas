@@ -94,7 +94,7 @@ namespace Entradas.Server.Services.EventoFechaService
         {
             ServiceResponse<EventoFechaPaginadoDto> response = new();
 
-            var resultadosPorPagina = 10f;
+            var resultadosPorPagina = 6f;
             var registrosTotales = _context.EventoFecha.Count();
             var cantidadPaginas = Math.Ceiling(registrosTotales / resultadosPorPagina);
 
