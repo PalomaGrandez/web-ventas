@@ -11,12 +11,12 @@ namespace Entradas.Server.Services.EventoService
         {
             _context = context;
         }
+
         public async Task<ServiceResponse<int>> CreateEvento(EventoRegistroDto dto)
         {
             try
             {
                 Evento evento = new();
-
                 evento = EventoMapper.ToEntity(dto);
 
                 var result = _context.Evento.Add(evento);
@@ -49,7 +49,7 @@ namespace Entradas.Server.Services.EventoService
             if (evento == null)
             {
                 response.Success = false;
-                response.Message = "No se encontro el evento.";
+                response.Message = "No se encontró el evento.";
                 return response;
             }
             response.Data = evento;
@@ -61,9 +61,11 @@ namespace Entradas.Server.Services.EventoService
         {
             ServiceResponse<List<Evento>> response = new();
 
-            var eventos = await _context.Evento.ToListAsync();
+            var eventos = await _context.Evento
+                .Where(e => e.FlagEliminado == false) // Filtrar por eventos no eliminados
+                .ToListAsync();
 
-            if (eventos == null)
+            if (eventos == null || eventos.Count == 0)
             {
                 response.Success = false;
                 response.Message = "No se encontraron eventos registrados.";
@@ -82,22 +84,26 @@ namespace Entradas.Server.Services.EventoService
         {
             ServiceResponse<EventoPaginadoDto> response = new();
 
-            var resultadosPorPagina = 10f;
-            var registrosTotales = _context.Evento.Count();
+            var resultadosPorPagina = 6f;
+            var registrosTotales = await _context.Evento
+                .Where(x => x.FlagEliminado == false) // Filtrar por eventos no eliminados
+                .CountAsync();
+
             var cantidadPaginas = Math.Ceiling(registrosTotales / resultadosPorPagina);
+
             if (registrosTotales > 0)
             {
-                var eventos = await _context.Evento.
-                        Where(x => x.FlagEliminado == false).
-                        OrderBy(c => c.EventoId).
-                        Skip((pagina - 1) * (int)resultadosPorPagina).
-                        Take((int)resultadosPorPagina).
-                        ToListAsync();
+                var eventos = await _context.Evento
+                    .Where(x => x.FlagEliminado == false) // Filtrar por eventos no eliminados
+                    .OrderBy(c => c.EventoId)
+                    .Skip((pagina - 1) * (int)resultadosPorPagina)
+                    .Take((int)resultadosPorPagina)
+                    .ToListAsync();
 
-                if (eventos == null)
+                if (eventos == null || eventos.Count == 0)
                 {
                     response.Success = false;
-                    response.Message = "No se encontraron categorias registradas.";
+                    response.Message = "No se encontraron eventos registrados.";
                     return response;
                 }
                 else
@@ -130,8 +136,10 @@ namespace Entradas.Server.Services.EventoService
 
             try
             {
-                var resultadosPorPagina = 10;
-                var eventosQueryable = _context.Evento.AsQueryable();
+                var resultadosPorPagina = 6;
+                var eventosQueryable = _context.Evento
+                    .Where(x => x.FlagEliminado == false) // Filtrar por eventos no eliminados
+                    .AsQueryable();
 
                 if (!string.IsNullOrEmpty(nombre))
                     eventosQueryable = eventosQueryable.Where(x => x.Nombre.Contains(nombre));
@@ -155,8 +163,8 @@ namespace Entradas.Server.Services.EventoService
 
                 var eventos = await eventosQueryable
                     .OrderBy(c => c.EventoId)
-                    .Skip((pagina - 1) * resultadosPorPagina)
-                    .Take(resultadosPorPagina)
+                    //.Skip((pagina - 1) * resultadosPorPagina)
+                    //.Take(resultadosPorPagina)
                     .ToListAsync();
 
                 var eventoPaginadoDto = new EventoPaginadoDto
@@ -192,7 +200,6 @@ namespace Entradas.Server.Services.EventoService
                 };
             }
 
-            //var evento = EventoMapper.ToEntity(dto);
             dbEvento.Nombre = dto.Nombre;
             dbEvento.Informacion = dto.Informacion;
             dbEvento.Ubicacion = dto.Ubicacion;
@@ -223,7 +230,6 @@ namespace Entradas.Server.Services.EventoService
                 };
             }
 
-            //var evento = EventoMapper.ToEntity(dto);
             dbEvento.FlagEliminado = true;
 
             var result = _context.Evento.Update(dbEvento);

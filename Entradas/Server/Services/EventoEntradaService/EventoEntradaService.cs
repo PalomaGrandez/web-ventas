@@ -1,7 +1,7 @@
 ﻿using Entradas.Shared.DTO.EventoEntradaDto;
+using Entradas.Shared.DTO.EventoFechaDto;
 using Entradas.Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Entradas.Server.Services.EventoEntradaService
 {
@@ -13,11 +13,11 @@ namespace Entradas.Server.Services.EventoEntradaService
         {
             _context = context;
         }
+
         public async Task<ServiceResponse<int>> CreateEventoEntrada(EventoEntrada eventoEntrada)
         {
             try
             {
-
                 var resul = _context.EventoEntrada.Add(eventoEntrada);
                 var dbResult = await _context.SaveChangesAsync();
 
@@ -52,7 +52,6 @@ namespace Entradas.Server.Services.EventoEntradaService
                 };
             }
 
-            //var evento = EventoMapper.ToEntity(dto);
             dbEventoEntrada.FlagEliminado = true;
 
             var result = _context.EventoEntrada.Update(dbEventoEntrada);
@@ -88,8 +87,13 @@ namespace Entradas.Server.Services.EventoEntradaService
         {
             ServiceResponse<EventoEntradaPaginadoDto> response = new();
 
-            var resultadosPorPagina = 10f;
-            var registrosTotales = _context.EventoEntrada.Count();
+            var resultadosPorPagina = 6f;
+            var registrosTotales = _context.EventoEntrada
+     .Where(p => p.FlagEliminado == false)
+     .Count();
+
+            Console.WriteLine($"Total de registros sin eliminar: {registrosTotales}");
+
             var cantidadPaginas = Math.Ceiling(registrosTotales / resultadosPorPagina);
             if (registrosTotales > 0)
             {
@@ -129,70 +133,65 @@ namespace Entradas.Server.Services.EventoEntradaService
                 return response;
             }
         }
+
         public async Task<ServiceResponse<EventoEntradaPaginadoDto>> GetEventoEntradasPorEvento(int pagina, int eventoId)
         {
             ServiceResponse<EventoEntradaPaginadoDto> response = new();
 
-            var resultadosPorPagina = 10f;
-            var registrosTotales = _context.EventoEntrada.Count();
+            var resultadosPorPagina = 6f;
+            int registrosTotales;
+            List<EventoEntrada> eventoEntradas = new();
+
+            if (eventoId > 0)
+            {
+                registrosTotales = await _context.EventoEntrada
+                                                 .Where(p => p.EventoId == eventoId && p.FlagEliminado == false)
+                                                 .CountAsync();
+
+                eventoEntradas = await _context.EventoEntrada
+                                                .Where(p => p.EventoId == eventoId && p.FlagEliminado == false)
+                                                .OrderBy(p => p.EventoEntradaId)
+                                                .Skip((pagina - 1) * (int)resultadosPorPagina)
+                                                .Take((int)resultadosPorPagina)
+                                                .ToListAsync();
+            }
+            else
+            {
+                registrosTotales = await _context.EventoEntrada
+                                                 .Where(p => p.FlagEliminado == false)
+                                                 .CountAsync();
+
+                eventoEntradas = await _context.EventoEntrada
+                                                .Where(p => p.FlagEliminado == false)
+                                                .OrderBy(p => p.EventoEntradaId)
+                                                .Skip((pagina - 1) * (int)resultadosPorPagina)
+                                                .Take((int)resultadosPorPagina)
+                                                .ToListAsync();
+            }
+
             var cantidadPaginas = Math.Ceiling(registrosTotales / resultadosPorPagina);
 
-            if (registrosTotales > 0)
+            if (eventoEntradas.Any())
             {
-                List<EventoEntrada> eventoEntradas = new();
-
-                if (eventoId > 0)
+                EventoEntradaPaginadoDto eventoEntradaPaginadoDto = new()
                 {
-                    eventoEntradas = await _context.EventoEntrada
-                            //.Include(p => p.Cliente)
-                            .Where(p => p.EventoId == eventoId && p.FlagEliminado == false)
-                            .OrderBy(p => p.EventoEntradaId)
-                            .Skip((pagina - 1) * (int)resultadosPorPagina)
-                            .Take((int)resultadosPorPagina)
-                            .ToListAsync();
+                    EventoEntradas = eventoEntradas,
+                    PaginaActual = pagina,
+                    Paginas = (int)cantidadPaginas,
+                    RegistrosTotales = registrosTotales
+                };
 
-                    registrosTotales = _context.EventoEntrada.Where(p => p.EventoId == eventoId).Count();
-                    cantidadPaginas = Math.Ceiling(registrosTotales / resultadosPorPagina);
-                }
-                else
-                {
-                    eventoEntradas = await _context.EventoEntrada
-                            //.Include(p => p.Cliente)
-                            .Where(p => p.FlagEliminado == false)
-                            .OrderBy(p => p.EventoEntradaId)
-                            .Skip((pagina - 1) * (int)resultadosPorPagina)
-                            .Take((int)resultadosPorPagina)
-                            .ToListAsync();
-                }
-
-                if (eventoEntradas == null)
-                {
-                    response.Success = false;
-                    response.Message = "No se encontraron entradas registrados para el evento.";
-                    return response;
-                }
-                else
-                {
-                    EventoEntradaPaginadoDto eventoEntradaPaginadoDto = new()
-                    {
-                        EventoEntradas = eventoEntradas,
-                        PaginaActual = pagina,
-                        Paginas = (int)cantidadPaginas,
-                        RegistrosTotales = registrosTotales
-                    };
-
-                    response.Success = true;
-                    response.Data = eventoEntradaPaginadoDto;
-                    response.Message = $"{eventoEntradas.Count} entradas registradas.";
-                    return response;
-                }
+                response.Success = true;
+                response.Data = eventoEntradaPaginadoDto;
+                response.Message = $"{eventoEntradas.Count} entradas registradas.";
             }
             else
             {
                 response.Success = false;
                 response.Message = "No se encontraron entradas registradas para el evento.";
-                return response;
             }
+
+            return response;
         }
 
         public async Task<ServiceResponse<int>> UpdateEventoEntrada(EventoEntrada eventoEntrada)
@@ -209,7 +208,6 @@ namespace Entradas.Server.Services.EventoEntradaService
                 };
             }
 
-            //var evento = EventoMapper.ToEntity(dto);
             dbEventoEntrada.Tipo = eventoEntrada.Tipo;
             dbEventoEntrada.PrecioRegular = eventoEntrada.PrecioRegular;
             dbEventoEntrada.PrecioDescuento = eventoEntrada.PrecioDescuento;

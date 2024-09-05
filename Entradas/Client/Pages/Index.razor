@@ -39,18 +39,17 @@
     <MudText Typo="Typo.h4" Style="font-weight: bold; font-size: 2rem; font-family: 'Poppins', sans-serif;">PRODUCTOS DESTACADOS</MudText>
 </center>
 
-<div style="margin: 20px 10%; display: flex; justify-content: center; align-items: center;">
-    <MudTextField @bind-Value="searchQuery"
-                  Placeholder="Buscar producto..."
-                  Variant="Variant.Outlined"
-                  Class="mud-width-full mud-max-width-600 custom-text-field"
-                  OnKeyUp="PerformSearch" />
-
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SearchEventos" Class="ml-2">
-        <MudIcon Icon="@Icons.Material.Filled.Search" />
-    </MudButton>
+<div style="margin: 20px 10%; display: flex; justify-content: center; align-items: center; position: relative;">
+    <MudAutocomplete T="Evento"
+                     Value="selectedEvento"
+                     ValueChanged="EventoSeleccionado"
+                     Placeholder="Escribe para buscar..."
+                     Variant="Variant.Outlined"
+                     Class="mud-width-full mud-max-width-600 custom-text-field"
+                     SearchFunc="BuscarEventos"
+                     ToStringFunc="@(e => e.Nombre)"
+                     MinCharacters="1" />
 </div>
-
 
 <style>
     .custom-text-field input::placeholder {
@@ -69,7 +68,6 @@
             border-color: rgba(255, 255, 255, 1); /* Color blanco completo al enfocar */
         }
 </style>
-
 <MudGrid Class="d-flex justify-center p-3">
 
     @if (filteredEventos.Count > 0)
@@ -99,7 +97,8 @@
         }
         <MudItem xs="12" sm="12" lg="12">
             <div class="d-flex flex-column align-center">
-                <MudPagination Variant="Variant.Filled" Size="Size.Large" Count="paginasTotales" SelectedChanged="PaginaSeleccionada" Class="pa-4" />
+                <MudPagination Variant="Variant.Filled" Size="Size.Large" Count="paginasTotales" SelectedChanged="@(async (pagina) => await PaginaSeleccionada(pagina))" Class="pa-4" />
+
             </div>
         </MudItem>
     }
@@ -137,14 +136,32 @@
     private string searchQuery = string.Empty;
     private bool _hayResultados = true;
     private List<Evento> filteredEventos = new List<Evento>();
-    //
+    private Evento selectedEvento;
+
+    private async Task<IEnumerable<Evento>> BuscarEventos(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return EventoService.Eventos;
+        }
+
+        return EventoService.Eventos
+            .Where(e => e.Nombre.Contains(value, StringComparison.OrdinalIgnoreCase) || e.Ubicacion.Contains(value, StringComparison.OrdinalIgnoreCase));
+    }
+
+
 
     protected override async Task OnInitializedAsync()
     {
+        EventoService.OnChange += StateHasChanged; 
         await CargarBanners();
         await CargarEventos();
     }
 
+    public void Dispose()
+    {
+        EventoService.OnChange -= StateHasChanged; 
+    }
 
     private void EventoDetalle(int id)
     {
@@ -154,12 +171,48 @@
     private async Task CargarEventos(int pagina = 1)
     {
         _cargando = true;
-        EventoService.OnChange += StateHasChanged;
+
+        Console.WriteLine($"Cargando eventos para la página {pagina}");
+
         await EventoService.GetEventosPaginado(pagina);
+
+
+        if (EventoService.Eventos.Count > 0)
+        {
+            Console.WriteLine($"Eventos cargados: {EventoService.Eventos.Count}");
+        }
+        else
+        {
+            Console.WriteLine("No se cargaron eventos.");
+        }
+
         paginasTotales = EventoService.PaginasTotales;
         filteredEventos = EventoService.Eventos;
         _cargando = false;
+
+        StateHasChanged();
     }
+
+
+
+
+
+    private async Task PerformSearch()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            filteredEventos = EventoService.Eventos;
+        }
+        else
+        {
+            filteredEventos = EventoService.Eventos
+                .Where(e => e.Nombre.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) || e.Ubicacion.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
 
     private async Task CargarBanners()
     {
@@ -172,30 +225,22 @@
     private async Task PaginaSeleccionada(int pagina)
     {
         paginaActual = pagina;
+        Console.WriteLine($"Cargando eventos para la página {pagina}");
         await CargarEventos(pagina);
     }
 
-    private void PerformSearch(KeyboardEventArgs args)
+
+    private void EventoSeleccionado(Evento evento)
     {
-        if (args.Key == "Enter")
+        if (evento != null)
         {
-            SearchEventos();
+            NavigationManager.NavigateTo($"/producto-detalle/{evento.EventoId}");
         }
     }
 
     private void SearchEventos()
     {
-        if (string.IsNullOrWhiteSpace(searchQuery))
-        {
-            filteredEventos = EventoService.Eventos;
-            _hayResultados = true;
-        }
-        else
-        {
-            filteredEventos = EventoService.Eventos.Where(e => e.Nombre.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) || e.Ubicacion.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
-            _hayResultados = filteredEventos.Count > 0;
-        }
-
-        StateHasChanged();
+       
+        PerformSearch().GetAwaiter().GetResult();
     }
 }

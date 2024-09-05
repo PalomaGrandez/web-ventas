@@ -25,22 +25,25 @@
 
             if (itemRepetido == null)
             {
+                // Si el item no existe, agregarlo al carrito
                 orden.Add(ordenRegistroDto);
             }
             else
             {
-                // Mantén la cantidad que ya se había actualizado antes, sin sobrescribirla
-                itemRepetido.Cantidad += ordenRegistroDto.Cantidad;
+                // Actualiza la cantidad sin sumar
+                itemRepetido.Cantidad = ordenRegistroDto.Cantidad;  // Cambiado para no sumar la cantidad
 
-                // Solo actualiza las propiedades que no han sido cambiadas manualmente
+                // Actualiza las otras propiedades necesarias
                 itemRepetido.Fecha = ordenRegistroDto.Fecha;
                 itemRepetido.EntradaTipo = ordenRegistroDto.EntradaTipo;
                 itemRepetido.PrecioRegular = ordenRegistroDto.PrecioRegular;
                 itemRepetido.PrecioTotal = itemRepetido.Cantidad * itemRepetido.PrecioRegular;
             }
 
+            // Guardar la lista actualizada en el almacenamiento
             await _sessionStorage.SetItemAsync("orden", orden);
         }
+
 
         public async Task<ServiceResponse<int>> CreateOrden(OrdenRegistroDto dto)
         {

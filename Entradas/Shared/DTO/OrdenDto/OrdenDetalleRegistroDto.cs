@@ -27,5 +27,7 @@ namespace Entradas.Shared.DTO.OrdenDto
         public decimal PrecioTotal { get; set; }
 
         public string NombreEvento { get; set; }
+
+        public string Imagen { get; set; }
     }
 }
