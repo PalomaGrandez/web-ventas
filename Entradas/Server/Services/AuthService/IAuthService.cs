@@ -6,6 +6,9 @@ namespace Entradas.Server.Services.AuthService
 {
     public interface IAuthService
     {
+
+        Task<bool> CheckEmailExists(string email);
+        Task<bool> CheckUsernameExists(string username);
         Task<ServiceResponse<int>> Registro(UsuarioRegistroDto request);
         Task<ServiceResponse<string>> Login(UsuarioLoginDto request);
         //Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request);

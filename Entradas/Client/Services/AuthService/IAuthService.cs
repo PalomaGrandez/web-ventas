@@ -16,5 +16,8 @@ namespace Entradas.Client.Services.AuthService
         Task<bool> IsUserAuthenticated();
         Task<string> GetUserRole();
         Task<int> GetUserId();
+
+        Task<bool> EmailExists(string email);
+        Task<bool> UsernameExists(string username);
     }
 }

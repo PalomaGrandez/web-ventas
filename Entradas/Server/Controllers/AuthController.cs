@@ -18,6 +18,22 @@ namespace Entradas.Server.Controllers
             _emailService = emailService;
         }
 
+
+        [HttpGet("CheckEmailExists/{email}")]
+        public async Task<ActionResult<bool>> CheckEmailExists(string email)
+        {
+            var exists = await _authService.CheckEmailExists(email);
+            return Ok(exists);
+        }
+
+        [HttpGet("CheckUsernameExists/{username}")]
+        public async Task<ActionResult<bool>> CheckUsernameExists(string username)
+        {
+            var exists = await _authService.CheckUsernameExists(username);
+            return Ok(exists);
+        }
+
+
         [HttpPost]
         [Route("Registro")]
         public async Task<ActionResult<ServiceResponse<UsuarioRegistroDto>>> Registro(UsuarioRegistroDto request)
@@ -35,6 +51,8 @@ namespace Entradas.Server.Controllers
             }
             return BadRequest(response);
         }
+
+
 
         [HttpPost("Login")]
         public async Task<ActionResult<ServiceResponse<string>>> Login(UsuarioLoginDto request)

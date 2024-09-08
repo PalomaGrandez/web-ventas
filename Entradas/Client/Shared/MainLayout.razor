@@ -26,6 +26,19 @@
     <MudSpacer />
     @if (autenticado)
     {
+
+        <MudMenu Icon="@Icons.Material.Filled.Person" Color="Color.Inherit"
+                 AnchorOrigin="Origin.BottomCenter"
+                 TransformOrigin="Origin.TopCenter">
+            <MudMenuItem Style="padding: 0;">
+                <div style="border-radius: 7px; font-weight: normal; font-size: 0.8rem; font-family: 'Poppins', sans-serif; padding: 4px 20px;">
+                    Hola @nombre
+                </div>
+            </MudMenuItem>
+        </MudMenu>
+
+
+
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
             <MudButton EndIcon="@Icons.Material.Filled.ShoppingCart" Color="Color.Inherit" OnClick="CarritoCompras" Style="border-radius: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">Carrito</MudButton>
             <MudButton EndIcon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="CerrarSesion" Style="border-radius: 20px; font-weight: bold; font-size:  1.2rem; font-family: 'Poppins', sans-serif">Cerrar Sesión</MudButton>

@@ -129,9 +129,39 @@
         await CargarOrdenLocal();
     }
 
+
+    // private async Task ConfirmacionCompra()
+    // {
+    //     // Verificar si hay items en la orden
+    //     if (!ordenDetalle.Any())
+    //     {
+    //         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+    //         Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
+    //         return;
+    //     }
+
+    //     // Calcular el total de la orden y convertirlo a entero
+    //     var totalOrden = (int)(ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular));
+
+    //     // Navegar a la pantalla de confirmación de compra pasando el monto total como parámetro
+    //     NavigationManager.NavigateTo($"/usuario/completar-compra/{totalOrden}");
+    // }
+
+
     private async Task ConfirmacionCompra()
     {
-        // Verificar si hay items en la orden
+        // Verificar si el usuario está autenticado y su rol
+        var isAuthenticated = await AuthService.IsUserAuthenticated();
+        var rol = await AuthService.GetUserRole();
+
+        // Si no está autenticado o no es "Customer", redirigir a la página de inicio de sesión
+        if (!isAuthenticated || !rol.Equals("Customer"))
+        {
+            NavigationManager.NavigateTo($"Auth/iniciar-sesion");
+            return;
+        }
+
+        // Verificar si hay ítems en la orden
         if (!ordenDetalle.Any())
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
@@ -145,6 +175,7 @@
         // Navegar a la pantalla de confirmación de compra pasando el monto total como parámetro
         NavigationManager.NavigateTo($"/usuario/completar-compra/{totalOrden}");
     }
+
 
     private void GoToHome() { NavigationManager.NavigateTo("/"); }
 

@@ -93,25 +93,41 @@
     private async Task HandleRegistration()
     {
         _guardando = true;
+
+        // Verificar si el email o nombre de usuario ya existen
+        var emailExists = await AuthService.EmailExists(usuarioDto.Email);
+        var usernameExists = await AuthService.UsernameExists(usuarioDto.NombreUsuario);
+
+        if (emailExists)
+        {
+            Snackbar.Add("El email ya está en uso. Por favor, elija otro.", Severity.Warning);
+            _guardando = false;
+            return;
+        }
+
+        if (usernameExists)
+        {
+            Snackbar.Add("El nombre de usuario ya está en uso. Por favor, elija otro.", Severity.Warning);
+            _guardando = false;
+            return;
+        }
+
+        // Continuar con el registro si no existen duplicados
         var result = await AuthService.Registro(usuarioDto);
 
-        message = result.Message;
-
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        Snackbar.Clear();
         if (result.Success)
         {
-
-            Snackbar.Add($"Se registro el usuario exitosammente.", Severity.Success);
-
-            NavigationManager.NavigateTo($"/");
+            Snackbar.Add("Usuario registrado exitosamente.", Severity.Success);
+            NavigationManager.NavigateTo("/");
         }
         else
         {
-            Snackbar.Add($"Ha sucedido un error. No se pudo realizar el registro", Severity.Error);
+            Snackbar.Add(result.Message, Severity.Error);
         }
-        _guardando = true;
+
+        _guardando = false;
     }
+
 
     private void Cancelar()
     {

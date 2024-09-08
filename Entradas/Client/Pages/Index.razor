@@ -4,7 +4,7 @@
 @inject IEventoService EventoService
 @inject IBannerService BannerService
 
-<PageTitle>Fabrica Entradas</PageTitle>
+<PageTitle>Mana Geek</PageTitle>
 
 <MudCarousel ItemsSource="@BannerService.Banners"
              Style="height:450px; width:auto; display:block"
@@ -74,7 +74,8 @@
                                    StartIcon="@Icons.Material.Filled.Add"
                                    Color="Color.Info"
                                    Class=" hover-scale"
-                                   OnClick="()=>EventoDetalle(evento.EventoId)">Ver Producto</MudButton>
+                                   OnClick="()=>EventoDetalle(evento.EventoId)"
+                                   Disabled="@(evento.CapacidadTotal <= 0)">Ver Producto</MudButton>
                     </MudCardActions>
                 </MudCard>
             </MudItem>
