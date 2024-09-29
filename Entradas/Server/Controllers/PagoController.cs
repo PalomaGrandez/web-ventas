@@ -18,7 +18,7 @@ namespace Entradas.Server.Controllers
             Console.WriteLine($"monto recibido: {request.Amount}");
             Console.WriteLine($"nombre recibido: {request.Nombre}");
             Console.WriteLine($"correo recibido: {request.Email}");
-            Console.WriteLine($"telefono recibido: {request.Telefono}");
+            //Console.WriteLine($"telefono recibido: {request.Telefono}");
 
             if (string.IsNullOrEmpty(request.TokenId))
             {
@@ -30,7 +30,7 @@ namespace Entradas.Server.Controllers
 
             // Crear una solicitud POST
             var restRequest = new RestRequest();
-            restRequest.AddHeader("Authorization", "Bearer sk_test_47b1d0312b63a309"); // Usa tu llave secreta de prueba
+            restRequest.AddHeader("Authorization", "Bearer sk_live_6d709dfb06d8fea5"); // Usa tu llave secreta de prueba
             restRequest.AddHeader("Content-Type", "application/json");
 
             // Configurar el método HTTP como POST
@@ -49,7 +49,7 @@ namespace Entradas.Server.Controllers
                 {
                     first_name = request.Nombre,
                     last_name = request.Apellido,
-                    phone_number = request.Telefono
+                ////    //phone_number = request.Telefono
                 }
             };
 
@@ -85,6 +85,6 @@ namespace Entradas.Server.Controllers
 
         public string Apellido { get; set; }
 
-        public string Telefono { get; set; }
+        //public string Telefono { get; set; }
     }
 }

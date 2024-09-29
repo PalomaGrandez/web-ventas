@@ -1,0 +1,56 @@
+﻿@page "/orden-detalle/{ordenId:int}"
+@inject IOrdenService OrdenService
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mx-auto">
+    <MudCard Class="my-3 p-3">
+        <MudCardHeader Style="justify-content: center">
+            <MudText Typo="Typo.h4">Detalles de la Orden</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            @if (ordenDetalles != null && ordenDetalles.Any())
+            {
+                @foreach (var detalle in ordenDetalles)
+                {
+                    <MudPaper Class="p-4 my-4" Elevation="4">
+                        <MudGrid>
+                            @* <MudItem xs="12" sm="6">
+                                <MudText Typo="Typo.subtitle1"><strong>Evento ID:</strong> @detalle.EventoId</MudText>
+                            </MudItem> *@
+                            <MudItem xs="12" sm="6">
+                                <MudText Typo="Typo.subtitle1"><strong>Carta:</strong> @detalle.NombreEvento</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudText Typo="Typo.subtitle1"><strong>Condicion:</strong> @detalle.EntradaTipo</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudText Typo="Typo.subtitle1"><strong>Precio:</strong> @detalle.PrecioRegular.ToString("C")</MudText>
+                            </MudItem>
+                            <div style="justify-content:center; margin-left: 10px">
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.subtitle1"><strong>Imagen del Evento:</strong></MudText>
+                                <MudImage Src="@detalle.Imagen" Alt="Imagen del evento" Width="100" />
+                            </MudItem>
+                            </div>
+                        </MudGrid>
+                    </MudPaper>
+                }
+            }
+            else
+            {
+                <MudText Typo="Typo.body1">Cargando detalles de la orden...</MudText>
+            }
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public int OrdenId { get; set; }
+
+    private List<OrdenDetalleRegistroDto> ordenDetalles = new List<OrdenDetalleRegistroDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ordenDetalles = await OrdenService.GetOrdenDetallePorOrdenId(OrdenId);
+    }
+}

@@ -13,9 +13,9 @@
         <MudGrid Justify="Justify.Center">
             <MudItem xs="12" sm="6" lg="6">
                 <MudCard Elevation="3">
-                    <MudCardHeader>
+                    <MudCardHeader Style="justify-content:center; text-align:center">
                         <CardHeaderContent>
-                            <MudText Typo="Typo.h6">Registrar Usuario</MudText>
+                            <MudText Style="font-weight: bold; font-family: 'Poppins', sans-serif; font-size:1.5rem; width: 100%;" Typo="Typo.h6">Registro de Usuario Nuevo</MudText>
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
@@ -29,6 +29,16 @@
                                       @bind-Value="usuarioDto!.NombreUsuario" For="@(() => usuarioDto!.NombreUsuario)" />
                         <MudTextField Label="Email" HelperText="Ingrese el email"
                                       @bind-Value="usuarioDto!.Email" For="@(() => usuarioDto!.Email)" />
+                        <MudSelect Label="Tipo de Documento" HelperText="Seleccione Tipo de Documento"
+                                   @bind-Value="usuarioDto.TipoDocumento">
+                            @foreach (var tipo in tiposDocumentos)
+                            {
+                                <MudSelectItem Value="@tipo">@tipo</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudTextField Label="Numero de Documento" HelperText="Ingrese su Numero de Documento"
+                                      @bind-Value="usuarioDto!.NumeroDocumento" For="@(() => usuarioDto!.NumeroDocumento)" />
                         <MudTextField Label="Contraseña"
                                       HelperText="Ingrese la contraseña"
                                       InputType="@PasswordInput"
@@ -93,25 +103,48 @@
     private async Task HandleRegistration()
     {
         _guardando = true;
+
+        // Verificar si el email o nombre de usuario ya existen
+        var emailExists = await AuthService.EmailExists(usuarioDto.Email);
+        var usernameExists = await AuthService.UsernameExists(usuarioDto.NombreUsuario);
+
+        if (emailExists)
+        {
+            Snackbar.Add("El email ya está en uso. Por favor, elija otro.", Severity.Warning);
+            _guardando = false;
+            return;
+        }
+
+        if (usernameExists)
+        {
+            Snackbar.Add("El nombre de usuario ya está en uso. Por favor, elija otro.", Severity.Warning);
+            _guardando = false;
+            return;
+        }
+
+        // Continuar con el registro si no existen duplicados
         var result = await AuthService.Registro(usuarioDto);
 
-        message = result.Message;
-
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        Snackbar.Clear();
         if (result.Success)
         {
-
-            Snackbar.Add($"Se registro el usuario exitosammente.", Severity.Success);
-
-            NavigationManager.NavigateTo($"/");
+            Snackbar.Add("Usuario registrado exitosamente.", Severity.Success);
+            NavigationManager.NavigateTo("/");
         }
         else
         {
-            Snackbar.Add($"Ha sucedido un error. No se pudo realizar el registro", Severity.Error);
+            Snackbar.Add(result.Message, Severity.Error);
         }
-        _guardando = true;
+
+        _guardando = false;
     }
+
+
+    private List<string> tiposDocumentos = new List<string>
+ {
+     "DNI",
+     "CE",
+     "Pasaporte",
+ };
 
     private void Cancelar()
     {

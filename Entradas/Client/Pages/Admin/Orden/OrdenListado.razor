@@ -12,25 +12,42 @@
 
         <div style="height:20px" />
         <MudContainer MaxWidth="MaxWidth.Large">
-            <MudCard Elevation="3" Class="p-2 m-2">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h5">@tituloPagina</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        @*   <MudIconButton Icon="@Icons.Material.Filled.Add"
-                        Variant="Variant.Filled"
-                        Size="Size.Large"
-                        Color="Color.Success"
-                        Style="border-radius:20px"
-                        Title="Nueva Categoria"
-                        OnClick="Nuevo">
-                        </MudIconButton> *@
-                    </CardHeaderActions>
-                </MudCardHeader>
-            </MudCard>
+            <MudPaper Class="p-4" Elevation="4">
+                <MudText Typo="Typo.h6" Class="mb-4">Filtros de Búsqueda</MudText>
 
-            <MudTable Items="@OrdenService.Ordenes"
+                <MudGrid Spacing="3">
+                    <MudItem xs="12" md="4">
+                        <MudDatePicker T="DateTime?" Label="Fecha Inicio" @bind-Date="fechaInicio" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudDatePicker T="DateTime?" Label="Fecha Fin" @bind-Date="fechaFin" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudSelect T="string" Label="Estado" @bind-Value="estadoSeleccionado">
+                            <MudSelectItem Value="@("Todos")">Todos</MudSelectItem>
+                            <MudSelectItem Value="@("REGISTRADO")">Resgistrado</MudSelectItem>
+                            <MudSelectItem Value="@("PAGADO")">Pagado</MudSelectItem>
+                            <MudSelectItem Value="@("EN PROCESO")">En Proceso</MudSelectItem>
+                            <MudSelectItem Value="@("ENVIADO")">Enviado</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField Label="Nombre" @bind-Value="nombreFiltro" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField Label="Correo" @bind-Value="correoFiltro" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" class="d-flex justify-end">
+                        <MudButton OnClick="FiltrarPorFechasYEstado" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3">
+                            <MudIcon Icon="@Icons.Material.Filled.Search" /> Filtrar
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+
+            <div class="mt-4" />
+
+            <MudTable Items="@ordenesFiltradas"
                       Context="tableContext"
                       Hover="true"
                       Striped="true"
@@ -45,22 +62,18 @@
                     <MudTh>PRECIO TOTAL</MudTh>
                     <MudTh>ESTADO</MudTh>
                     <MudTh>MEDIO DE PAGO</MudTh>
-                    <MudTh>TICKET GENERADO</MudTh>
+                    <MudTh>NOMBRE</MudTh>
+                    <MudTh>CORREO</MudTh>
                     <MudTh>ACTUALIZAR</MudTh>
-                    <MudTh>GENERAR TICKETS</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="ID">@tableContext.OrdenId</MudTd>
                     <MudTd DataLabel="FECHA ORDEN">@tableContext.FechaOrden</MudTd>
                     <MudTd DataLabel="PRECIO TOTAL">@tableContext.PrecioTotal</MudTd>
                     <MudTd DataLabel="ESTADO">@tableContext.Estado</MudTd>
-                    <MudTd DataLabel="MEDIO DE PAGO">@tableContext.MedioPago</MudTd>
-                    <MudTd DataLabel="TICKET GENERADO">
-                        <MudCheckBox T="bool"
-                                     @bind-Checked=@tableContext.TicketGenerado
-                                     Color="Color.Success"
-                                     ReadOnly="true" />
-                    </MudTd>
+                    <MudTd DataLabel="MEDIO DE PAGO">YAPE</MudTd>
+                    <MudTd DataLabel="NOMBRE">@tableContext.Usuario.NombreUsuario</MudTd>
+                    <MudTd DataLabel="CORREO">@tableContext.Usuario.Email</MudTd>
                     <MudTd DataLabel="ACTUALIZAR">
                         <MudFab Size="Size.Small"
                                 StartIcon="@Icons.Material.Filled.Edit"
@@ -68,28 +81,23 @@
                                 DisableElevation="true"
                                 OnClick="()=> Actualizar(tableContext.OrdenId)">
                         </MudFab>
-                    </MudTd>
-                    <MudTd DataLabel="GENERAR TICKETS">
-                        @if (tableContext.Estado.Equals("APROBADO"))
-                        {
+
+                        <MudTd DataLabel="DETALLES">
                             <MudFab Size="Size.Small"
-                                    StartIcon="@Icons.Material.Filled.Approval"
-                                    Color="Color.Success"
+                                    StartIcon="@Icons.Material.Filled.Visibility"
+                                    Color="Color.Primary"
                                     DisableElevation="true"
-                                    OnClick="()=> GenerarEntradas(tableContext.OrdenId)">
+                                    OnClick="()=> VerDetalles(tableContext.OrdenId)">
                             </MudFab>
-                        }
+                        </MudTd>
                     </MudTd>
-                    @* <MudTd><MudFab Size="Size.Small" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" DisableElevation="true" OnClick="()=> Eliminar(context.EventoId)"></MudFab></MudTd> *@
                 </RowTemplate>
                 <PagerContent>
-                    @*<MudTablePager HideRowsPerPage="true" InfoFormat="@($"{infoFormat}")" HorizontalAlignment="HorizontalAlignment.Center" />*@
                     <div class="d-flex flex-column align-center">
                         <MudPagination Variant="Variant.Filled" Count="paginasTotales" SelectedChanged="PaginaSeleccionada" Class="pa-4" />
                     </div>
                 </PagerContent>
             </MudTable>
-
         </MudContainer>
     </Authorized>
     <NotAuthorized>
@@ -102,6 +110,18 @@
     private bool _cargando = false;
     private int paginasTotales = 0;
     private int paginaActual = 1;
+
+    private DateTime? fechaInicio;
+    private DateTime? fechaFin;
+    private string estadoSeleccionado = "Todos"; // Estado seleccionado por defecto
+    private string nombreFiltro = ""; // Filtro de nombre
+    private string correoFiltro = ""; // Filtro de correo
+    private List<Orden> ordenesFiltradas = new List<Orden>();
+
+    private void VerDetalles(int ordenId)
+    {
+        NavigationManager.NavigateTo($"/orden-detalle/{ordenId}");
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -130,7 +150,48 @@
         OrdenService.OnChange += StateHasChanged;
         await OrdenService.GetOrdenesPaginado(pagina);
         paginasTotales = OrdenService.PaginasTotales;
+
+        // Asigna las órdenes cargadas al listado de órdenes filtradas inicialmente
+        ordenesFiltradas = OrdenService.Ordenes.ToList();
+
         _cargando = false;
+    }
+
+    private void FiltrarPorFechasYEstado()
+    {
+        ordenesFiltradas = OrdenService.Ordenes.ToList();
+
+        // Aplicar filtro por fechas si están seleccionadas
+        if (fechaInicio.HasValue && fechaFin.HasValue)
+        {
+            ordenesFiltradas = ordenesFiltradas
+                .Where(o => o.FechaOrden >= fechaInicio && o.FechaOrden <= fechaFin)
+                .ToList();
+        }
+
+        // Aplicar filtro por estado si no se seleccionó "Todos"
+        if (estadoSeleccionado != "Todos")
+        {
+            ordenesFiltradas = ordenesFiltradas
+                .Where(o => o.Estado.Equals(estadoSeleccionado, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        // Aplicar filtro por nombre si se ha escrito algo en el filtro de nombre
+        if (!string.IsNullOrWhiteSpace(nombreFiltro))
+        {
+            ordenesFiltradas = ordenesFiltradas
+                .Where(o => o.Usuario.NombreUsuario.Contains(nombreFiltro, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        // Aplicar filtro por correo si se ha escrito algo en el filtro de correo
+        if (!string.IsNullOrWhiteSpace(correoFiltro))
+        {
+            ordenesFiltradas = ordenesFiltradas
+                .Where(o => o.Usuario.Email.Contains(correoFiltro, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
     }
 
     private async Task GenerarEntradas(int ordenId)

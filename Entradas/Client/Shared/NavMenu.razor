@@ -2,35 +2,37 @@
 
 <MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Inicio</MudNavLink>
-   @*  <AuthorizeView>
-        <Authorized> *@
-            @if (rol.Equals("Customer") == true)
-            {
-                Console.WriteLine($"Rol Pagina: {rol.Equals("Customer")}");
+    @*  <AuthorizeView>
+    <Authorized> *@
+    @if (rol.Equals("Customer") == true)
+    {
+        Console.WriteLine($"Rol Pagina: {rol.Equals("Customer")}");
 
-                <MudNavLink Href="/usuario/mis-pedidos" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Mis Pedidos</MudNavLink>
-            }
 
-            @if (rol.Equals("Admin") == true)
-            {
-                <MudNavGroup Title="Admin" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="false">
-                    <MudNavLink Href="/admin/Usuario/usuario-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Usuario</MudNavLink>
-                    <MudNavLink Href="/admin/categoria/categoria-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Category">Categorias</MudNavLink>
-                    <MudNavGroup Title="Evento" Icon="@Icons.Material.Filled.Event" Expanded="false">
-                        <MudNavLink Href="/admin/evento/evento-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EventAvailable">Eventos</MudNavLink>
-                        <MudNavLink Href="/admin/eventoentrada/evento-entrada-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EventSeat">Evento Entradas</MudNavLink>
-                        <MudNavLink Href="/admin/eventofecha/evento-fecha-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Evento Fechas</MudNavLink>
-                    </MudNavGroup>
-                    <MudNavLink Href="/admin/orden/orden-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Ordenes</MudNavLink>
-                    <MudNavLink Href="/admin/banner/banner-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Banners</MudNavLink>
-                </MudNavGroup>
-            }
-@*         </Authorized>
+        <MudNavLink Href="/usuario/mis-pedidos" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Mis Pedidos</MudNavLink>
+       @*   <MudNavLink Href="/user-direcciones" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocationOn">Mis Direcciones</MudNavLink>  *@
+    }
+
+    @if (rol.Equals("Admin") == true)
+    {
+        <MudNavGroup Title="Admin" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="false">
+            <MudNavLink Href="/admin/Usuario/usuario-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Usuario</MudNavLink>
+            <MudNavLink Href="/admin/categoria/categoria-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Category">Categorias</MudNavLink>
+            <MudNavGroup Title="Evento" Icon="@Icons.Material.Filled.Event" Expanded="false">
+                <MudNavLink Href="/admin/evento/evento-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EventAvailable">Eventos</MudNavLink>
+                <MudNavLink Href="/admin/eventoentrada/evento-entrada-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EventSeat">Evento Entradas</MudNavLink>
+                <MudNavLink Href="/admin/eventofecha/evento-fecha-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarMonth">Evento Fechas</MudNavLink>
+            </MudNavGroup>
+            <MudNavLink Href="/admin/orden/orden-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Ordenes</MudNavLink>
+            <MudNavLink Href="/admin/banner/banner-listado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Banners</MudNavLink>
+        </MudNavGroup>
+    }
+    @*         </Authorized>
     </AuthorizeView> *@
 
 </MudNavMenu>
 
-@code {   
+@code {
     string rol = "Invitado";
     string nombre = "Invitado";
 
@@ -42,7 +44,7 @@
 
         if (rolClaim != null)
         {
-            rol = rolClaim.Value;         
+            rol = rolClaim.Value;
         }
 
         if (nombreClaim != null)
@@ -51,3 +53,5 @@
         }
     }
 }
+
+

@@ -12,6 +12,7 @@ namespace Entradas.Server.Services.OrdenService
         Task<ServiceResponse<List<VwOrden>>> GetOrdenPorOrdenIdPorUsuarioId(int ordenId, int usuarioId);
         Task<ServiceResponse<List<VwOrdenTicket>>> GetOrdenTicketPorOrdenId(int ordenId);
         Task<ServiceResponse<VwOrdenTicket>> GetOrdenTicketPorOrdenTicketId(int ordenTicketId);
+        Task<List<OrdenDetalleRegistroDto>> GetOrdenDetallePorOrdenId(int ordenId);
         Task<ServiceResponse<int>> GenerarTickets(int ordenId);
         //Task<ServiceResponse<int>> GenerarTicketPdf(int ordenId);
         Task<ServiceResponse<int>> TicketNominar(OrdenTicketActualizarDto dto);

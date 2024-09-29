@@ -81,6 +81,19 @@ namespace Entradas.Client.Services.AuthService
             return await result.Content.ReadFromJsonAsync<ServiceResponse<string>>();
         }
 
+
+        public async Task<bool> EmailExists(string email)
+        {
+            var response = await _http.GetFromJsonAsync<bool>($"api/Auth/CheckEmailExists/{email}");
+            return response;
+        }
+
+        public async Task<bool> UsernameExists(string username)
+        {
+            var response = await _http.GetFromJsonAsync<bool>($"api/Auth/CheckUsernameExists/{username}");
+            return response;
+        }
+
         public async Task<ServiceResponse<int>> Registro(UsuarioRegistroDto request)
         {
             var result = await _http.PostAsJsonAsync("api/auth/Registro", request);

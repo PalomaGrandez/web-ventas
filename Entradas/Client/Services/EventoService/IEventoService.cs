@@ -11,6 +11,9 @@
         Task<ServiceResponse<int>> CreateEvento(EventoRegistroDto dto);
         Task<ServiceResponse<int>> UpdateEvento(EventoRegistroDto dto);
         Task<ServiceResponse<int>> DeleteEvento(int eventoId);
+
+        
+
         Task GetEventos();
         Task GetEventosPaginado(int pagina);
         Task BuscarEventoPaginado(int pagina, string? nombre, string? informacion, string? ubicacion);

@@ -66,7 +66,9 @@
                             </MudItem>*@
 
                             <MudItem lg="6" sm="12" xs="12">
-                                <MudSelect T="int?" Label="Condición" Disabled="@_cargandoEventoEntrada"
+                                <MudSelect T="int?"
+                                           Label="Condición"
+                                           Disabled="@_cargandoEventoEntrada"
                                            AnchorOrigin="Origin.BottomCenter"
                                            Value="@ordenRegistroDto!.EventoEntradaId"
                                            ValueChanged="@((int? eventoEntradaSeleccionado) => CargarEventoFecha((int)eventoEntradaSeleccionado!))"
@@ -75,16 +77,20 @@
                                            Variant="Variant.Outlined"
                                            HelperText="Seleccione la condición"
                                            For="@(() => ordenRegistroDto!.EventoEntradaId)">
-                                    @* <MudSelectItem Value="@((int?) 0)">Seleccione el evento</MudSelectItem> *@
+
                                     @if (EventoEntradaService.EventoEntradas.Count > 0)
                                     {
                                         @foreach (var eventoEntrada in EventoEntradaService.EventoEntradas)
                                         {
-                                            <MudSelectItem Value="@((int?)eventoEntrada.EventoEntradaId)">@eventoEntrada.Tipo</MudSelectItem>
+                                            <MudSelectItem Value="@((int?)eventoEntrada.EventoEntradaId)"
+                                                           Disabled="@(eventoEntrada.Capacidad == null || eventoEntrada.Capacidad == 0)">
+                                                @eventoEntrada.Tipo
+                                            </MudSelectItem>
                                         }
                                     }
                                 </MudSelect>
                             </MudItem>
+
 
                           @*    <MudItem lg="4" sm="12" xs="12">
                             <MudSelect T="int?" Label="Fecha"
@@ -109,7 +115,7 @@
                             </MudItem>*@
 
                             <MudItem lg="4" sm="12" xs="12">
-                                <MudNumericField T="decimal"
+                                <MudTextField T="decimal"
                                                  Label="Precio"
                                                  @bind-Value="@ordenRegistroDto.PrecioRegular"
                                                  Variant="Variant.Outlined"
@@ -118,12 +124,18 @@
                                                  Format="F2" />
                             </MudItem>
                             <MudItem lg="4" sm="12" xs="12">
-                                <MudNumericField T="int" Label="Cantidad"
+                                <MudNumericField T="int"
+                                                 Label="Cantidad"
                                                  Variant="Variant.Outlined"
                                                  @bind-Value="@ordenRegistroDto.Cantidad"
                                                  For="@(() => ordenRegistroDto!.Cantidad)"
-                                                 HelperText="Ingrese la cantidad deseada" Max="10" Min="1" />
+                                                 HelperText="Ingrese la cantidad deseada"
+                                                 Max="@Math.Min(stockDisponible, 10)"
+                                                 Min="1"
+                                                 Immediate="true"
+                                                 OnBlur="VerificarCantidadDisponible" />
                             </MudItem>
+
                         </MudGrid>
 
                     </MudCardContent>
@@ -276,8 +288,6 @@
         await CargarOrdenLocal();
         
     }
-
-
 
     private async Task ConfirmacionCompra()
     {
@@ -461,6 +471,8 @@
         StateHasChanged(); // Forzar la actualización de la UI
     }
 
+    private int stockDisponible = 0; // Inicializamos con un valor por defecto
+
     private async Task CargarEventoFecha(int eventoEntradaSeleccionado)
     {
         ordenRegistroDto.EventoEntradaId = eventoEntradaSeleccionado;
@@ -472,11 +484,26 @@
         EventoEntradaService.OnChange += StateHasChanged;
         _cargandoEventoFecha = false;
 
+        // Asignar el stock disponible
+        stockDisponible = responseEventoEntrada.Data.Capacidad ?? 0; // Si el valor es nulo, asignamos un valor por defecto
+
+        // Asignar otros datos relevantes
         ordenRegistroDto.PrecioRegular = (decimal)responseEventoEntrada.Data!.PrecioRegular!;
         ordenRegistroDto.EntradaTipo = responseEventoEntrada.Data.Tipo;
 
-        StateHasChanged(); // Forzar actualización de la UI
+        StateHasChanged(); // Forzar la actualización de la UI
     }
+
+
+    private void VerificarCantidadDisponible()
+    {
+        if (ordenRegistroDto.Cantidad > stockDisponible)
+        {
+            ordenRegistroDto.Cantidad = stockDisponible;
+            Snackbar.Add("No hay suficiente stock para la cantidad solicitada. Se ha ajustado al máximo disponible.", Severity.Warning);
+        }
+    }
+
 
 
     private async Task FechaSeleccionada(int eventoFechaId)

@@ -1,0 +1,57 @@
+﻿@* @page "/admin/orden/orden-tracking-listado"
+
+@inject IOrdenService OrdenService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Listado de Tracking de Órdenes</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudCard Elevation="3" Class="p-4">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5">Listado de Órdenes con Tracking</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTable Items="ordenes" Context="ordenContext" Hover="true" Striped="true" Elevation="3" Dense="true">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>Fecha de Orden</MudTh>
+                    <MudTh>Fecha de Recolección</MudTh>
+                    <MudTh>Acciones</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="ID">@ordenContext.OrdenId</MudTd>
+                    <MudTd DataLabel="Fecha de Orden">@ordenContext.FechaOrden?.ToString("dd/MM/yyyy")</MudTd>
+                    <MudTd DataLabel="Fecha de Recolección">@ordenContext.OrdenDetalle.FirstOrDefault()?.FechaRecoleccion.ToString("dd/MM/yyyy")</MudTd>
+                    <MudTd DataLabel="Acciones">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => EditarTracking(ordenContext.OrdenId)">
+                            Editar Tracking
+                        </MudButton>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private List<Orden> ordenes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarOrdenes();
+    }
+
+    private async Task CargarOrdenes()
+    {
+        await OrdenService.GetOrdenesPaginado(1); // Obtén la primera página de órdenes
+        ordenes = OrdenService.Ordenes;
+    }
+
+    private void EditarTracking(int ordenId)
+    {
+        NavigationManager.NavigateTo($"/admin/orden/orden-tracking/{ordenId}");
+    }
+}
+ *@

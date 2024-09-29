@@ -1,4 +1,6 @@
-﻿namespace Entradas.Client.Services.OrdenService
+﻿using System.Net.Http;
+
+namespace Entradas.Client.Services.OrdenService
 {
     public class OrdenService : IOrdenService
     {
@@ -42,6 +44,20 @@
 
             // Guardar la lista actualizada en el almacenamiento
             await _sessionStorage.SetItemAsync("orden", orden);
+        }
+
+        public async Task<EventoEntrada> ObtenerEventoEntradaDisponible(int eventoEntradaId)
+        {
+            var response = await _http.GetFromJsonAsync<ServiceResponse<EventoEntrada>>($"api/evento/ObtenerEventoEntradaDisponible/{eventoEntradaId}");
+
+            return response?.Data ?? new EventoEntrada();
+        }
+
+
+        public async Task<List<OrdenDetalleRegistroDto>> GetOrdenDetallePorOrdenId(int ordenId)
+        {
+            var response = await _http.GetFromJsonAsync<List<OrdenDetalleRegistroDto>>($"api/orden/getOrdenDetallePorOrdenId/{ordenId}");
+            return response;
         }
 
 

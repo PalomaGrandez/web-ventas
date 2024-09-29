@@ -49,15 +49,16 @@
                                                    Adornment="Adornment.Start"
                                                    Placeholder="Seleccione el estado"
                                                    Variant="Variant.Text">
-                                            <MudSelectItem Value="@("" )"></MudSelectItem>
                                             <MudSelectItem Value="@("REGISTRADO" )"></MudSelectItem>
-                                            <MudSelectItem Value="@("PROCESANDO" )"></MudSelectItem>
-                                            <MudSelectItem Value="@("RECHAZADO" )"></MudSelectItem>
+                                            <MudSelectItem Value="@("PAGADO" )"></MudSelectItem>
+                                            <MudSelectItem Value="@("EN PROCESO" )"></MudSelectItem>
+                                            <MudSelectItem Value="@("ENVIADO" )"></MudSelectItem>
+                                            @* <MudSelectItem Value="@("RECHAZADO" )"></MudSelectItem>
                                             <MudSelectItem Value="@("ANULADO" )"></MudSelectItem>
-                                            <MudSelectItem Value="@("APROBADO" )"></MudSelectItem>
+                                            <MudSelectItem Value="@("APROBADO" )"></MudSelectItem> *@
                                         </MudSelect>
                                     </MudItem>
-                                    <MudItem lg="4" sm="4" xs="12">
+                                   @*  <MudItem lg="4" sm="4" xs="12">
                                         <MudSelect T="string"
                                                    Label="Medio de Pago"
                                                    Disabled="@_cargandoEstados"
@@ -72,13 +73,13 @@
                                             <MudSelectItem Value="@("TRANSFERENCIA" )">TRANSFERENCIA</MudSelectItem>
                                             <MudSelectItem Value="@("DEPOSITO" )">DEPOSITO</MudSelectItem>
                                         </MudSelect>
-                                    </MudItem>
-                                    <MudItem lg="4" sm="4" xs="12">
+                                    </MudItem> *@
+                                    @* <MudItem lg="4" sm="4" xs="12">
                                         <MudTextField T="string"
                                                       Label="Numero Operación"
                                                       Placeholder="Ingrese el numero de operación"
                                                       @bind-Value="ordenActualizarDto.NumeroOperacion" />
-                                    </MudItem>
+                                    </MudItem> *@
                                 </MudGrid>
                             </MudCardContent>
                             <MudCardActions>
@@ -169,11 +170,13 @@
             }
         }
     }
-
     private async Task HandleRegistration()
     {
         // Establecer la bandera de guardado en true
         _guardando = true;
+
+        // Establecer NumeroOperacion en 123
+        ordenActualizarDto.NumeroOperacion = "1232445";
 
         // Verificar si el ID es nulo para determinar si es una nueva orden o una actualización
         if (Id != null)
@@ -199,6 +202,7 @@
         // Restablecer la bandera de guardado a false después del proceso
         _guardando = false;
     }
+
 
     private void Cancelar()
     {

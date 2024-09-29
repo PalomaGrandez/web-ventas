@@ -16,47 +16,59 @@ namespace Entradas.Server.Services.AuthService
             _context = context;
             _configuration = configuration;
         }
+
+        public async Task<bool> CheckEmailExists(string email)
+        {
+            return await _context.Usuario.AnyAsync(u => u.Email == email);
+        }
+
+        public async Task<bool> CheckUsernameExists(string username)
+        {
+            return await _context.Usuario.AnyAsync(u => u.NombreUsuario == username);
+        }
         public async Task<ServiceResponse<int>> Registro(UsuarioRegistroDto request)
         {
-            try
+            var response = new ServiceResponse<int>();
+
+            // Verificar si el email o nombre de usuario ya existen
+            if (await CheckEmailExists(request.Email))
             {
-                // Crear hash de la contraseña
-                CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
-
-                // Crear nuevo usuario
-                var usuario = new Usuario
-                {
-                    Nombres = request.Nombres,
-                    ApellidoPaterno = request.ApellidoPaterno,
-                    ApellidoMaterno = request.ApellidoMaterno,
-                    NombreUsuario = request.NombreUsuario,
-                    Email = request.Email,
-                    PasswordHash = passwordHash,
-                    PasswordSalt = passwordSalt,
-                    FechaCreacion = DateTime.Now,
-                    Rol = "Customer"
-                };
-
-                // Agregar usuario a la base de datos
-                _context.Usuario.Add(usuario);
-
-                // Guardar cambios en la base de datos
-                var result = await _context.SaveChangesAsync();
-
-                return new ServiceResponse<int>
-                {
-                    Data = result,
-                    Message = "Se ha registrado el usuario exitosamente."
-                };
+                response.Success = false;
+                response.Message = "El email ya está en uso.";
+                return response;
             }
-            catch (Exception ex)
+
+            if (await CheckUsernameExists(request.NombreUsuario))
             {
-                return new ServiceResponse<int>
-                {
-                    Success = false,
-                    Message = "Error al registrar el usuario: " + ex.Message
-                };
+                response.Success = false;
+                response.Message = "El nombre de usuario ya está en uso.";
+                return response;
             }
+
+            // Crear hash de la contraseña
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            var usuario = new Usuario
+            {
+                Nombres = request.Nombres,
+                ApellidoPaterno = request.ApellidoPaterno,
+                ApellidoMaterno = request.ApellidoMaterno,
+                NombreUsuario = request.NombreUsuario,
+                Email = request.Email,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                FechaCreacion = DateTime.Now,
+                Rol = "Customer",
+                 TipoDocumento = request.TipoDocumento,
+                NumeroDocumento = request.NumeroDocumento
+            };
+
+            _context.Usuario.Add(usuario);
+            await _context.SaveChangesAsync();
+
+            response.Data = usuario.UsuarioId;
+            response.Message = "Usuario registrado exitosamente.";
+            return response;
         }
 
         //Operaciones adicionales
@@ -105,7 +117,9 @@ namespace Entradas.Server.Services.AuthService
                                             ApellidoMaterno = x.ApellidoMaterno,
                                             NombreUsuario = x.NombreUsuario,
                                             Email = x.Email,
-                                            FechaCreacion = x.FechaCreacion
+                                            FechaCreacion = x.FechaCreacion,
+                                            TipoDocuemnto = x.TipoDocumento,
+                                            NumeroDocumento = x.NumeroDocumento
                                         })
                                         .AsQueryable();
             int resultadosPorPagina = 10;
@@ -153,8 +167,10 @@ namespace Entradas.Server.Services.AuthService
 
             try
             {
+                // Check if login identifier is an email or username
                 var usuario = await _context.Usuario
-                    .FirstOrDefaultAsync(x => x.Email.ToLower() == request.Email.ToLower());
+                    .FirstOrDefaultAsync(x => x.Email.ToLower() == request.LoginIdentifier.ToLower() ||
+                                              x.NombreUsuario.ToLower() == request.LoginIdentifier.ToLower());
 
                 if (usuario == null)
                 {
@@ -181,6 +197,7 @@ namespace Entradas.Server.Services.AuthService
 
             return response;
         }
+
 
         private static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {

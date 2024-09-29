@@ -55,7 +55,7 @@ window.AbrirCulqi = function (settings, client) {
         appearance,
     };
 
-    const publicKey = 'pk_test_3153d0c7ed6a853a';
+    const publicKey = 'pk_live_f88f5d1d2457d6af';
 
     const Culqi = new CulqiCheckout(publicKey, config);
 
@@ -66,15 +66,15 @@ window.AbrirCulqi = function (settings, client) {
             const email = config.client.email;
             const nombre = config.client.first_name;
             const apellido = config.client.last_name;
-            const telefono = config.client.phone_number;
+            /*const telefono = config.client.phone_number;*/
             console.log('Se ha creado un Token: ', token);
             console.log('El golpe es: ', amount);
             console.log('Su mail del causa es: ', email);
             console.log('el nombre del causa es: ', nombre + " " + apellido);
-            console.log('el fono del causa es: ', telefono);
+           /* console.log('el fono del causa es: ', telefono);*/
 
             try {
-                const response = await fetch('https://localhost:7122/api/pagos/procesar', {
+                const response = await fetch('https://manageek.com/api/pagos/procesar', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ window.AbrirCulqi = function (settings, client) {
                         Email: email,
                         Nombre: nombre,
                         Apellido: apellido,
-                        Telefono: telefono
+                        /*Telefono: telefono*/
                     }),
                 });
 
@@ -95,6 +95,15 @@ window.AbrirCulqi = function (settings, client) {
                 console.log('Respuesta del backend: ', result);
 
                 if (response.ok) {
+
+                    DotNet.invokeMethodAsync('Entradas.Client', 'ProcesarPago', token)
+                        .then(data => {
+                            console.log('Stock actualizado en Blazor.');
+                        })
+                        .catch(error => {
+                            console.error('Error al actualizar el stock en Blazor: ', error);
+                        });
+
                     window.location.href = "/usuario/pago-completo";
 
                     alert('Pago procesado exitosamente.');

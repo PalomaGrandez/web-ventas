@@ -1,4 +1,6 @@
-﻿namespace Entradas.Client.Services.EventoService
+﻿using System.Net.Http;
+
+namespace Entradas.Client.Services.EventoService
 {
     public class EventoService : IEventoService
     {
@@ -36,6 +38,7 @@
             OnChange?.Invoke();
         }
 
+        
         public async Task GetEventosPaginado(int pagina)
         {
             var response = await _http.GetFromJsonAsync<ServiceResponse<EventoPaginadoDto>>($"api/evento/GetEventosPaginado?pagina={pagina}");

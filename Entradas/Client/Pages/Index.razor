@@ -4,7 +4,7 @@
 @inject IEventoService EventoService
 @inject IBannerService BannerService
 
-<PageTitle>Fabrica Entradas</PageTitle>
+<PageTitle>Mana Geek</PageTitle>
 
 <MudCarousel ItemsSource="@BannerService.Banners"
              Style="height:450px; width:auto; display:block"
@@ -48,7 +48,9 @@
                      Class="mud-width-full mud-max-width-600 custom-text-field"
                      SearchFunc="BuscarEventos"
                      ToStringFunc="@(e => e.Nombre)"
-                     MinCharacters="1" />
+                     MinCharacters="1"
+                     Adornment="Adornment.End"
+                     AdornmentIcon="@Icons.Material.Filled.Search" />
 </div>
 
 
@@ -60,8 +62,10 @@
         {
             <MudItem xs="12" sm="6" lg="4" md="6" Class="d-flex justify-center">
                 <MudCard Elevation="3" Style="border-radius: 15px; width: 100%; max-width: 450px; padding: 16px;">
-                    <div style="display: flex; justify-content: center; align-items: center; background-color: #e8e8e8; height: 220px; border-radius: 8px;">
-                        <img src="@evento.Imagen" style="max-width: 80%; max-height: 200px; object-fit: contain;" />
+                    <div style="cursor: pointer;" @onclick="() => EventoDetalle(evento.EventoId)">
+                        <div style="display: flex; justify-content: center; align-items: center; background-color: #e8e8e8; height: 220px; border-radius: 8px;">
+                            <img src="@evento.Imagen" style="max-width: 80%; max-height: 200px; object-fit: contain;" />
+                        </div>
                     </div>
                     <MudCardContent>
                         <MudText Typo="Typo.subtitle2">@evento.Ubicacion</MudText>
@@ -73,9 +77,20 @@
                                    ButtonType="ButtonType.Button"
                                    StartIcon="@Icons.Material.Filled.Add"
                                    Color="Color.Info"
-                                   Class=" hover-scale"
-                                   OnClick="()=>EventoDetalle(evento.EventoId)">Ver Producto</MudButton>
+                                   Class="hover-scale"
+                                   OnClick="()=>EventoDetalle(evento.EventoId)"
+                                   Disabled="@(evento.CapacidadTotal <= 0)">
+                            @if (evento.CapacidadTotal > 0)
+                            {
+                                <span>Detalle</span>
+                           }
+                            else
+                            {
+                                <span>No hay stock disponible</span>
+                            }
+                        </MudButton>
                     </MudCardActions>
+
                 </MudCard>
             </MudItem>
         }

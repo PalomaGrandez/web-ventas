@@ -1,0 +1,130 @@
+﻿@* @page "/admin/orden/orden-tracking"
+@page "/admin/orden/orden-tracking/{OrdenId:int}"
+
+@inject NavigationManager NavigationManager
+@inject IOrdenService OrdenService
+@inject ISnackbar Snackbar
+@inject IAuthService AuthService
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <PageTitle>@tituloPagina</PageTitle>
+        <div style="height:20px"></div>
+
+        <EditForm Model="ordenDetalle" Context="formContext" OnValidSubmit="HandleTrackingUpdate">
+            <DataAnnotationsValidator />
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12" sm="7">
+                    <MudCard Elevation="3">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">@tituloPagina</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudTextField Label="Precio Total" @bind-Value="ordenDetalle.PrecioTotal" Disabled="true" />
+                            <MudDatePicker Label="Fecha de Recolección"
+                                           Date="@ordenDetalle.FechaRecoleccion"
+                                           DateFormat="dd/MM/yyyy"
+                                           DateChanged="OnDateChanged" />
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Disabled="@_guardando" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Class="ml-auto">
+                                @if (_guardando)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                    <MudText Class="ms-2">Guardando</MudText>
+                                }
+                                else
+                                {
+                                    <MudText>Guardar</MudText>
+                                }
+                            </MudButton>
+                            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.Cancel" Class="ml-auto" OnClick="Cancelar">Cancelar</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+
+    </Authorized>
+    <NotAuthorized>
+        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Error">
+            No tienes permisos para acceder a esta página.
+        </MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public int OrdenId { get; set; }
+
+    private string tituloPagina = "Editar Tracking de Orden";
+    private OrdenDetalle ordenDetalle = new();
+    private bool _guardando = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarOrden();
+    }
+
+    private async Task CargarOrden()
+    {
+        var response = await OrdenService.GetOrdenPorId(OrdenId);  // Este devuelve la orden completa
+        if (response.Success)
+        {
+            var orden = response.Data;
+
+            // Buscar los detalles de la orden
+            ordenDetalle = orden.OrdenDetalle.FirstOrDefault();
+
+            if (ordenDetalle != null && ordenDetalle.FechaRecoleccion == null)
+            {
+                // Si no tiene fecha, asigna 8 días después del día actual
+                ordenDetalle.FechaRecoleccion = DateTime.Now.AddDays(8);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Error al cargar los detalles del pedido.", Severity.Error);
+        }
+    }
+
+    private async Task HandleTrackingUpdate()
+    {
+        _guardando = true;
+        var result = await OrdenService.UpdateOrden(new OrdenActualizarDto
+            {
+                OrdenId = ordenDetalle.OrdenId,
+                PrecioTotal = ordenDetalle.PrecioTotal,
+                FechaRecoleccion = ordenDetalle.FechaRecoleccion // La fecha editada por el admin
+            });
+
+        if (result.Success)
+        {
+            Snackbar.Add("Fecha de recolección actualizada exitosamente.", Severity.Success);
+            NavigationManager.NavigateTo("/admin/orden/orden-listado");
+        }
+        else
+        {
+            Snackbar.Add($"Error: {result.Message}", Severity.Error);
+        }
+
+        _guardando = false;
+    }
+
+    private void OnDateChanged(DateTime? newDate)
+    {
+        if (newDate.HasValue) // Verifica si newDate tiene un valor
+        {
+            ordenDetalle.FechaRecoleccion = newDate.Value; // Usa .Value para asignar el valor de DateTime
+        }
+    }
+
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/admin/orden/orden-listado");
+    }
+}
+ *@
