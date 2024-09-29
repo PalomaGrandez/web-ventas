@@ -55,7 +55,7 @@ window.AbrirCulqi = function (settings, client) {
         appearance,
     };
 
-    const publicKey = 'pk_test_3153d0c7ed6a853a';
+    const publicKey = 'pk_live_f88f5d1d2457d6af';
 
     const Culqi = new CulqiCheckout(publicKey, config);
 
@@ -95,6 +95,15 @@ window.AbrirCulqi = function (settings, client) {
                 console.log('Respuesta del backend: ', result);
 
                 if (response.ok) {
+
+                    DotNet.invokeMethodAsync('Entradas.Client', 'ProcesarPago', token)
+                        .then(data => {
+                            console.log('Stock actualizado en Blazor.');
+                        })
+                        .catch(error => {
+                            console.error('Error al actualizar el stock en Blazor: ', error);
+                        });
+
                     window.location.href = "/usuario/pago-completo";
 
                     alert('Pago procesado exitosamente.');

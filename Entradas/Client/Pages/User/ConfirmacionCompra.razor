@@ -1,4 +1,4 @@
-﻿@page "/usuario/completar-compra/{montoTotal:int}"
+﻿@page "/usuario/completar-compra/{montoTotal:decimal}"
 @inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
@@ -6,6 +6,7 @@
 @inject ISnackbar Snackbar
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IDialogService DialogService
+
 @using Microsoft.JSInterop;
 
 <PageTitle>Confirmación de Compra</PageTitle>
@@ -21,14 +22,7 @@
                 </MudCardHeader>
                 <MudCardContent>
                     <MudText Typo="Typo.body1" Style="font-family: 'Poppins', sans-serif; text-align:center;">
-                        <MudIcon Icon="@Icons.Material.Filled.AccessTime" Class="mr-2" /> Su pedido estará disponible para ser recogido a partir del día siguiente,
-                        dentro de los días hábiles de lunes a sábado en el horario de 9 a.m. a 9 p.m.
-                    </MudText>
-                    <MudText Typo="Typo.body1" Style="font-family: 'Poppins', sans-serif; text-align:center;" Class="mt-3">
-                        <MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="mr-2" /> <strong>Avenida San Martin 721, pasaje D-44, Pueblo Libre</strong>.
-                    </MudText>
-                    <MudText Typo="Typo.body1" Style="font-family: 'Poppins', sans-serif; text-align:center;" Class="mt-4">
-                        <MudIcon Icon="@Icons.Material.Filled.Payment" Class="mr-2" /> Realice su pago con Yape y envíe el comprobante a soporte@fabrica.pe con el asunto: Pago Pedido N° xxxx-xx-xxxxxx.
+                        <MudIcon Icon="@Icons.Material.Filled.Payment" Class="mr-2" /> Realice su pago con Yape siguiendo los pasos indicados en el código de aprobación.
                     </MudText>
                     <MudText Typo="Typo.body1" Style="font-family: 'Poppins', sans-serif; text-align:center;" Class="mt-2">
                         Verá sus productos en 'Mis Pedidos'.
@@ -37,6 +31,7 @@
                         <MudImage Style="width:700px height:auto" ObjectPosition="ObjectPosition.Center" Src="pago/cod_aprobacion.png" Class="rounded-lg" ObjectFit="ObjectFit.Contain" Fluid="true" />
                     </div>
                 </MudCardContent>
+
                 <MudCardActions Class="d-flex justify-center mt-4">
                     <MudButton ButtonType="ButtonType.Button"
                                Size="Size.Large"
@@ -49,6 +44,15 @@
                                Class="hover-scale">
                         Realizar Pago
                     </MudButton>
+                   @*  <MudButton ButtonType="ButtonType.Button"
+                               Size="Size.Large"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               OnClick="IrASeleccionProducto">
+                              
+                               
+                        Realizar PagoP
+                    </MudButton> *@
                 </MudCardActions>
             </MudCard>
         </MudItem>
@@ -98,7 +102,7 @@
 
 @code {
     [Parameter]
-    public int MontoTotal { get; set; } // Parámetro para recibir el monto total
+    public decimal MontoTotal { get; set; } // Parámetro para recibir el monto total
 
     private List<OrdenDetalleRegistroDto> ordenDetalle = new();
     private bool _guardando = false;
@@ -118,6 +122,14 @@
         Console.WriteLine(ordenDetalle.Count);
     }
 
+    // private void IrASeleccionProducto()
+    // {
+    //     NavigationManager.NavigateTo($"/usuario/pago-completo");
+    // }
+
+   
+
+
     private async Task ValidarSesion()
     {
         var authenticationState = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -134,11 +146,15 @@
 
     public async Task AbrirCulqi()
     {
+
+
+
         try
         {
             Console.WriteLine(nombre + apellido + email);
 
-            int precioTotalEntero = MontoTotal * 100;
+
+            int precioTotalEntero = (int)(MontoTotal * 100m);
 
             var settings = new
             {
@@ -162,4 +178,7 @@
             Console.WriteLine($"Error al intentar abrir Culqi: {ex.Message}");
         }
     }
+
+   
+
 }

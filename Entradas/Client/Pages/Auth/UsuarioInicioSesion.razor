@@ -20,12 +20,13 @@
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
-                        <MudTextField Label="Email"
-                                      HelperText="Ingrese el email"
+                        <MudTextField Label="Email o Nombre de Usuario"
+                                      HelperText="Ingrese su email o nombre de usuario"
                                       Variant="Variant.Outlined"
                                       Style="border-radius:20px"
-                                      @bind-Value="usuarioLoginDto!.Email"
-                                      For="@(() => usuarioLoginDto!.Email)" />
+                                      @bind-Value="usuarioLoginDto!.LoginIdentifier"
+                                      For="@(() => usuarioLoginDto!.LoginIdentifier)" />
+
                         <MudTextField Label="Password"
                                       HelperText="Ingrese el password"
                                       Variant="Variant.Outlined"

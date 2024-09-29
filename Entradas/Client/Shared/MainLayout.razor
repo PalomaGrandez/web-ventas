@@ -10,7 +10,7 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudAppBar Elevation="1" Style="height: 75px; background-color: #002448;">
+<MudAppBar Elevation="1" Style="height: 75px; background-color: #002448; z-index: 1300;">
     <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle" />
     <MudImage Src="icons/mago.png" Height="50" Width="50" onclick="@Home" Style="cursor: pointer;" />
 
@@ -63,15 +63,26 @@
 
 
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="2" ClipMode="DrawerClipMode.Always">
-        <div style="height: 10px"></div>
-        <MudDrawerHeader>
-            <MudAvatar Variant="Variant.Filled">@nombre?.Substring(0, 1)</MudAvatar>
-            <div style="width: 10px"></div>
-            <MudText Typo="Typo.h5" Class="mt-1" Style="overflow-wrap: normal; max-width: 200px">@nombre</MudText>
-        </MudDrawerHeader>
-        <NavMenu></NavMenu>
-    </MudDrawer>
+<MudDrawer @bind-Open="_drawerOpen" Elevation="2" ClipMode="DrawerClipMode.Never" Anchor="Anchor.Left" Overlay="false"
+           Style="position: fixed; height: 100vh; z-index: 1200; background-color: white;">
+
+    <div style="height: 30px"></div>
+    <MudDrawerHeader Style="margin-top: 50px;">
+        <MudAvatar Variant="Variant.Filled">@nombre?.Substring(0, 1)</MudAvatar>
+        <div style="width: 30px"></div>
+        <MudText Typo="Typo.h5" Class="mt-1" Style="overflow-wrap: normal; max-width: 200px">@nombre</MudText>
+    </MudDrawerHeader>
+    <NavMenu></NavMenu>
+</MudDrawer>
+
+<style>
+    .mud-overlay {
+        display: none !important;
+    }
+</style>
+
+
+
     <MudMainContent>
         @Body
     </MudMainContent>

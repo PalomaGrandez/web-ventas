@@ -58,7 +58,9 @@ namespace Entradas.Server.Services.AuthService
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 FechaCreacion = DateTime.Now,
-                Rol = "Customer"
+                Rol = "Customer",
+                 TipoDocumento = request.TipoDocumento,
+                NumeroDocumento = request.NumeroDocumento
             };
 
             _context.Usuario.Add(usuario);
@@ -115,7 +117,9 @@ namespace Entradas.Server.Services.AuthService
                                             ApellidoMaterno = x.ApellidoMaterno,
                                             NombreUsuario = x.NombreUsuario,
                                             Email = x.Email,
-                                            FechaCreacion = x.FechaCreacion
+                                            FechaCreacion = x.FechaCreacion,
+                                            TipoDocuemnto = x.TipoDocumento,
+                                            NumeroDocumento = x.NumeroDocumento
                                         })
                                         .AsQueryable();
             int resultadosPorPagina = 10;
@@ -163,8 +167,10 @@ namespace Entradas.Server.Services.AuthService
 
             try
             {
+                // Check if login identifier is an email or username
                 var usuario = await _context.Usuario
-                    .FirstOrDefaultAsync(x => x.Email.ToLower() == request.Email.ToLower());
+                    .FirstOrDefaultAsync(x => x.Email.ToLower() == request.LoginIdentifier.ToLower() ||
+                                              x.NombreUsuario.ToLower() == request.LoginIdentifier.ToLower());
 
                 if (usuario == null)
                 {
@@ -191,6 +197,7 @@ namespace Entradas.Server.Services.AuthService
 
             return response;
         }
+
 
         private static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {

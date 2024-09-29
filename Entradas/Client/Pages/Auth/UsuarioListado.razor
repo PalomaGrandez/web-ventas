@@ -56,6 +56,8 @@
                     <PropertyColumn Title="USUARIO" Property="x => x.NombreUsuario" />
                     <PropertyColumn Title="EMAIL" Property="x => x.Email" />
                     <PropertyColumn Title="FECHA CREACION" Property="x => x.FechaCreacion" />
+                   @*  <PropertyColumn Title="TIPO DOCUMENTO" Property="x => x.TipoDocuemnto" />
+                    <PropertyColumn Title="NUMERO DOCUMENTO" Property="x => x.NumeroDocumento" /> *@
                 </Columns>
                 <PagerContent>
                     @if (AuthService.PaginasTotales > 1)

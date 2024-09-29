@@ -4,6 +4,7 @@
 @inject ISnackbar Snackbar
 @inject IAuthService AuthService
 
+
 <PageTitle>Carrito de Compras</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-10">
@@ -24,11 +25,11 @@
                     <MudTh>ELIMINAR</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="IMAGEN">
+                    <MudTd DataLabel="CARTA">
     <MudImage Src="@detalleContext.Imagen" Alt="@detalleContext.NombreEvento" Style="max-width:50px; height:auto;" />
 </MudTd>
                     <MudTd DataLabel="FECHA">@detalleContext.NombreEvento</MudTd>
-                    <MudTd DataLabel="TIPO DE INTRUMENTO">@detalleContext.EntradaTipo</MudTd>
+                    <MudTd DataLabel="CONDICION">@detalleContext.EntradaTipo</MudTd>
                     <MudTd DataLabel="PRECIO">@detalleContext.PrecioRegular</MudTd>
                     <MudTd DataLabel="CANTIDAD">
                         <div class="d-flex align-items-center">
@@ -49,7 +50,9 @@
                 </RowTemplate>
                 <FooterContent>
                     <MudTd colspan="3" Style="align-content:end"><MudText Typo="Typo.h6">TOTAL GENERAL:</MudText> </MudTd>
-                    <MudTd Style="align-content:end"><MudText Typo="Typo.h6">S/.@ordenDetalle.Sum(pd => pd.Cantidad * pd.PrecioRegular)</MudText></MudTd>
+                    <MudTd Style="align-content:end">
+                        <MudText Typo="Typo.h6">S/.@ordenDetalle.Sum(pd => pd.Cantidad * pd.PrecioRegular)</MudText>
+                    </MudTd>
                 </FooterContent>
             </MudTable>
         </MudCardContent>
@@ -85,10 +88,10 @@
                                        Variant="Variant.Filled"
                                        Color="Color.Error"
                                        OnClick="Cancelar"
-                                       StartIcon="@Icons.Material.Filled.Cancel"
+                                       StartIcon="@Icons.Material.Filled.ShoppingCart"
                                        FullWidth="true"
                                        Class="no-wrap">
-                                Cancelar
+                                Vaciar Carrito
                             </MudButton>
                         </MudItem>
                         <MudItem xs="12" sm="4" md="3">
@@ -169,29 +172,60 @@
             return;
         }
 
-        // Calcular el total de la orden y convertirlo a entero
-        var totalOrden = (int)(ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular));
+        // Calcular el total de la orden manteniendo el valor decimal
+        var totalOrden = ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular);
+
+        // Formatear el totalOrden con punto decimal
+        var totalOrdenFormateado = totalOrden.ToString("F2", CultureInfo.InvariantCulture);
 
         // Navegar a la pantalla de confirmación de compra pasando el monto total como parámetro
-        NavigationManager.NavigateTo($"/usuario/completar-compra/{totalOrden}");
+        NavigationManager.NavigateTo($"/usuario/completar-compra/{totalOrdenFormateado}");
     }
+
 
 
     private void GoToHome() { NavigationManager.NavigateTo("/"); }
 
-    private void AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
+    private async Task AumentarCantidad(OrdenDetalleRegistroDto detalleContext)
     {
+        // Busca el item actual en el carrito
         var item = ordenDetalle.FirstOrDefault(d => d.EventoId == detalleContext.EventoId &&
                                                     d.EventoEntradaId == detalleContext.EventoEntradaId &&
                                                     d.EventoFechaId == detalleContext.EventoFechaId);
-        if (item != null && item.Cantidad < 10)
+
+        // Verifica si el EventoEntradaId es válido
+        if (detalleContext.EventoEntradaId.HasValue)
         {
-            item.Cantidad++;
-            item.PrecioTotal = item.PrecioRegular * item.Cantidad;
-            OrdenService.AgregarItemLocal(item);  // Esta línea asegura que se guarde la cantidad actualizada
-            StateHasChanged();
+            // Obtiene el evento y la capacidad disponible
+            var evento = await OrdenService.ObtenerEventoEntradaDisponible(detalleContext.EventoEntradaId.Value);
+
+            // Verifica si la cantidad actual en el carrito es menor a la capacidad disponible y si el cliente no ha excedido el límite de 10
+            if (item.Cantidad < evento.Capacidad && item.Cantidad < 10)
+            {
+                item.Cantidad++;
+                item.PrecioTotal = item.PrecioRegular * item.Cantidad;
+                await OrdenService.AgregarItemLocal(item);  // Actualizar en el almacenamiento local
+                StateHasChanged();
+            }
+            else if (item.Cantidad >= 10)
+            {
+                // Si ya se alcanzó el límite por cliente
+                Snackbar.Add("El límite por cliente es de 10 cartas.", Severity.Warning);
+            }
+            else
+            {
+                // Si no hay suficiente stock
+                Snackbar.Add("No hay suficiente stock disponible para esta carta.", Severity.Error);
+            }
+        }
+        else
+        {
+            Snackbar.Add("El ID de la carta es inválido.", Severity.Error);
         }
     }
+
+
+
 
 
     private void DisminuirCantidad(OrdenDetalleRegistroDto detalleContext)
@@ -211,7 +245,16 @@
     private async Task CargarOrdenLocal()
     {
         ordenDetalle = await OrdenService.ObtenerOrdenDetalleLocal();
+
+        // Recorrer cada detalle de la orden y mostrar Id y Monto
+        foreach (var detalle in ordenDetalle)
+        {
+            Console.WriteLine($"EventoEntradaId: {detalle.EventoEntradaId}, Monto: {detalle.Cantidad}; EntradaTipo : {detalle.EntradaTipo}; PrecioTotal: {detalle.PrecioTotal}; Cantidad:{detalle.Cantidad}");
+            
+        }
     }
+
+
 
     public async Task RemoverItemLocal(int eventoId, int eventoEntradaId)
     {
@@ -223,6 +266,8 @@
     private async Task Cancelar()
     {
         await OrdenService.LimpiarItemLocal();
+        Snackbar.Add("El carrito se ha vaciado exitosamente.", Severity.Success);
         NavigationManager.NavigateTo("/");
+
     }
 }

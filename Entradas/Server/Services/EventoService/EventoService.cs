@@ -130,6 +130,98 @@ namespace Entradas.Server.Services.EventoService
             }
         }
 
+
+
+        public async Task<ServiceResponse<EventoEntrada>> ObtenerEventoEntradaDisponible(int eventoEntradaId)
+        {
+            var eventoEntrada = await _context.EventoEntrada.FirstOrDefaultAsync(e => e.EventoEntradaId == eventoEntradaId);
+
+            if (eventoEntrada == null)
+            {
+                return new ServiceResponse<EventoEntrada>
+                {
+                    Success = false,
+                    Message = "Evento no encontrado"
+                };
+            }
+
+            return new ServiceResponse<EventoEntrada>
+            {
+                Data = eventoEntrada,
+                Success = true
+            };
+        }
+
+        public async Task<ServiceResponse<int>> ReducirCapacidadEvento(List<EventoEntradaCompraDto> entradasCompradas)
+        {
+            var response = new ServiceResponse<int>();
+
+            foreach (var entrada in entradasCompradas)
+            {
+                // Obtener la entrada específica por su ID en EventoEntrada
+                var eventoEntrada = await _context.EventoEntrada.FirstOrDefaultAsync(e => e.EventoEntradaId == entrada.EventoEntradaId);
+                if (eventoEntrada == null)
+                {
+                    response.Success = false;
+                    response.Message = $"Evento entrada con ID {entrada.EventoEntradaId} no encontrada.";
+                    return response;
+                }
+
+                // Verificar si hay suficiente capacidad en la categoría de entrada específica
+                if (eventoEntrada.Capacidad < entrada.CantidadComprada)
+                {
+                    response.Success = false;
+                    response.Message = $"No hay suficiente capacidad disponible para la entrada con ID {entrada.EventoEntradaId}.";
+                    return response;
+                }
+
+                // Reducir la capacidad en la categoría de entrada específica
+                eventoEntrada.Capacidad -= entrada.CantidadComprada;
+
+                // Obtener el evento asociado para actualizar su capacidad total
+                var evento = await _context.Evento.FirstOrDefaultAsync(e => e.EventoId == eventoEntrada.EventoId);
+                if (evento == null)
+                {
+                    response.Success = false;
+                    response.Message = $"Evento asociado con la entrada {entrada.EventoEntradaId} no encontrado.";
+                    return response;
+                }
+
+                // Validar que CapacidadTotal es suficiente en el evento (opcional)
+                if (evento.CapacidadTotal < entrada.CantidadComprada)
+                {
+                    response.Success = false;
+                    response.Message = $"Capacidad total insuficiente para el evento con ID {evento.EventoId}.";
+                    return response;
+                }
+
+                // Reducir la capacidad total del evento
+                evento.CapacidadTotal -= entrada.CantidadComprada;
+
+                // Actualizar ambas tablas
+                _context.EventoEntrada.Update(eventoEntrada);
+                _context.Evento.Update(evento);
+            }
+
+            // Guardar los cambios en la base de datos
+            try
+            {
+                await _context.SaveChangesAsync();
+                response.Success = true;
+                response.Message = "Capacidad actualizada correctamente para todas las entradas.";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error al guardar los cambios: {ex.Message}";
+            }
+
+            return response;
+        }
+
+
+
+
         public async Task<ServiceResponse<EventoPaginadoDto>> BuscarEventoPaginado(int pagina, string? nombre, string? informacion, string? ubicacion)
         {
             var response = new ServiceResponse<EventoPaginadoDto>();
@@ -286,4 +378,11 @@ namespace Entradas.Server.Services.EventoService
             };
         }
     }
+
+    public class EventoEntradaCompraDto
+    {
+        public int EventoEntradaId { get; set; }
+        public int CantidadComprada { get; set; }
+    }
+
 }

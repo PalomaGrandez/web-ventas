@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Entradas.Shared.Models;
-
 namespace Entradas.Shared.Data
+
 {
     public partial class DataContext : DbContext
     {
@@ -30,6 +30,7 @@ namespace Entradas.Shared.Data
         public virtual DbSet<Usuario> Usuario { get; set; }
         public virtual DbSet<VwOrden> VwOrden { get; set; }
         public virtual DbSet<VwOrdenTicket> VwOrdenTicket { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -242,6 +243,9 @@ namespace Entradas.Shared.Data
                     .HasMaxLength(100)
                     .IsUnicode(false);
             });
+
+           
+
 
             modelBuilder.Entity<VwOrdenTicket>(entity =>
             {

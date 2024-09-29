@@ -6,6 +6,8 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IDialogService DialogService
 @inject IAuthService AuthService
+@inject HttpClient HttpClient
+
 
 <PageTitle>Pago Completo</PageTitle>
 
@@ -58,23 +60,30 @@
     string nombre = "Invitado";
     string email = "Invitado";
     string apellido = "Invitado";
-    
+
     private void GoToHome()
     {
         NavigationManager.NavigateTo("/");
     }
 
     protected override async Task OnInitializedAsync()
-    {   
-         await CargarOrdenLocal();
-         await RealizarPedido();
-       
+    {
+        await CargarOrdenLocal();
+        await RealizarPedido();
+
     }
+
 
     private async Task CargarOrdenLocal()
     {
         ordenDetalle = await OrdenService.ObtenerOrdenDetalleLocal();
-        Console.WriteLine(ordenDetalle.Count);
+
+        // Recorrer cada detalle de la orden y mostrar Id y Monto
+        foreach (var detalle in ordenDetalle)
+        {
+            Console.WriteLine($"EventoEntradaId: {detalle.EventoEntradaId}, Monto: {detalle.Cantidad}; EntradaTipo : {detalle.EntradaTipo}; PrecioTotal: {detalle.PrecioTotal}; Cantidad:{detalle.Cantidad}");
+            Console.WriteLine(ordenDetalle.Count);
+        }
     }
 
     public Task OpenDialogAsync()
@@ -88,6 +97,27 @@
         return DialogService.ShowAsync<CustomDialog>(null, options);
     }
 
+    public async Task ReducirCapacidad(List<EventoEntradaCompraDto> entradasCompradas)
+    {
+        _guardando = true; // Muestra una señal de que el proceso está corriendo
+
+        // Llamar a la API para reducir la capacidad, enviando la lista de entradas compradas
+        var result = await HttpClient.PutAsJsonAsync("api/Evento/reducirCapacidad", entradasCompradas);
+
+        if (result.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Capacidad reducida correctamente", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Error al reducir la capacidad", Severity.Error);
+        }
+
+        _guardando = false; // Finaliza el proceso
+    }
+
+
+
     public async Task RealizarPedido()
     {
         _guardando = true;
@@ -98,33 +128,68 @@
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
             Snackbar.Add("La orden debe contener al menos un ítem", Severity.Error);
+            _guardando = false; // Detener la animación de guardado
             return;
         }
 
+        // Crear una nueva orden
         orden.FechaOrden = DateTime.Now;
         orden.Estado = EstadosOrden.REGISTRADO;
         orden.Items = ordenDetalle;
         orden.UsuarioId = userId;
         orden.PrecioTotal = (decimal)ordenDetalle.Sum(x => x.Cantidad * x.PrecioRegular);
 
+        // Registrar la orden en la API
         var response = await OrdenService.CreateOrden(orden);
+        if (!response.Success)
+        {
+            Snackbar.Add($"Ha sucedido un error al crear la orden: {response.Message}", Severity.Error);
+            _guardando = false;
+            return;
+        }
+
 
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
         if (response.Success)
         {
-            await OrdenService.LimpiarItemLocal();
-            _guardando = true;
+            // Crear una lista de entradas compradas a partir de 'ordenDetalle'
+            var entradasCompradas = ordenDetalle.Select(detalle => new EventoEntradaCompraDto
+                {
+                    EventoEntradaId = detalle.EventoEntradaId ?? 0,
+                    CantidadComprada = detalle.Cantidad
+                }).ToList();
 
-            //Snackbar.Add("Orden registrada exitosamente!", Severity.Success);
-            //await OpenDialogAsync();
-           // NavigationManager.NavigateTo("/confirmacion-compra");
+            // Agrega un log para verificar los datos que estás enviando
+            foreach (var entrada in entradasCompradas)
+            {
+                Console.WriteLine($"EventoEntradaId: {entrada.EventoEntradaId}, CantidadComprada: {entrada.CantidadComprada}");
+            }
+
+
+            // Llamar al método para reducir la capacidad enviando la lista
+            // await ReducirCapacidad(entradasCompradas);
+
+            // Mostrar un mensaje de éxito en lugar de navegar
+            Snackbar.Add("¡Pedido completado y capacidad reducida correctamente!", Severity.Success);
+
+            // Limpiar la orden local y finalizar el proceso
+            await OrdenService.LimpiarItemLocal();
         }
         else
         {
-            _guardando = true;
             Snackbar.Add($"Ha sucedido un error: {response.Message}", Severity.Error);
-           // NavigationManager.NavigateTo("/");
         }
+
+        _guardando = false;
     }
+
+
+
+    public class EventoEntradaCompraDto
+    {
+        public int EventoEntradaId { get; set; }
+        public int CantidadComprada { get; set; }
+    }
+
 
 }

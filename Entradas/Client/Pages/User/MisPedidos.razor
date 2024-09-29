@@ -1,10 +1,10 @@
 ﻿@page "/usuario/mis-pedidos"
 @inject IJSRuntime JS
-
 @inject IOrdenService OrdenService
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
 @inject AuthenticationStateProvider AuthStateProvider
+@inject IDialogService DialogService
 
 <PageTitle>@tituloPagina</PageTitle>
 
@@ -53,22 +53,20 @@
                             {
                                 <MudChip Size="Size.Medium" Color="Color.Info">@context.Item.Estado</MudChip>
                             }
-                            else if (context.Item.Estado.Equals("PROCESANDO"))
+                            else if (context.Item.Estado.Equals("PAGADO"))
                             {
                                 <MudChip Size="Size.Medium" Color="Color.Warning">@context.Item.Estado</MudChip>
                             }
-                            else if (context.Item.Estado.Equals("RECHAZADO"))
+                            else if (context.Item.Estado.Equals("EN PROCESO"))
                             {
-                                <MudChip Size="Size.Medium" Color="Color.Error">@context.Item.Estado</MudChip>
+                                <MudChip Size="Size.Medium" Color="Color.Warning">@context.Item.Estado</MudChip>
                             }
-                            else if (context.Item.Estado.Equals("ANULADO"))
+                            else if (context.Item.Estado.Equals("ENVIADO"))
                             {
-                                <MudChip Size="Size.Medium" Color="Color.Error">@context.Item.Estado</MudChip>
+                                <MudChip Size="Size.Medium" Color="Color.Warning">@context.Item.Estado</MudChip>
                             }
-                            else if (context.Item.Estado.Equals("APROBADO"))
-                            {
-                                <MudChip Size="Size.Medium" Color="Color.Success">@context.Item.Estado</MudChip>
-                            }
+
+
                         </CellTemplate>
                     </TemplateColumn>
                     <TemplateColumn Title="DETALLE">
@@ -81,6 +79,18 @@
                             </MudFab>
                         </CellTemplate>
                     </TemplateColumn>
+
+                    <TemplateColumn Title="TRACKING">
+                        <CellTemplate>
+                            <MudFab Size="Size.Medium"
+                                    StartIcon="@Icons.Material.Filled.Search"
+                                    Color="Color.Warning"
+                                    DisableElevation="true"
+                                    OnClick="() => AbrirTracking(context.Item.OrdenId)">
+                            </MudFab>
+                        </CellTemplate>
+                    </TemplateColumn>
+
                     @*  <TemplateColumn Title="TICKETS">
                     <CellTemplate>
                     <MudFab Size="Size.Medium"
@@ -109,7 +119,7 @@
     private int paginasTotales = 0;
     private int paginaActual = 1;
     private int userId;
-
+    private string estadoActual;
 
     string user = "Invitado";
     string nombre = "Invitado";
@@ -159,6 +169,23 @@
               await JS.InvokeVoidAsync("initCulqi", "btn_pagar");
       }
       }*/
+
+
+    private void AbrirTracking(int ordenId)
+    {
+        var ordenCorrespondiente = OrdenService.Ordenes.FirstOrDefault(o => o.OrdenId == ordenId);
+        if (ordenCorrespondiente != null)
+        {
+            estadoActual = ordenCorrespondiente.Estado;
+        }
+        else
+        {
+            estadoActual = "Estado no disponible";
+        }
+
+        // Mostrar el dialog con el estado
+        DialogService.Show<Tracking>("", new DialogParameters { { "Estado", estadoActual } });
+    }
 
     private async Task ValidarSesion()
     {

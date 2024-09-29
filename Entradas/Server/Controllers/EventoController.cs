@@ -1,5 +1,6 @@
 ﻿using Entradas.Server.Helpers;
 using Entradas.Shared.Models;
+using MudBlazor;
 
 namespace Entradas.Server.Controllers
 {
@@ -13,6 +14,8 @@ namespace Entradas.Server.Controllers
         {
             _eventoService = eventoService;
         }
+
+      
 
         [Authorize(Roles = Roles.ADMIN)]
         [HttpPost]
@@ -30,6 +33,33 @@ namespace Entradas.Server.Controllers
             var result = await _eventoService.GetEventos();
             return Ok(result);
         }
+
+        [HttpGet("ObtenerEventoEntradaDisponible/{eventoEntradaId}")]
+        public async Task<ActionResult<ServiceResponse<EventoEntrada>>> ObtenerEventoEntradaDisponible(int eventoEntradaId)
+        {
+            var result = await _eventoService.ObtenerEventoEntradaDisponible(eventoEntradaId);
+            return Ok(result);
+        }
+
+        [HttpPut("reducirCapacidad")]
+        public async Task<IActionResult> ReducirCapacidad([FromBody] List<EventoEntradaCompraDto> entradasCompradas)
+        {
+            var result = await _eventoService.ReducirCapacidadEvento(entradasCompradas);
+
+            if (result.Success)
+            {
+                // Registro de la información de cada evento y cantidad comprada
+                foreach (var entrada in entradasCompradas)
+                {
+                    Console.WriteLine($"EventoEntradaId: {entrada.EventoEntradaId}, CantidadComprada: {entrada.CantidadComprada}");
+                }
+
+                return Ok(result);
+            }
+
+            return BadRequest(result);
+        }
+
 
 
         [HttpGet]

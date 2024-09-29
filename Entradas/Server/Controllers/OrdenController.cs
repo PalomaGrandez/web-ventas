@@ -63,6 +63,8 @@ namespace Entradas.Server.Controllers
             return BadRequest(response);
         }
 
+
+
         [HttpGet]
         [Route("GetOrdenesPaginado")]
         public async Task<ActionResult<ServiceResponse<OrdenPaginadoDto>>> GetOrdenesPaginado([FromQuery] int pagina)
@@ -174,6 +176,24 @@ namespace Entradas.Server.Controllers
 
             return BadRequest(response);
         }
+
+
+
+        [HttpGet("getOrdenDetallePorOrdenId/{ordenId}")]
+        public async Task<IActionResult> GetOrdenDetallePorOrdenId(int ordenId)
+        {
+            var ordenDetalles = await _ordenService.GetOrdenDetallePorOrdenId(ordenId);
+            if (ordenDetalles == null || !ordenDetalles.Any())
+            {
+                return NotFound();
+            }
+            return Ok(ordenDetalles);
+        }
+
+
+
+
+
 
         [Authorize(Roles = Roles.CUSTOMER)]
         [HttpPut]

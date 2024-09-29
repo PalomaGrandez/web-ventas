@@ -1,0 +1,102 @@
+﻿@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public string Estado { get; set; }
+
+    private List<string> estadosTracking = new List<string>
+    {
+        "REGISTRADO",
+        "PAGADO",
+        "EN PROCESO",
+        "ENVIADO",
+        "ENTREGADO"
+    };
+
+    private DateTime fechaRecoleccion = DateTime.Now.AddDays(8); // Simula una fecha de recolección estimada
+
+    private void CerrarDialog() => MudDialog.Close();
+}
+
+<MudDialogContent>
+
+    <!-- Título en la parte superior y centrado -->
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4" Style="font-weight: bold; font-size: 1.5rem; font-family: 'Poppins', sans-serif; color: black;">Tracking del Pedido</MudText>
+    </MudItem>
+
+    <MudGrid Class="pa-4">
+        <!-- Columna de la lista de tracking con línea vertical -->
+        <MudItem xs="6" Class="d-flex justify-center align-center position-relative tracking-container">
+            <MudGrid Class="ml-2">
+                @foreach (var estado in estadosTracking)
+                {
+                    <MudItem xs="12" Class="mb-3 position-relative tracking-item">
+                        <MudChip Color="@((estado == Estado) ? Color.Success : Color.Primary)" 
+                                 Icon="@((estado == Estado) ? Icons.Material.Filled.Check : Icons.Material.Filled.Timeline)" 
+                                 Size="Size.Medium"
+                                 Class="tracking-chip">
+                            @estado
+                        </MudChip>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudItem>
+
+        <!-- Columna para el cuadro de fecha estimada de recolección -->
+        <MudItem xs="6" Class="d-flex justify-center align-center">
+            <MudPaper Elevation="4" Class="pa-6 ma-2" Style="background-color: #e5efe5; border-left: 4px solid #43a047; width: 100%; max-width: 400px;">
+                <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: bold; font-size: 1.3rem; font-family: 'Poppins', sans-serif; color: black;">Fecha estimada de recojo</MudText>
+                <MudText Typo="Typo.h3" Align="Align.Center" Style="font-weight: bold; font-size: 1rem; font-family: 'Poppins', sans-serif; color: black;">@fechaRecoleccion.ToString("dd MMMM yyyy")</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudDialogContent>
+
+<!-- Centrar el botón Cerrar -->
+<MudDialogActions Class="d-flex justify-center">
+    <MudButton OnClick="CerrarDialog" Color="Color.Primary" Class="ma-2">Cerrar</MudButton>
+</MudDialogActions>
+
+<style>
+    /* Mejorar espaciado y estilo de los chips */
+    .tracking-chip {
+        padding: 12px;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    /* Contenedor de la línea vertical */
+    .tracking-container {
+        position: relative;
+        padding-left: 20px; /* Mover la línea más hacia la izquierda */
+    }
+
+    /* Línea vertical que conecta los chips */
+    .tracking-container::before {
+        content: '';
+        position: absolute;
+        left: 45px; /* Ajustar la posición para moverla más a la izquierda */
+        top: 30px; /* Ajustar para que la línea no se salga hacia arriba */
+        bottom: 30px; /* Ajustar para que la línea no se salga hacia abajo */
+        width: 2px;
+        background-color: #4A4A8B; /* Color de la línea */
+    }
+
+    /* Alineación de los elementos */
+    .tracking-item {
+        position: relative;
+    }
+
+    /* Ajustar la línea para que no sobrepase los extremos */
+    .tracking-item:first-child::before {
+        top: 50%;
+    }
+
+    .tracking-item:last-child::before {
+        bottom: 50%;
+    }
+
+    /* Aumentar padding para hacer el recuadro más grande */
+    .pa-6 {
+        padding: 30px !important;
+    }
+</style>

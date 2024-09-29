@@ -13,9 +13,9 @@
         <MudGrid Justify="Justify.Center">
             <MudItem xs="12" sm="6" lg="6">
                 <MudCard Elevation="3">
-                    <MudCardHeader>
+                    <MudCardHeader Style="justify-content:center; text-align:center">
                         <CardHeaderContent>
-                            <MudText Typo="Typo.h6">Registrar Usuario</MudText>
+                            <MudText Style="font-weight: bold; font-family: 'Poppins', sans-serif; font-size:1.5rem; width: 100%;" Typo="Typo.h6">Registro de Usuario Nuevo</MudText>
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
@@ -29,6 +29,16 @@
                                       @bind-Value="usuarioDto!.NombreUsuario" For="@(() => usuarioDto!.NombreUsuario)" />
                         <MudTextField Label="Email" HelperText="Ingrese el email"
                                       @bind-Value="usuarioDto!.Email" For="@(() => usuarioDto!.Email)" />
+                        <MudSelect Label="Tipo de Documento" HelperText="Seleccione Tipo de Documento"
+                                   @bind-Value="usuarioDto.TipoDocumento">
+                            @foreach (var tipo in tiposDocumentos)
+                            {
+                                <MudSelectItem Value="@tipo">@tipo</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudTextField Label="Numero de Documento" HelperText="Ingrese su Numero de Documento"
+                                      @bind-Value="usuarioDto!.NumeroDocumento" For="@(() => usuarioDto!.NumeroDocumento)" />
                         <MudTextField Label="Contraseña"
                                       HelperText="Ingrese la contraseña"
                                       InputType="@PasswordInput"
@@ -128,6 +138,13 @@
         _guardando = false;
     }
 
+
+    private List<string> tiposDocumentos = new List<string>
+ {
+     "DNI",
+     "CE",
+     "Pasaporte",
+ };
 
     private void Cancelar()
     {

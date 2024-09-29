@@ -14,13 +14,82 @@ namespace Entradas.Server.Services.OrdenService
         {
             _context = context;
         }
+        //public async Task<ServiceResponse<int>> CreateOrden(OrdenRegistroDto dto)
+        //{
+        //    var response = new ServiceResponse<int>();
+
+        //    using (var transaction = await _context.Database.BeginTransactionAsync())
+        //    {
+        //        try
+        //        {
+        //            var items = new List<OrdenDetalle>();
+
+        //            foreach (var item in dto.Items)
+        //            {
+        //                // Obtener el stock actual para cada item en la orden
+        //                var entrada = await _context.EventoEntrada
+        //                    .FirstOrDefaultAsync(e => e.EventoEntradaId == item.EventoEntradaId);
+
+        //                if (entrada == null || entrada.Capacidad < item.Cantidad)
+        //                {
+        //                    throw new Exception($"Stock insuficiente para el item {item.EventoEntradaId}");
+        //                }
+
+        //                // Reducir el stock del item
+        //                entrada.Capacidad -= item.Cantidad;
+        //                _context.EventoEntrada.Update(entrada);
+        //                await _context.SaveChangesAsync();
+
+        //                var ordenDetalle = new OrdenDetalle
+        //                {
+        //                    EventoId = (int)item.EventoId!,
+        //                    EventoEntradaId = (int)item.EventoEntradaId!,
+        //                    EventoFechaId = (int)item.EventoFechaId!,
+        //                    Cantidad = (int)item.Cantidad,
+        //                    PrecioUnitario = (decimal)item.PrecioRegular,
+        //                    PrecioTotal = (decimal)item.PrecioTotal,
+        //                    FlagDescuento = false
+        //                };
+
+        //                items.Add(ordenDetalle);
+        //            }
+
+        //            // Crear la orden
+        //            var orden = OrdenMapper.ToEntity(dto);
+        //            orden.OrdenDetalle = items;
+
+        //            _context.Orden.Add(orden);
+        //            await _context.SaveChangesAsync();
+
+        //            // Confirmar la transacción
+        //            await transaction.CommitAsync();
+
+        //            // Devolver el ID de la orden creada
+        //            response.Data = orden.OrdenId;
+        //            response.Message = "Orden creada y stock actualizado exitosamente";
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // Revertir la transacción en caso de error
+        //            await transaction.RollbackAsync();
+        //            response.Data = 0;
+        //            response.Success = false;
+        //            response.Message = $"Error al crear la orden: {ex.Message}";
+        //        }
+
+        //        return response;
+        //    }
+        //}
+
         public async Task<ServiceResponse<int>> CreateOrden(OrdenRegistroDto dto)
         {
             var response = new ServiceResponse<int>();
 
             try
             {
+
                 var items = new List<OrdenDetalle>();
+                int totalCantidad = 0;
 
                 foreach (var item in dto.Items)
                 {
@@ -34,8 +103,30 @@ namespace Entradas.Server.Services.OrdenService
                         PrecioTotal = (decimal)item.PrecioTotal,
                         FlagDescuento = false
                     };
-
+                    var eventoEntrada = await _context.EventoEntrada.FirstOrDefaultAsync(e => e.EventoEntradaId == ordenDetalle.EventoEntradaId);
+                    if (eventoEntrada == null)
+                    {
+                        response.Data = 0;
+                        response.Success = false;
+                        response.Message = $"EventoEntrada con ID {ordenDetalle.EventoEntradaId} no encontrado.";
+                        return response;
+                    }
+                    //restar capacidad
+                    if (eventoEntrada.Capacidad >= ordenDetalle.Cantidad)
+                    {
+                        eventoEntrada.Capacidad -= ordenDetalle.Cantidad;
+                        //eventoEntrada.Capacidad = eventoEntrada.Capacidad - ordenDetalle.Cantidad;
+                    }
+                    else
+                    {
+                        response.Data = 0;
+                        response.Success = false;
+                        response.Message = $"Capacidad insuficiente para EventoEntrada ID {ordenDetalle.EventoEntradaId}.";
+                        return response;
+                    }
+                    totalCantidad += (int)ordenDetalle.Cantidad;
                     items.Add(ordenDetalle);
+
                 }
 
                 var orden = OrdenMapper.ToEntity(dto);
@@ -44,6 +135,33 @@ namespace Entradas.Server.Services.OrdenService
 
                 var result = _context.Orden.Add(orden);
                 var dbResult = await _context.SaveChangesAsync();
+
+                //Actualizar CapacidadTotal del Evento
+                var evento = await _context.Evento
+            .FirstOrDefaultAsync(e => e.EventoId == dto.Items[0].EventoId);
+
+                if (evento == null)
+                {
+                    response.Data = 0;
+                    response.Success = false;
+                    response.Message = $"Evento con ID {dto.Items[0].EventoId} no encontrado.";
+                    return response;
+                }
+
+                if (evento.CapacidadTotal >= totalCantidad)
+                {
+                    evento.CapacidadTotal -= totalCantidad;  // Restar la cantidad total de la orden
+                }
+                else
+                {
+                    response.Data = 0;
+                    response.Success = false;
+                    response.Message = $"Capacidad insuficiente para el Evento ID {dto.Items[0].EventoId}.";
+                    return response;
+                }
+
+                // Guardar los cambios en el Evento
+                await _context.SaveChangesAsync();
 
                 response.Data = result.Entity.OrdenId;
                 response.Message = result.ToString();
@@ -57,7 +175,8 @@ namespace Entradas.Server.Services.OrdenService
                 return response;
             }
         }
-        
+
+
         /*
         public async Task<ServiceResponse<FileStreamResult>> GenerarTicketPdf(int ordenTicketId)
         {
@@ -109,6 +228,8 @@ namespace Entradas.Server.Services.OrdenService
             return new FileStreamResult(stream, "application/pdf");
 
         }*/
+
+
 
         public async Task<ServiceResponse<int>> GenerarTickets(int ordenId)
         {
@@ -201,7 +322,10 @@ namespace Entradas.Server.Services.OrdenService
         }
 
 
-        public async Task<ServiceResponse<OrdenPaginadoDto>> GetOrdenesPaginado(int pagina)
+
+       
+
+    public async Task<ServiceResponse<OrdenPaginadoDto>> GetOrdenesPaginado(int pagina)
         {
             // Inicializar la respuesta del servicio
             ServiceResponse<OrdenPaginadoDto> response = new();
@@ -220,14 +344,27 @@ namespace Entradas.Server.Services.OrdenService
                 // Verificar si existen registros en la base de datos
                 if (registrosTotales > 0)
                 {
-                    // Obtener la lista de eventos paginados desde la base de datos
+                    // Obtener la lista de órdenes paginadas desde la base de datos e incluir la relación con Usuario
                     var ordenes = await _context.Orden
-                        .OrderBy(c => c.OrdenId)
+                        .Include(o => o.Usuario) // Incluir la relación con la tabla de usuarios
+                        .OrderByDescending(c => c.FechaOrden)
                         .Skip((pagina - 1) * (int)resultadosPorPagina)
                         .Take((int)resultadosPorPagina)
+                        .Select(o => new
+                        {
+                            OrdenId = o.OrdenId,
+                            FechaOrden = o.FechaOrden,
+                            PrecioTotal = o.PrecioTotal,
+                            Estado = o.Estado,
+                            MedioPago = o.MedioPago,
+                            TicketGenerado = o.TicketGenerado,
+                            // Extraer el nombre completo y correo del usuario
+                            NombreUsuario = $"{o.Usuario.Nombres} {o.Usuario.ApellidoPaterno} {o.Usuario.ApellidoMaterno}",
+                            CorreoUsuario = o.Usuario.Email
+                        })
                         .ToListAsync();
 
-                    // Verificar si se encontraron eventos
+                    // Verificar si se encontraron órdenes
                     if (ordenes == null || ordenes.Count == 0)
                     {
                         response.Success = false;
@@ -235,10 +372,24 @@ namespace Entradas.Server.Services.OrdenService
                     }
                     else
                     {
-                        // Crear el DTO para eventos paginados
+                        // Crear el DTO para órdenes paginadas
                         OrdenPaginadoDto ordenPaginadoDto = new()
                         {
-                            Ordenes = ordenes,
+                            // Mapea directamente la lista de objetos anónimos a la propiedad Ordenes
+                            Ordenes = ordenes.Select(o => new Orden
+                            {
+                                OrdenId = o.OrdenId,
+                                FechaOrden = o.FechaOrden,
+                                PrecioTotal = o.PrecioTotal,
+                                Estado = o.Estado,
+                                MedioPago = o.MedioPago,
+                                TicketGenerado = o.TicketGenerado,
+                                Usuario = new Usuario
+                                {
+                                    NombreUsuario = o.NombreUsuario,
+                                    Email = o.CorreoUsuario
+                                }
+                            }).ToList(),
                             PaginaActual = pagina,
                             Paginas = (int)cantidadPaginas,
                             RegistrosTotales = registrosTotales
@@ -250,7 +401,7 @@ namespace Entradas.Server.Services.OrdenService
                 }
                 else
                 {
-                    // No se encontraron eventos registrados
+                    // No se encontraron órdenes registradas
                     response.Success = false;
                     response.Message = "No se encontraron órdenes registradas.";
                 }
@@ -264,6 +415,7 @@ namespace Entradas.Server.Services.OrdenService
 
             return response;
         }
+
 
         public async Task<ServiceResponse<OrdenPaginadoDto>> GetOrdenesPorUsuario(int pagina, int usuarioId)
         {
@@ -289,7 +441,7 @@ namespace Entradas.Server.Services.OrdenService
                     // Obtener la lista de eventos paginados desde la base de datos
                     var ordenes = await _context.Orden
                         .Where(x => x.UsuarioId == usuarioId)
-                        .OrderByDescending(c => c.FechaOrden)
+                        .OrderBy(c => c.FechaOrden)
                         .Skip((pagina - 1) * (int)resultadosPorPagina)
                         .Take((int)resultadosPorPagina)
                         .ToListAsync();
@@ -376,23 +528,19 @@ namespace Entradas.Server.Services.OrdenService
                                         .Where(x => x.OrdenId == ordenId && x.UsuarioId == usuarioId)
                                         .ToListAsync();
 
-                // Verificar si se encontraron registros
                 if (orden.Any())
                 {
-                    // Si se encontraron registros, establecer el éxito en verdadero y asignar los datos
                     response.Success = true;
                     response.Data = orden;
                 }
                 else
                 {
-                    // Si no se encontraron registros, establecer el éxito en falso y asignar un mensaje
                     response.Success = false;
                     response.Message = "No se encontró la orden buscada.";
                 }
             }
             catch (Exception ex)
             {
-                // Manejar errores inesperados y asignar un mensaje de error
                 response.Success = false;
                 response.Message = "Ocurrió un error al obtener las órdenes. Detalles: " + ex.Message;
             }
@@ -527,6 +675,29 @@ namespace Entradas.Server.Services.OrdenService
         }
 
 
+
+        public async Task<List<OrdenDetalleRegistroDto>> GetOrdenDetallePorOrdenId(int ordenId)
+        {
+            var ordenDetalles = await _context.OrdenDetalle
+                .Where(o => o.OrdenId == ordenId)
+                .Select(o => new OrdenDetalleRegistroDto
+                {
+                    EventoId = o.EventoId,
+                    NombreEvento = o.Evento.Nombre,
+                    EntradaTipo = o.EventoEntrada.Tipo,
+                    Imagen = o.Evento.Imagen,
+                    PrecioRegular = o.PrecioUnitario ?? 0,
+                })
+                .ToListAsync();
+
+            return ordenDetalles;
+        }
+
+
+
+
+
+
         // Método asincrónico para actualizar una orden
         public async Task<ServiceResponse<int>> UpdateOrden(OrdenActualizarDto dto)
         {
@@ -544,6 +715,7 @@ namespace Entradas.Server.Services.OrdenService
                     Message = "Orden no encontrada."
                 };
             }
+
 
             // Actualizar los campos de la orden con los valores proporcionados en el DTO
             dbOrden.Estado = dto.Estado;
@@ -565,4 +737,5 @@ namespace Entradas.Server.Services.OrdenService
         }
 
     }
+
 }

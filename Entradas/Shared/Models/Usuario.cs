@@ -22,7 +22,9 @@ namespace Entradas.Shared.Models
         public byte[] PasswordSalt { get; set; }
         public DateTime? FechaCreacion { get; set; }
         public string Rol { get; set; }
-
+        public string TipoDocumento { get; set; }
+        public string NumeroDocumento { get; set; }
         public virtual ICollection<Orden> Orden { get; set; }
+
     }
 }

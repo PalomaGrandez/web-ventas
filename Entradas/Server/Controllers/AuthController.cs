@@ -38,6 +38,9 @@ namespace Entradas.Server.Controllers
         [Route("Registro")]
         public async Task<ActionResult<ServiceResponse<UsuarioRegistroDto>>> Registro(UsuarioRegistroDto request)
         {
+
+
+
             var response = await _authService.Registro(request);
             if (response.Success)
             {
@@ -51,6 +54,7 @@ namespace Entradas.Server.Controllers
             }
             return BadRequest(response);
         }
+
 
 
 
